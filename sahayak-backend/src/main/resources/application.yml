@@ -1,0 +1,42 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: sahayak-backend
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+# ─────────────────────────────────────────
+# AWS Configuration
+# ─────────────────────────────────────────
+aws:
+  region: ap-south-1
+  # For local dev: credentials come from ~/.aws/credentials (run `aws configure`)
+  # For EC2/Beanstalk: credentials come from the attached IAM role automatically
+  s3:
+    bucket: sahayak-prescriptions-temp
+  dynamodb:
+    table-name: sahayak-sessions
+  bedrock:
+    model-id: anthropic.claude-3-5-sonnet-20240620-v1:0
+
+# ─────────────────────────────────────────
+# App Feature Flags
+# ─────────────────────────────────────────
+sahayak:
+  # Set to true to use real AWS services, false = pure mock mode
+  use-real-aws: ${USE_REAL_AWS:false}
+  # Default language when none specified
+  default-language: hi-IN
+
+# ─────────────────────────────────────────
+# Logging
+# ─────────────────────────────────────────
+logging:
+  level:
+    com.sahayak: DEBUG
+    software.amazon.awssdk: WARN
+    org.springframework.web: INFO

@@ -1,0 +1,93 @@
+# ==============================
+# OS Files
+# ==============================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ==============================
+# IDE / Editor
+# ==============================
+.vscode/
+.idea/
+*.iml
+*.iws
+*.ipr
+.kiro/
+.project
+.classpath
+.settings/
+*.swp
+*.swo
+*~
+
+# ==============================
+# Node.js / Frontend
+# ==============================
+node_modules/
+dist/
+build/
+*.local
+.env
+.env.local
+.env.*.local
+.cache/
+.parcel-cache/
+
+# Vite
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ==============================
+# Java / Maven / Spring Boot
+# ==============================
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Compiled class files
+*.class
+
+# Package files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Virtual machine crash logs
+hs_err_pid*
+replay_pid*
+
+# Gradle (in case of future use)
+.gradle/
+build/
+
+# ==============================
+# Environment & Secrets
+# ==============================
+.env
+.env.*
+!.env.example
+application-local.yml
+application-local.properties
+
+# ==============================
+# Misc
+# ==============================
+*.bak
+*.tmp
+*.temp
+coverage/
+.nyc_output/
