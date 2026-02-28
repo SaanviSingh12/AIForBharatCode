@@ -1,0 +1,47 @@
+[
+  {
+    "brandName": "Crocin 500",
+    "genericName": "Paracetamol 500mg",
+    "dosage": "1 tablet twice daily after meals",
+    "brandPrice": 35,
+    "genericPrice": 8,
+    "savingsPercent": 77,
+    "savingsAmount": 27
+  },
+  {
+    "brandName": "Augmentin 625",
+    "genericName": "Amoxicillin + Clavulanic Acid 625mg",
+    "dosage": "1 tablet twice daily for 5 days",
+    "brandPrice": 180,
+    "genericPrice": 45,
+    "savingsPercent": 75,
+    "savingsAmount": 135
+  },
+  {
+    "brandName": "Omez 20",
+    "genericName": "Omeprazole 20mg",
+    "dosage": "1 capsule daily before breakfast",
+    "brandPrice": 95,
+    "genericPrice": 12,
+    "savingsPercent": 87,
+    "savingsAmount": 83
+  },
+  {
+    "brandName": "Metformin SR 500",
+    "genericName": "Metformin HCl 500mg",
+    "dosage": "1 tablet twice daily with meals",
+    "brandPrice": 75,
+    "genericPrice": 18,
+    "savingsPercent": 76,
+    "savingsAmount": 57
+  },
+  {
+    "brandName": "Amlodipine 5mg",
+    "genericName": "Amlodipine Besylate 5mg",
+    "dosage": "1 tablet once daily",
+    "brandPrice": 65,
+    "genericPrice": 9,
+    "savingsPercent": 86,
+    "savingsAmount": 56
+  }
+]

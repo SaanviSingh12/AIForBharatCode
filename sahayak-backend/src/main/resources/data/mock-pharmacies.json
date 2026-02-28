@@ -1,0 +1,47 @@
+[
+  {
+    "id": "ph1",
+    "name": "Jan Aushadhi Kendra - Sector 4",
+    "type": "jan-aushadhi",
+    "distance": 0.5,
+    "phone": "+91-9876543210",
+    "address": "Shop 12, Sector 4 Market, New Delhi - 110085",
+    "timings": "8 AM - 8 PM (Mon-Sat)"
+  },
+  {
+    "id": "ph2",
+    "name": "PMBJK - Civil Lines",
+    "type": "jan-aushadhi",
+    "distance": 1.1,
+    "phone": "+91-9876543211",
+    "address": "Block B, Civil Lines, New Delhi - 110054",
+    "timings": "7 AM - 9 PM (All Days)"
+  },
+  {
+    "id": "ph3",
+    "name": "Pradhan Mantri Janaushadhi Kendra - Model Town",
+    "type": "jan-aushadhi",
+    "distance": 2.4,
+    "phone": "+91-9876543215",
+    "address": "Model Town Market, New Delhi - 110009",
+    "timings": "9 AM - 7 PM (Mon-Sat)"
+  },
+  {
+    "id": "ph4",
+    "name": "MedPlus Pharmacy",
+    "type": "private",
+    "distance": 1.8,
+    "phone": "+91-9876543212",
+    "address": "Main Market, Connaught Place, New Delhi - 110001",
+    "timings": "24 Hours"
+  },
+  {
+    "id": "ph5",
+    "name": "Apollo Pharmacy",
+    "type": "private",
+    "distance": 2.1,
+    "phone": "+91-9876543213",
+    "address": "Karol Bagh, New Delhi - 110005",
+    "timings": "8 AM - 10 PM"
+  }
+]
