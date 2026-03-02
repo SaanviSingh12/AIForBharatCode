@@ -10,6 +10,7 @@ export const Home: React.FC = () => {
     const navigate = useNavigate();
     const { language, userProfile } = useApp();
     const t = getTranslations(language);
+    const enTranslations = getTranslations('en');
 
     const menuItems = [
         {
@@ -82,7 +83,11 @@ export const Home: React.FC = () => {
 
             {/* Main Menu */}
             <div className="px-6 mt-6">
-                <h2 className="font-semibold text-gray-900 mb-4">{t.services}</h2>
+                <h2 className="font-semibold text-gray-900 mb-1">{t.services}</h2>
+                {language !== 'en' && (
+                    <p className="text-xs text-gray-500 italic">Services</p>
+                )}
+                {language === 'en' && <div className="mb-3" />}
                 <div className="grid grid-cols-2 gap-4">
                     {menuItems.map((item, index) => (
                         <Card
@@ -94,6 +99,11 @@ export const Home: React.FC = () => {
                                 <item.icon className="w-7 h-7 text-white" />
                             </div>
                             <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
+                            {language !== 'en' && (
+                                <p className="text-xs text-gray-500 italic">
+                                    {['Symptom Entry', 'Find Doctor', 'Prescription', 'Profile'][index]}
+                                </p>
+                            )}
                             <p className="text-xs text-gray-600">{item.subtitle}</p>
                         </Card>
                     ))}
@@ -102,16 +112,26 @@ export const Home: React.FC = () => {
 
             {/* Government Schemes */}
             <div className="px-6 mt-6">
-                <h2 className="font-semibold text-gray-900 mb-4">{t.governmentSchemes}</h2>
+                <h2 className="font-semibold text-gray-900 mb-1">{t.governmentSchemes}</h2>
+                {language !== 'en' && (
+                    <p className="text-xs text-gray-500 italic">Government Schemes</p>
+                )}
+                {language === 'en' && <div className="mb-3" />}
                 <div className="space-y-3">
                     <Card className="p-4 bg-gradient-to-r from-orange-50 to-orange-100">
                         <h3 className="font-semibold text-orange-900 mb-1">{t.pmjayTitle}</h3>
+                        {language !== 'en' && (
+                            <p className="text-xs text-orange-600 italic">PM-JAY</p>
+                        )}
                         <p className="text-sm text-orange-800">
                             {t.pmjayDescription}
                         </p>
                     </Card>
                     <Card className="p-4 bg-gradient-to-r from-green-50 to-green-100">
                         <h3 className="font-semibold text-green-900 mb-1">{t.janAushadhiTitle}</h3>
+                        {language !== 'en' && (
+                            <p className="text-xs text-green-600 italic">Jan Aushadhi</p>
+                        )}
                         <p className="text-sm text-green-800">
                             {t.janAushadhiDescription}
                         </p>

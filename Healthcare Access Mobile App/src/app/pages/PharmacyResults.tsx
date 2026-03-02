@@ -64,9 +64,12 @@ export const PharmacyResults: React.FC = () => {
                         <ArrowLeft className="w-5 h-5" />
                     </Button>
                     <div>
-                        <h1 className="font-semibold text-lg">Nearby Pharmacies</h1>
+                        <h1 className="font-semibold text-lg">{t.nearbyPharmacies}</h1>
+                        {language !== 'en' && (
+                            <p className="text-xs text-gray-500 italic">Nearby Pharmacies</p>
+                        )}
                         {fromPrescription && prescription && (
-                            <p className="text-xs text-gray-600">Results for: {prescription}</p>
+                            <p className="text-xs text-gray-600">{t.resultsFor} {prescription}</p>
                         )}
                     </div>
                 </div>
@@ -107,9 +110,15 @@ export const PharmacyResults: React.FC = () => {
                 {/* Medicines */}
                 {fromPrescription && (
                     <div className="space-y-4 mb-6">
-                        <div className="flex items-center justify-between">
-                            <h2 className="font-semibold text-gray-900">Generic Medicine Prices</h2>
-                            <Badge className="bg-green-100 text-green-800">Save up to 85%</Badge>
+                        <div>
+                            <h2 className="font-semibold text-gray-900 mb-1">{t.genericMedicinePrices}</h2>
+                            {language !== 'en' && (
+                                <p className="text-xs text-gray-500 italic">Generic Medicine Prices</p>
+                            )}
+                            <div className="flex items-center justify-between">
+                                <div></div>
+                                <Badge className="bg-green-100 text-green-800">{t.saveUpTo85}</Badge>
+                            </div>
                         </div>
 
                         {(useApiData ? apiMedicines! : mockMedicines).map((medicine, idx) => (
@@ -128,26 +137,26 @@ export const PharmacyResults: React.FC = () => {
 
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="bg-red-50 rounded-lg p-3">
-                                        <p className="text-xs text-gray-600 mb-1">Branded</p>
+                                        <p className="text-xs text-gray-600 mb-1">{t.branded}</p>
                                         <p className="text-lg font-bold text-red-600">
                                             ₹{'brandPrice' in medicine ? medicine.brandPrice : medicine.brandedPrice}
                                         </p>
                                     </div>
                                     <div className="bg-green-50 rounded-lg p-3">
-                                        <p className="text-xs text-gray-600 mb-1">Generic (Jan Aushadhi)</p>
+                                        <p className="text-xs text-gray-600 mb-1">{t.genericJanAushadhi}</p>
                                         <p className="text-lg font-bold text-green-600">₹{medicine.genericPrice}</p>
                                     </div>
                                 </div>
 
                                 <div className="mt-3 bg-orange-50 rounded-lg p-2 text-center">
                                     <p className="text-sm text-orange-800">
-                                        💰 You save{' '}
+                                        💰 {t.youSave}{' '}
                                         <span className="font-bold">
                                             ₹{'savingsAmount' in medicine
                                                 ? medicine.savingsAmount
                                                 : (('brandPrice' in medicine ? medicine.brandPrice : medicine.brandedPrice) - medicine.genericPrice)}
                                         </span>{' '}
-                                        per pack
+                                        {t.perPack}
                                     </p>
                                 </div>
                             </Card>
@@ -159,13 +168,19 @@ export const PharmacyResults: React.FC = () => {
 
                 {/* Pharmacy List */}
                 <div>
-                    <div className="flex items-center justify-between mb-4">
-                        <h2 className="font-semibold text-gray-900">
-                            {displayPharmacies.length} pharmacies within 10 km
+                    <div>
+                        <h2 className="font-semibold text-gray-900 mb-1">
+                            {displayPharmacies.length} {t.pharmaciesWithin10km}
                         </h2>
-                        <p className="text-xs text-green-600">
-                            ✓ Jan Aushadhi prioritized
-                        </p>
+                        {language !== 'en' && (
+                            <p className="text-xs text-gray-500 italic">pharmacies within 10 km</p>
+                        )}
+                        <div className="flex items-center justify-between mb-4">
+                            <div></div>
+                            <p className="text-xs text-green-600">
+                                ✓ {t.janAushadhiPrioritized}
+                            </p>
+                        </div>
                     </div>
 
                     <div className="space-y-4">
@@ -213,9 +228,9 @@ export const PharmacyResults: React.FC = () => {
                                     {pharmacy.type === 'government' && (
                                         <div className="mt-3 bg-green-50 rounded-lg p-3">
                                             <p className="text-xs text-green-800">
-                                                ✓ Quality generic medicines available<br />
-                                                ✓ Up to 85% savings on medicines<br />
-                                                ✓ Part of PM Jan Aushadhi Scheme
+                                                ✓ {t.qualityGenericMedicines}<br />
+                                                ✓ {t.upTo85Savings}<br />
+                                                ✓ {t.partOfPMJanAushadhi}
                                             </p>
                                         </div>
                                     )}
@@ -238,10 +253,9 @@ export const PharmacyResults: React.FC = () => {
 
                 {/* Info Card */}
                 <Card className="p-4 bg-blue-50 border-blue-200">
-                    <h3 className="font-semibold text-blue-900 mb-2">ℹ️ About Jan Aushadhi Kendras</h3>
+                    <h3 className="font-semibold text-blue-900 mb-2">ℹ️ {t.aboutJanAushadhi}</h3>
                     <p className="text-sm text-blue-800">
-                        Jan Aushadhi Kendras are government pharmacies that provide quality generic medicines at affordable prices.
-                        These medicines are manufactured in government-approved facilities and meet all quality standards.
+                        {t.janAushadhiDescriptionLong}
                     </p>
                 </Card>
             </div>
