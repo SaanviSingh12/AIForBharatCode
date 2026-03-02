@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { Mic, MicOff, Send, ArrowLeft, AlertTriangle, Volume2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { translations } from '../data/mockData';
+import { useTranslation } from '../i18n';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Textarea } from '../components/ui/textarea';
@@ -12,7 +12,7 @@ import { analyzeSymptoms as apiAnalyzeSymptoms, playAudioResponse } from '../ser
 export const SymptomEntry: React.FC = () => {
   const navigate = useNavigate();
   const { language, setSymptoms, setTriageResult, setIsLoading, setApiError } = useApp();
-  const t = translations[language] || translations.en;
+  const t = useTranslation();
 
   const [isRecording, setIsRecording] = useState(false);
   const [symptomText, setSymptomText] = useState('');
@@ -124,14 +124,14 @@ export const SymptomEntry: React.FC = () => {
         <Button variant="ghost" size="icon" onClick={() => navigate('/home')}>
           <ArrowLeft className="w-5 h-5" />
         </Button>
-        <h1 className="font-semibold text-lg">{t.symptomEntry}</h1>
+        <h1 className="font-semibold text-lg">{t.symptom_title}</h1>
       </div>
 
       <div className="p-6 space-y-6">
         {/* Voice Input Section */}
         <Card className="p-6">
           <div className="flex flex-col items-center">
-            <p className="text-gray-700 mb-4 text-center">{t.speakSymptoms}</p>
+            <p className="text-gray-700 mb-4 text-center">{t.symptom_speak}</p>
             <button
               onClick={handleRecordToggle}
               className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${
@@ -147,16 +147,16 @@ export const SymptomEntry: React.FC = () => {
               )}
             </button>
             {isRecording && (
-              <p className="text-red-500 mt-3 animate-pulse">Recording... (tap to stop)</p>
+              <p className="text-red-500 mt-3 animate-pulse">{t.symptom_recording}</p>
             )}
           </div>
         </Card>
 
         {/* Text Input Section */}
         <Card className="p-6">
-          <p className="text-gray-700 mb-3">Or type your symptoms:</p>
+          <p className="text-gray-700 mb-3">{t.symptom_or_type}</p>
           <Textarea
-            placeholder={t.typeSymptoms}
+            placeholder={t.symptom_type_placeholder}
             value={symptomText}
             onChange={(e) => setSymptomText(e.target.value)}
             className="min-h-32 mb-3"
@@ -167,11 +167,11 @@ export const SymptomEntry: React.FC = () => {
             disabled={!symptomText.trim() || isAnalyzing}
           >
             {isAnalyzing ? (
-              <span>{t.analyzing}</span>
+              <span>{t.symptom_analyzing}</span>
             ) : (
               <>
                 <Send className="w-4 h-4 mr-2" />
-                Analyze Symptoms
+                {t.symptom_analyze}
               </>
             )}
           </Button>
@@ -185,7 +185,7 @@ export const SymptomEntry: React.FC = () => {
                 <AlertTriangle className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-blue-900 mb-2">AI Analysis</h3>
+                <h3 className="font-semibold text-blue-900 mb-2">{t.symptom_ai_analysis}</h3>
                 <p className="text-blue-800 text-sm">{aiResponse}</p>
               </div>
             </div>
@@ -198,7 +198,7 @@ export const SymptomEntry: React.FC = () => {
                 onClick={() => playAudioResponse(audioBase64)}
               >
                 <Volume2 className="w-4 h-4 mr-2" />
-                Play Audio Response
+                {t.symptom_play_audio}
               </Button>
             )}
 
@@ -206,7 +206,7 @@ export const SymptomEntry: React.FC = () => {
               onClick={handleFindDoctors}
               className="w-full mt-2 bg-blue-600 hover:bg-blue-700"
             >
-              {t.findDoctors}
+              {t.symptom_find_doctors}
             </Button>
           </Card>
         )}
@@ -216,7 +216,7 @@ export const SymptomEntry: React.FC = () => {
           <div className="flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-yellow-800">
-              If you are experiencing severe or life-threatening symptoms, please call emergency services immediately at{' '}
+              {t.symptom_emergency_warning}{' '}
               <span className="font-bold">108</span>
             </p>
           </div>

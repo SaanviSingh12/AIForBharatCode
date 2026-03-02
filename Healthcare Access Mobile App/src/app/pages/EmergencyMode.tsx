@@ -2,11 +2,13 @@ import React from 'react';
 import { useNavigate } from 'react-router';
 import { ArrowLeft, Phone, AlertTriangle, Ambulance, Heart, Shield, Flame, Users, Baby } from 'lucide-react';
 import { emergencyNumbers } from '../data/mockData';
+import { useTranslation } from '../i18n';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 
 export const EmergencyMode: React.FC = () => {
   const navigate = useNavigate();
+  const t = useTranslation();
 
   const handleCall = (number: string) => {
     window.location.href = `tel:${number}`;
@@ -48,8 +50,8 @@ export const EmergencyMode: React.FC = () => {
           <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
             <AlertTriangle className="w-12 h-12 text-white" />
           </div>
-          <h1 className="font-bold text-3xl mb-2">EMERGENCY MODE</h1>
-          <p className="text-red-100">आपातकालीन मोड</p>
+          <h1 className="font-bold text-3xl mb-2">{t.emergency_mode_title}</h1>
+          <p className="text-red-100">{t.emergency_mode_subtitle}</p>
         </div>
       </div>
 
@@ -57,14 +59,14 @@ export const EmergencyMode: React.FC = () => {
       <div className="px-4 mb-6">
         <Card className="bg-white/10 backdrop-blur-sm border-white/20 p-4">
           <p className="text-white text-center text-sm">
-            ⚠️ If you are experiencing a life-threatening emergency, call an ambulance immediately
+            {t.emergency_alert_msg}
           </p>
         </Card>
       </div>
 
       {/* Emergency Contacts */}
       <div className="px-4 pb-6 space-y-3">
-        <h2 className="font-semibold text-xl mb-4 text-center">Emergency Numbers</h2>
+        <h2 className="font-semibold text-xl mb-4 text-center">{t.emergency_numbers_title}</h2>
         
         {emergencyNumbers.map((emergency, index) => {
           const Icon = getIcon(emergency.icon);
@@ -88,7 +90,7 @@ export const EmergencyMode: React.FC = () => {
                   className="w-full bg-red-600 hover:bg-red-700 h-12 text-base"
                 >
                   <Phone className="w-5 h-5 mr-2" />
-                  CALL {emergency.number}
+                  {t.emergency_call_prefix} {emergency.number}
                 </Button>
               </div>
             </Card>
@@ -99,13 +101,13 @@ export const EmergencyMode: React.FC = () => {
       {/* Additional Information */}
       <div className="px-4 pb-8">
         <Card className="bg-white/10 backdrop-blur-sm border-white/20 p-4">
-          <h3 className="font-semibold text-white mb-3">Important Guidelines</h3>
+          <h3 className="font-semibold text-white mb-3">{t.emergency_guidelines_title}</h3>
           <ul className="space-y-2 text-sm text-red-100">
-            <li>• Stay calm and speak clearly when calling</li>
-            <li>• Provide your exact location</li>
-            <li>• Describe the emergency situation</li>
-            <li>• Follow the operator's instructions</li>
-            <li>• Don't hang up until told to do so</li>
+            <li>• {t.emergency_guideline_1}</li>
+            <li>• {t.emergency_guideline_2}</li>
+            <li>• {t.emergency_guideline_3}</li>
+            <li>• {t.emergency_guideline_4}</li>
+            <li>• {t.emergency_guideline_5}</li>
           </ul>
         </Card>
       </div>
@@ -116,10 +118,9 @@ export const EmergencyMode: React.FC = () => {
           <div className="flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="font-semibold mb-1">Medical Emergency Symptoms</p>
+              <p className="font-semibold mb-1">{t.emergency_symptoms_title}</p>
               <p className="text-sm">
-                Chest pain, difficulty breathing, severe bleeding, unconsciousness, 
-                stroke symptoms, severe burns, or suspected heart attack - Call 108 immediately!
+                {t.emergency_symptoms_desc}
               </p>
             </div>
           </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { ArrowLeft, Phone, MapPin, Building, Award, Calendar, Clock, Languages } from 'lucide-react';
 import { mockDoctors } from '../data/mockData';
+import { useTranslation } from '../i18n';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
@@ -9,12 +10,13 @@ import { Badge } from '../components/ui/badge';
 export const DoctorDetails: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const t = useTranslation();
   const doctor = mockDoctors.find(d => d.id === id);
 
   if (!doctor) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p>Doctor not found</p>
+        <p>{t.doctor_not_found}</p>
       </div>
     );
   }
@@ -56,7 +58,7 @@ export const DoctorDetails: React.FC = () => {
             <p className="text-blue-100 mb-2">{doctor.specialty}</p>
             <div className="flex items-center gap-2 text-sm">
               <MapPin className="w-4 h-4" />
-              <span>{doctor.distance} km away</span>
+              <span>{doctor.distance} {t.doctor_away}</span>
             </div>
           </div>
         </div>
@@ -66,9 +68,9 @@ export const DoctorDetails: React.FC = () => {
         {/* Type Badge */}
         <div className="flex justify-center">
           <Badge className={`${getDoctorTypeColor(doctor.type)} text-sm px-4 py-2`}>
-            {doctor.type === 'government' && '🏛️ Government Doctor'}
-            {doctor.type === 'independent' && '🏥 Independent Practice'}
-            {doctor.type === 'commercial' && '🏨 Commercial Hospital'}
+            {doctor.type === 'government' && t.doctor_govt_badge}
+            {doctor.type === 'independent' && t.doctor_independent_badge}
+            {doctor.type === 'commercial' && t.doctor_commercial_badge}
           </Badge>
         </div>
 
@@ -77,7 +79,7 @@ export const DoctorDetails: React.FC = () => {
           <div className="flex items-start gap-3">
             <Building className="w-5 h-5 text-gray-600 mt-1" />
             <div>
-              <p className="text-sm text-gray-600 mb-1">Address</p>
+              <p className="text-sm text-gray-600 mb-1">{t.doctor_address}</p>
               <p className="text-gray-900">{doctor.address}</p>
             </div>
           </div>
@@ -86,14 +88,14 @@ export const DoctorDetails: React.FC = () => {
             <Award className="w-5 h-5 text-gray-600 mt-1" />
             <div>
               <p className="text-sm text-gray-600 mb-1">Experience</p>
-              <p className="text-gray-900">{doctor.experience} years</p>
+              <p className="text-gray-900">{doctor.experience} {t.years}</p>
             </div>
           </div>
 
           <div className="flex items-start gap-3">
             <Languages className="w-5 h-5 text-gray-600 mt-1" />
             <div>
-              <p className="text-sm text-gray-600 mb-2">Languages Spoken</p>
+              <p className="text-sm text-gray-600 mb-2">{t.doctor_languages_spoken}</p>
               <div className="flex flex-wrap gap-2">
                 {doctor.languages.map((lang, idx) => (
                   <span
@@ -110,7 +112,7 @@ export const DoctorDetails: React.FC = () => {
           <div className="flex items-start gap-3">
             <Phone className="w-5 h-5 text-gray-600 mt-1" />
             <div>
-              <p className="text-sm text-gray-600 mb-1">Contact</p>
+              <p className="text-sm text-gray-600 mb-1">{t.doctor_contact}</p>
               <p className="text-gray-900 font-semibold">{doctor.phone}</p>
             </div>
           </div>
@@ -120,20 +122,20 @@ export const DoctorDetails: React.FC = () => {
         <Card className="p-6">
           <div className="flex items-center gap-2 mb-4">
             <Clock className="w-5 h-5 text-gray-600" />
-            <h3 className="font-semibold text-gray-900">Consultation Hours</h3>
+            <h3 className="font-semibold text-gray-900">{t.doctor_consultation_hours}</h3>
           </div>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-600">Monday - Friday</span>
+              <span className="text-gray-600">{t.doctor_mon_fri}</span>
               <span className="text-gray-900 font-semibold">9:00 AM - 5:00 PM</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Saturday</span>
+              <span className="text-gray-600">{t.doctor_saturday}</span>
               <span className="text-gray-900 font-semibold">9:00 AM - 1:00 PM</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Sunday</span>
-              <span className="text-red-600 font-semibold">Closed</span>
+              <span className="text-gray-600">{t.doctor_sunday}</span>
+              <span className="text-red-600 font-semibold">{t.doctor_closed}</span>
             </div>
           </div>
         </Card>
@@ -146,9 +148,9 @@ export const DoctorDetails: React.FC = () => {
                 <Award className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-orange-900 mb-1">PM-JAY Empanelled</h3>
+                <h3 className="font-semibold text-orange-900 mb-1">{t.doctor_pmjay_empanelled}</h3>
                 <p className="text-sm text-orange-800">
-                  Free consultation and treatment available under Ayushman Bharat scheme
+                  {t.doctor_pmjay_free_desc}
                 </p>
               </div>
             </div>
@@ -162,18 +164,18 @@ export const DoctorDetails: React.FC = () => {
             className="w-full bg-green-600 hover:bg-green-700 h-12 text-base"
           >
             <Phone className="w-5 h-5 mr-2" />
-            Call Doctor
+            {t.doctor_call}
           </Button>
           <Button
             variant="outline"
             className="w-full h-12 text-base"
             onClick={() => {
               // Mock booking functionality
-              alert('Booking functionality will be implemented with backend');
+              alert(t.doctor_booking_msg);
             }}
           >
             <Calendar className="w-5 h-5 mr-2" />
-            Book Appointment
+            {t.doctor_book_appointment}
           </Button>
         </div>
       </div>

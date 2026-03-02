@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { ArrowLeft, User, Calendar, Users, Phone, MapPin, Save, Edit, Heart, Award } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useTranslation } from '../i18n';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -11,6 +12,7 @@ import { BottomNav } from '../components/BottomNav';
 export const UserProfile: React.FC = () => {
   const navigate = useNavigate();
   const { userProfile, setUserProfile } = useApp();
+  const t = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(userProfile);
 
@@ -36,7 +38,7 @@ export const UserProfile: React.FC = () => {
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className="font-semibold text-lg">Profile</h1>
+          <h1 className="font-semibold text-lg">{t.profile_title}</h1>
           <Button
             variant="ghost"
             size="icon"
@@ -59,12 +61,12 @@ export const UserProfile: React.FC = () => {
       <div className="p-6 space-y-4">
         {/* Personal Information */}
         <Card className="p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Personal Information</h3>
+          <h3 className="font-semibold text-gray-900 mb-4">{t.profile_personal_info}</h3>
           
           {isEditing ? (
             <div className="space-y-4">
               <div>
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="name">{t.profile_full_name}</Label>
                 <Input
                   id="name"
                   value={formData.name}
@@ -73,7 +75,7 @@ export const UserProfile: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="age">Age</Label>
+                <Label htmlFor="age">{t.profile_age}</Label>
                 <Input
                   id="age"
                   value={formData.age}
@@ -82,7 +84,7 @@ export const UserProfile: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="gender">Gender</Label>
+                <Label htmlFor="gender">{t.profile_gender}</Label>
                 <Input
                   id="gender"
                   value={formData.gender}
@@ -95,7 +97,7 @@ export const UserProfile: React.FC = () => {
                 className="w-full bg-green-600 hover:bg-green-700"
               >
                 <Save className="w-4 h-4 mr-2" />
-                Save Changes
+                {t.profile_save_changes}
               </Button>
             </div>
           ) : (
@@ -103,21 +105,21 @@ export const UserProfile: React.FC = () => {
               <div className="flex items-center gap-3">
                 <User className="w-5 h-5 text-gray-600" />
                 <div>
-                  <p className="text-sm text-gray-600">Name</p>
+                  <p className="text-sm text-gray-600">{t.profile_name_label}</p>
                   <p className="text-gray-900 font-semibold">{userProfile.name}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Calendar className="w-5 h-5 text-gray-600" />
                 <div>
-                  <p className="text-sm text-gray-600">Age</p>
-                  <p className="text-gray-900 font-semibold">{userProfile.age} years</p>
+                  <p className="text-sm text-gray-600">{t.profile_age}</p>
+                  <p className="text-gray-900 font-semibold">{userProfile.age} {t.years}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Users className="w-5 h-5 text-gray-600" />
                 <div>
-                  <p className="text-sm text-gray-600">Gender</p>
+                  <p className="text-sm text-gray-600">{t.profile_gender}</p>
                   <p className="text-gray-900 font-semibold">{userProfile.gender}</p>
                 </div>
               </div>
@@ -127,19 +129,19 @@ export const UserProfile: React.FC = () => {
 
         {/* Contact Information (Mock) */}
         <Card className="p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Contact Information</h3>
+          <h3 className="font-semibold text-gray-900 mb-4">{t.profile_contact_info}</h3>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               <Phone className="w-5 h-5 text-gray-600" />
               <div>
-                <p className="text-sm text-gray-600">Phone Number</p>
+                <p className="text-sm text-gray-600">{t.profile_phone}</p>
                 <p className="text-gray-900 font-semibold">+91 98765 43210</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <MapPin className="w-5 h-5 text-gray-600" />
               <div>
-                <p className="text-sm text-gray-600">Location</p>
+                <p className="text-sm text-gray-600">{t.profile_location}</p>
                 <p className="text-gray-900 font-semibold">New Delhi, India</p>
               </div>
             </div>
@@ -153,17 +155,17 @@ export const UserProfile: React.FC = () => {
               <Award className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-orange-900 mb-1">PM-JAY Status</h3>
+              <h3 className="font-semibold text-orange-900 mb-1">{t.profile_pmjay_status}</h3>
               <p className="text-sm text-orange-800 mb-3">
-                Ayushman Bharat Health Card
+                {t.profile_health_card}
               </p>
               <div className="bg-white rounded-lg p-3">
                 <div className="flex justify-between mb-2">
-                  <span className="text-sm text-gray-600">Card Number</span>
+                  <span className="text-sm text-gray-600">{t.profile_card_number}</span>
                   <span className="text-sm font-semibold text-gray-900">1234-5678-9012</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Coverage</span>
+                  <span className="text-sm text-gray-600">{t.profile_coverage}</span>
                   <span className="text-sm font-semibold text-green-600">₹5,00,000</span>
                 </div>
               </div>
@@ -173,20 +175,20 @@ export const UserProfile: React.FC = () => {
 
         {/* Medical History (Mock) */}
         <Card className="p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Medical History</h3>
+          <h3 className="font-semibold text-gray-900 mb-4">{t.profile_medical_history}</h3>
           <div className="space-y-3">
             <div className="flex items-start gap-3 bg-blue-50 rounded-lg p-3">
               <Heart className="w-5 h-5 text-blue-600 mt-0.5" />
               <div>
-                <p className="text-sm font-semibold text-gray-900">Diabetes Type 2</p>
-                <p className="text-xs text-gray-600">Diagnosed: Jan 2023</p>
+                <p className="text-sm font-semibold text-gray-900">{t.profile_diabetes}</p>
+                <p className="text-xs text-gray-600">{t.profile_diabetes_date}</p>
               </div>
             </div>
             <div className="flex items-start gap-3 bg-blue-50 rounded-lg p-3">
               <Heart className="w-5 h-5 text-blue-600 mt-0.5" />
               <div>
-                <p className="text-sm font-semibold text-gray-900">Hypertension</p>
-                <p className="text-xs text-gray-600">Diagnosed: Mar 2022</p>
+                <p className="text-sm font-semibold text-gray-900">{t.profile_hypertension}</p>
+                <p className="text-xs text-gray-600">{t.profile_hypertension_date}</p>
               </div>
             </div>
           </div>
@@ -194,13 +196,13 @@ export const UserProfile: React.FC = () => {
 
         {/* App Settings */}
         <Card className="p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">App Settings</h3>
+          <h3 className="font-semibold text-gray-900 mb-4">{t.profile_app_settings}</h3>
           <Button
             variant="outline"
             className="w-full justify-start"
             onClick={() => navigate('/')}
           >
-            🌐 Change Language
+            {t.profile_change_language}
           </Button>
         </Card>
       </div>

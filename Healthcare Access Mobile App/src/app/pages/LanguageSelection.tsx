@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router';
 import { Globe, ChevronRight } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { languages } from '../data/mockData';
+import { getTranslations } from '../i18n';
 import { Card } from '../components/ui/card';
 
 export const LanguageSelection: React.FC = () => {
   const navigate = useNavigate();
   const { setLanguage } = useApp();
+  const t = getTranslations('en'); // Use English for language selection page
 
   const handleLanguageSelect = (langCode: string) => {
     setLanguage(langCode);
@@ -23,7 +25,7 @@ export const LanguageSelection: React.FC = () => {
             <Globe className="w-7 h-7 text-white" />
           </div>
           <div>
-            <h1 className="font-bold text-2xl text-gray-900">Sahayak</h1>
+            <h1 className="font-bold text-2xl text-gray-900">{t.app_name}</h1>
             <p className="text-sm text-gray-600">सहायक • Healthcare for All</p>
           </div>
         </div>
@@ -33,7 +35,7 @@ export const LanguageSelection: React.FC = () => {
       <div className="flex-1 p-6 overflow-y-auto">
         <div className="max-w-md mx-auto">
           <h2 className="text-xl font-semibold text-gray-900 mb-2 text-center">
-            Select Your Language
+            {t.lang_select_title}
           </h2>
           <p className="text-gray-600 text-center mb-6">
             अपनी भाषा चुनें • Choose Your Language
@@ -59,10 +61,10 @@ export const LanguageSelection: React.FC = () => {
 
           <div className="mt-8 bg-blue-50 rounded-xl p-4">
             <p className="text-sm text-gray-700 text-center">
-              Powered by PM-JAY & Jan Aushadhi Scheme
+              {t.lang_powered_by}
             </p>
             <p className="text-xs text-gray-600 text-center mt-1">
-              Ayushman Bharat Digital Mission
+              {t.lang_abdm}
             </p>
           </div>
         </div>

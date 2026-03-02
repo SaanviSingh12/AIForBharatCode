@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { ArrowLeft, Search, Phone, MapPin, Building, Award } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { translations, mockDoctors, Doctor } from '../data/mockData';
+import { mockDoctors, Doctor } from '../data/mockData';
+import { useTranslation } from '../i18n';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -13,7 +14,7 @@ import type { HospitalDto } from '../services/api';
 export const DoctorSearch: React.FC = () => {
   const navigate = useNavigate();
   const { language, triageResult } = useApp();
-  const t = translations[language] || translations.en;
+  const t = useTranslation();
 
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -53,9 +54,9 @@ export const DoctorSearch: React.FC = () => {
 
   const getDoctorTypeLabel = (type: Doctor['type']) => {
     switch (type) {
-      case 'government': return t.governmentDoctor;
-      case 'independent': return t.independentDoctor;
-      case 'commercial': return t.commercialDoctor;
+      case 'government': return t.doctor_government;
+      case 'independent': return t.doctor_independent;
+      case 'commercial': return t.doctor_commercial;
       default: return type;
     }
   };
@@ -85,14 +86,14 @@ export const DoctorSearch: React.FC = () => {
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className="font-semibold text-lg">{t.findDoctor}</h1>
+          <h1 className="font-semibold text-lg">{t.doctor_search_title}</h1>
         </div>
 
         {/* Search Bar */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <Input
-            placeholder={t.searchDoctors}
+            placeholder={t.doctor_search_placeholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -104,10 +105,10 @@ export const DoctorSearch: React.FC = () => {
       <div className="p-4 space-y-4">
         <div className="flex items-center justify-between">
           <p className="text-sm text-gray-600">
-            {filteredDoctors.length} doctors found
+            {filteredDoctors.length} {t.doctor_found_suffix}
           </p>
           <p className="text-xs text-green-600">
-            ✓ Government doctors prioritized
+            {t.doctor_govt_prioritized}
           </p>
         </div>
 
@@ -142,7 +143,7 @@ export const DoctorSearch: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-2 text-gray-600">
                   <Award className="w-4 h-4 flex-shrink-0" />
-                  <span>{doctor.experience} years experience</span>
+                  <span>{doctor.experience} {t.doctor_experience_suffix}</span>
                 </div>
               </div>
 

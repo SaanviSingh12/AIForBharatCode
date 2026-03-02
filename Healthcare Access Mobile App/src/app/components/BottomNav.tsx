@@ -1,17 +1,19 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router';
 import { Home, Heart, Stethoscope, Pill, User } from 'lucide-react';
+import { useTranslation } from '../i18n';
 
 export const BottomNav: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const t = useTranslation();
 
   const navItems = [
-    { path: '/home', icon: Home, label: 'Home' },
-    { path: '/symptom-entry', icon: Heart, label: 'Symptoms' },
-    { path: '/doctor-search', icon: Stethoscope, label: 'Doctors' },
-    { path: '/prescription-search', icon: Pill, label: 'Pharmacy' },
-    { path: '/profile', icon: User, label: 'Profile' },
+    { path: '/home', icon: Home, label: t.nav_home },
+    { path: '/symptom-entry', icon: Heart, label: t.nav_symptoms },
+    { path: '/doctor-search', icon: Stethoscope, label: t.nav_doctors },
+    { path: '/prescription-search', icon: Pill, label: t.nav_pharmacy },
+    { path: '/profile', icon: User, label: t.nav_profile },
   ];
 
   // Don't show on language selection or emergency mode
