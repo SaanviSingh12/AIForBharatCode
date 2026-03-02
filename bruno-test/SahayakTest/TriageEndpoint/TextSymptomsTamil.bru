@@ -1,0 +1,16 @@
+meta {
+  name: TextSymptomsTamil
+  type: http
+  seq: 10
+}
+
+post {
+  url: http://localhost:8080/api/v1/triage
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  directText: எனக்கு தலைவலி மற்றும் காய்ச்சல் உள்ளத
+  language: ta-IN
+}
