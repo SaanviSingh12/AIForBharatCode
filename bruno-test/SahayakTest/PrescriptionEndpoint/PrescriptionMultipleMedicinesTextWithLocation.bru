@@ -1,0 +1,18 @@
+meta {
+  name: PrescriptionMultipleMedicinesTextWithLocation
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/api/v1/prescriptionText
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  prescription: Dolo 650 - twice daily for fever
+  language: hi-IN
+  lat: 28.4595
+  lng: 77.0266
+}

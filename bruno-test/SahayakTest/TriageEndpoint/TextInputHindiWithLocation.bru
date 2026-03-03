@@ -1,0 +1,18 @@
+meta {
+  name: TextInputHindiWithLocation
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:8080/api/v1/triage
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  directText: मुझे सिरदर्द और बुखार है
+  language: hi-IN
+  lat: 28.4595
+  lng: 77.0266
+}

@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "SahayakTest",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

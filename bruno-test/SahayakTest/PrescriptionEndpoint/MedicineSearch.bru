@@ -1,0 +1,15 @@
+meta {
+  name: MedicineSearch
+  type: http
+  seq: 6
+}
+
+get {
+  url: http://localhost:8080/api/v1/prescription/medicineSearch?query=crocin
+  body: none
+  auth: none
+}
+
+params:query {
+  query: crocin
+}
