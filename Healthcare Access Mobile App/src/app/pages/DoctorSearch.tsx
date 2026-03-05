@@ -9,7 +9,7 @@ import { Card } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Skeleton } from '../components/ui/skeleton';
 import { useApp } from '../context/AppContext';
-import { Doctor, mockDoctors } from '../data/mockData';
+import type { Doctor } from '../data/mockData';
 import { getDoctors, type DoctorDto, type HospitalDto } from '../services/api';
 
 export const DoctorSearch: React.FC = () => {
@@ -72,15 +72,10 @@ export const DoctorSearch: React.FC = () => {
         }))
         : [];
 
-    // Priority: triage results > fetched API doctors > mock data
-    let apiDoctors: Doctor[];
-    if (triageDoctors.length > 0) {
-        apiDoctors = triageDoctors;
-    } else if (fetchedDoctors.length > 0) {
-        apiDoctors = fetchedDoctors;
-    } else {
-        apiDoctors = mockDoctors;
-    }
+    // Priority: triage results > fetched API doctors
+    const apiDoctors: Doctor[] = triageDoctors.length > 0
+        ? triageDoctors
+        : fetchedDoctors;
 
     const filteredDoctors = apiDoctors
         .filter(
@@ -164,6 +159,11 @@ export const DoctorSearch: React.FC = () => {
                             <Skeleton className="h-10 w-full mt-3" />
                         </Card>
                     ))
+                ) : filteredDoctors.length === 0 ? (
+                    <Card className="p-8 text-center">
+                        <p className="text-gray-500">{t.noResults}</p>
+                        <p className="text-sm text-gray-400 mt-1">{t.tryAgain}</p>
+                    </Card>
                 ) : (
                 filteredDoctors.map((doctor) => (
                     <Card key={doctor.id} className="overflow-hidden">

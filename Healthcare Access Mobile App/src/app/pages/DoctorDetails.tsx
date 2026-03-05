@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { ArrowLeft, Phone, MapPin, Building, Award, Calendar, Clock, Languages } from 'lucide-react';
-import { Doctor, mockDoctors } from '../data/mockData';
+import type { Doctor } from '../data/mockData';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
@@ -12,10 +12,8 @@ export const DoctorDetails: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const [doctor, setDoctor] = useState<Doctor | null>(
-    mockDoctors.find(d => d.id === id) || null
-  );
-  const [isLoading, setIsLoading] = useState(false);
+  const [doctor, setDoctor] = useState<Doctor | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!id) return;
