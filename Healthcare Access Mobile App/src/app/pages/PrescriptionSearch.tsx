@@ -7,7 +7,7 @@ import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { useApp } from '../context/AppContext';
-import { analyzePrescription as apiAnalyzePrescription } from '../services/api';
+import { analyzePrescription as apiAnalyzePrescription, analyzePrescriptionText } from '../services/api';
 
 export const PrescriptionSearch: React.FC = () => {
     const navigate = useNavigate();
@@ -55,10 +55,33 @@ export const PrescriptionSearch: React.FC = () => {
         }
     };
 
-    const handleTextSearch = () => {
-        if (searchText.trim()) {
+    const handleTextSearch = async () => {
+        if (!searchText.trim()) return;
+
+        setIsProcessing(true);
+        setIsLoading(true);
+        setErrorMsg(null);
+
+        try {
+            const result = await analyzePrescriptionText(searchText, language);
+            setPrescriptionResult(result);
+
+            if (result.success) {
+                setPrescription(searchText);
+                navigate('/pharmacy-results', { state: { fromPrescription: true } });
+            } else {
+                setErrorMsg(result.error || 'Failed to analyze medicines');
+            }
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : 'Network error';
+            setErrorMsg(msg);
+            setApiError(msg);
+            // Fallback: navigate with text-only data
             setPrescription(searchText);
             navigate('/pharmacy-results', { state: { fromPrescription: true } });
+        } finally {
+            setIsProcessing(false);
+            setIsLoading(false);
         }
     };
 
@@ -156,10 +179,13 @@ export const PrescriptionSearch: React.FC = () => {
                         <Button
                             onClick={handleTextSearch}
                             className="w-full bg-green-600 hover:bg-green-700"
-                            disabled={!searchText.trim()}
+                            disabled={!searchText.trim() || isProcessing}
                         >
-                            <Search className="w-4 h-4 mr-2" />
-                            {t.searchMedicines}
+                            {isProcessing ? (
+                                <span className="animate-pulse">{t.analyzing}</span>
+                            ) : (
+                                <><Search className="w-4 h-4 mr-2" />{t.searchMedicines}</>
+                            )}
                         </Button>
                     </div>
                 </Card>

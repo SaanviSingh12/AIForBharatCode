@@ -42,6 +42,23 @@ export interface PharmacyDto {
   timings: string;
 }
 
+export interface DoctorDto {
+  id: string;
+  name: string;
+  specialty: string;
+  type: string; // "government", "independent", "commercial"
+  distance: number;
+  available: boolean;
+  fee: number;
+  phone: string;
+  address: string;
+  pmjay: boolean;
+  rating: number;
+  waitTime: string;
+  experience: number;
+  languages: string[];
+}
+
 export interface TriageApiResponse {
   success: boolean;
   symptomText: string;
@@ -177,4 +194,151 @@ export function playAudioResponse(base64: string): void {
   } catch (err) {
     console.warn('Could not play audio response:', err);
   }
+}
+
+// ── Prescription text & search ────────────────
+
+/**
+ * POST /api/v1/prescriptionText
+ * Analyze prescription from text input (no image needed).
+ */
+export async function analyzePrescriptionText(
+  prescription: string,
+  language: string,
+  location: { lat?: string; lng?: string } = {}
+): Promise<PrescriptionApiResponse> {
+  const params = new URLSearchParams();
+  params.append('prescription', prescription);
+  params.append('language', mapLanguageCode(language));
+  if (location.lat) params.append('lat', location.lat);
+  if (location.lng) params.append('lng', location.lng);
+
+  const res = await fetch(`${API_BASE}/api/v1/prescriptionText`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params,
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Prescription text API error ${res.status}: ${text}`);
+  }
+
+  return res.json();
+}
+
+/**
+ * GET /api/v1/prescription/medicineSearch
+ * Search medicines by name/query.
+ */
+export async function searchMedicines(
+  query: string,
+  language: string
+): Promise<MedicineDto[]> {
+  const params = new URLSearchParams({ query, language: mapLanguageCode(language) });
+  const res = await fetch(`${API_BASE}/api/v1/prescription/medicineSearch?${params}`);
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Medicine search API error ${res.status}: ${text}`);
+  }
+
+  return res.json();
+}
+
+/**
+ * GET /api/v1/prescription/nearbyPharmacies
+ * Get nearby Jan Aushadhi Kendras / pharmacies.
+ */
+export async function getNearbyPharmacies(
+  location: { lat?: string; lng?: string } = {}
+): Promise<PharmacyDto[]> {
+  const params = new URLSearchParams();
+  if (location.lat) params.append('lat', location.lat);
+  if (location.lng) params.append('lng', location.lng);
+
+  const url = params.toString()
+    ? `${API_BASE}/api/v1/prescription/nearbyPharmacies?${params}`
+    : `${API_BASE}/api/v1/prescription/nearbyPharmacies`;
+
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Nearby pharmacies API error ${res.status}: ${text}`);
+  }
+
+  return res.json();
+}
+
+// ── Doctor endpoints ──────────────────────────
+
+/**
+ * GET /api/v1/doctors
+ * Get all doctors. Optional query/specialty filters.
+ */
+export async function getDoctors(
+  filters: { query?: string; specialty?: string } = {}
+): Promise<DoctorDto[]> {
+  const params = new URLSearchParams();
+  if (filters.query) params.append('query', filters.query);
+  if (filters.specialty) params.append('specialty', filters.specialty);
+
+  const url = params.toString()
+    ? `${API_BASE}/api/v1/doctors?${params}`
+    : `${API_BASE}/api/v1/doctors`;
+
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Doctors API error ${res.status}: ${text}`);
+  }
+
+  return res.json();
+}
+
+/**
+ * GET /api/v1/doctors/:id
+ * Get a single doctor by ID.
+ */
+export async function getDoctorById(id: string): Promise<DoctorDto> {
+  const res = await fetch(`${API_BASE}/api/v1/doctors/${encodeURIComponent(id)}`);
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Doctor detail API error ${res.status}: ${text}`);
+  }
+
+  return res.json();
+}
+
+/**
+ * GET /api/v1/doctors/government
+ * Get only government (PMJAY-eligible) doctors.
+ */
+export async function getGovernmentDoctors(): Promise<DoctorDto[]> {
+  const res = await fetch(`${API_BASE}/api/v1/doctors/government`);
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Government doctors API error ${res.status}: ${text}`);
+  }
+
+  return res.json();
+}
+
+/**
+ * GET /api/v1/doctors/specialty/:specialty
+ * Get doctors filtered by specialty.
+ */
+export async function getDoctorsBySpecialty(specialty: string): Promise<DoctorDto[]> {
+  const res = await fetch(`${API_BASE}/api/v1/doctors/specialty/${encodeURIComponent(specialty)}`);
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Doctors by specialty API error ${res.status}: ${text}`);
+  }
+
+  return res.json();
 }
