@@ -1,0 +1,213 @@
+import { AlertTriangle, CheckCircle2, Loader2, Mic, Search, Stethoscope, Volume2 } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
+import { getTranslations } from '../../i18n';
+import { Button } from '../components/ui/button';
+import { useApp } from '../context/AppContext';
+import { analyzeSymptoms as apiAnalyzeSymptoms, playAudioResponse } from '../services/api';
+
+type Step = {
+    label: string;
+    icon: React.ReactNode;
+    status: 'pending' | 'active' | 'done' | 'error';
+};
+
+export const SymptomAnalysis: React.FC = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { language, setSymptoms, setTriageResult, setIsLoading, setApiError, pendingAudioBlob, setPendingAudioBlob } = useApp();
+    const t = getTranslations(language);
+
+    const audioBlob: Blob | null = pendingAudioBlob;
+    const directText: string | null = (location.state as any)?.directText ?? null;
+
+    const [steps, setSteps] = useState<Step[]>([
+        { label: 'Receiving your input', icon: <Mic className="w-5 h-5" />, status: 'pending' },
+        { label: 'Analyzing symptoms with AI', icon: <Search className="w-5 h-5" />, status: 'pending' },
+        { label: 'Finding specialist & hospitals', icon: <Stethoscope className="w-5 h-5" />, status: 'pending' },
+    ]);
+    const [audioBase64, setAudioBase64] = useState<string | null>(null);
+    const [summary, setSummary] = useState<string | null>(null);
+    const [failed, setFailed] = useState(false);
+
+    const hasRun = useRef(false);
+
+    const updateStep = (index: number, status: Step['status']) => {
+        setSteps((prev) => prev.map((s, i) => (i === index ? { ...s, status } : s)));
+    };
+
+    useEffect(() => {
+        if (hasRun.current) return;
+        hasRun.current = true;
+
+        if (!audioBlob && !directText) {
+            navigate('/symptom-entry', { replace: true });
+            return;
+        }
+
+        // Clear the pending blob from context after capturing it
+        if (audioBlob) setPendingAudioBlob(null);
+
+        runAnalysis();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const runAnalysis = async () => {
+        setIsLoading(true);
+        setApiError(null);
+        setTriageResult(null);
+
+        if (directText) setSymptoms(directText);
+
+        // Step 1: Input received
+        updateStep(0, 'active');
+        await delay(600);
+        updateStep(0, 'done');
+
+        // Step 2: Analyzing
+        updateStep(1, 'active');
+
+        try {
+            // Run API call and minimum display time in parallel
+            const [result] = await Promise.all([
+                apiAnalyzeSymptoms(
+                    audioBlob,
+                    language,
+                    {},
+                    directText ?? undefined
+                ),
+                delay(2000), // ensure step 2 shows for at least 2 seconds
+            ]);
+
+            setTriageResult(result);
+            updateStep(1, 'done');
+
+            if (result.success) {
+                setSummary(result.responseText || result.summary || '');
+                if (result.audioBase64) setAudioBase64(result.audioBase64);
+
+                // Step 3: Finding specialists
+                updateStep(2, 'active');
+                await delay(800);
+                updateStep(2, 'done');
+
+                // Brief pause to let user see everything completed
+                await delay(1200);
+
+                if (result.isEmergency) {
+                    navigate('/emergency', { replace: true });
+                } else {
+                    navigate('/doctor-search', { replace: true, state: { fromSymptoms: true } });
+                }
+            } else {
+                updateStep(1, 'error');
+                setApiError(result.error || 'Analysis failed');
+                setFailed(true);
+            }
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : 'Network error';
+            updateStep(1, 'error');
+            setApiError(msg);
+
+            // Fallback: check emergency keywords client-side
+            if (directText) {
+                const emergencyKeywords = ['chest pain', 'difficulty breathing', 'unconscious', 'severe bleeding', 'heart attack', 'stroke'];
+                const isEmergency = emergencyKeywords.some((kw) => directText.toLowerCase().includes(kw));
+                if (isEmergency) {
+                    await delay(800);
+                    navigate('/emergency', { replace: true });
+                    return;
+                }
+            }
+            setFailed(true);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+    const stepIcon = (step: Step) => {
+        if (step.status === 'active') return <Loader2 className="w-5 h-5 animate-spin text-blue-500" />;
+        if (step.status === 'done') return <CheckCircle2 className="w-5 h-5 text-green-500" />;
+        if (step.status === 'error') return <AlertTriangle className="w-5 h-5 text-red-500" />;
+        return <span className="w-5 h-5 text-gray-300">{step.icon}</span>;
+    };
+
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex flex-col">
+            {/* Header */}
+            <div className="bg-white shadow-sm p-4">
+                <h1 className="font-semibold text-lg text-center">{t.analyzing || 'Analyzing...'}</h1>
+            </div>
+
+            <div className="flex-1 flex flex-col items-center justify-center px-6 py-10">
+                {/* Steps list */}
+                <div className="w-full max-w-sm space-y-4 mb-8">
+                    {steps.map((step, i) => (
+                        <div
+                            key={i}
+                            className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-500 ${
+                                step.status === 'active'
+                                    ? 'bg-blue-50 border border-blue-200 shadow-sm'
+                                    : step.status === 'done'
+                                    ? 'bg-green-50 border border-green-200'
+                                    : step.status === 'error'
+                                    ? 'bg-red-50 border border-red-200'
+                                    : 'bg-white border border-gray-100'
+                            }`}
+                        >
+                            {stepIcon(step)}
+                            <span
+                                className={`text-sm font-medium ${
+                                    step.status === 'active'
+                                        ? 'text-blue-700'
+                                        : step.status === 'done'
+                                        ? 'text-green-700'
+                                        : step.status === 'error'
+                                        ? 'text-red-700'
+                                        : 'text-gray-400'
+                                }`}
+                            >
+                                {step.label}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Summary + audio (shown briefly if available) */}
+                {summary && (
+                    <div className="w-full max-w-sm bg-white rounded-xl border border-gray-200 p-4 mb-4">
+                        <p className="text-sm text-gray-700">{summary}</p>
+                        {audioBase64 && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="mt-3"
+                                onClick={() => playAudioResponse(audioBase64)}
+                            >
+                                <Volume2 className="w-4 h-4 mr-2" />
+                                Play Audio Response
+                            </Button>
+                        )}
+                    </div>
+                )}
+
+                {/* Error state */}
+                {failed && (
+                    <div className="w-full max-w-sm space-y-3">
+                        <p className="text-sm text-red-600 text-center">
+                            Unable to complete analysis. Please try again.
+                        </p>
+                        <Button
+                            onClick={() => navigate('/symptom-entry', { replace: true })}
+                            className="w-full bg-gradient-to-r from-blue-600 to-green-600"
+                        >
+                            {t.retry || 'Retry'}
+                        </Button>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
