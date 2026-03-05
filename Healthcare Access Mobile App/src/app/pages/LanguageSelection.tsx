@@ -1,10 +1,9 @@
 import { ChevronRight, Globe } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router';
-import { getTranslations } from '../../i18n';
+import { getTranslations, languages } from '../../i18n';
 import { Card } from '../components/ui/card';
 import { useApp } from '../context/AppContext';
-import { languages } from '../data/mockData';
 
 export const LanguageSelection: React.FC = () => {
     const navigate = useNavigate();

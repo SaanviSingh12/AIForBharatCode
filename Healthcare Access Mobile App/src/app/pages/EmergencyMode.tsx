@@ -1,7 +1,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
 import { ArrowLeft, Phone, AlertTriangle, Ambulance, Heart, Shield, Flame, Users, Baby } from 'lucide-react';
-import { emergencyNumbers } from '../data/mockData';
+const emergencyNumbers = [
+    { name: 'Ambulance (National)', number: '108', icon: 'ambulance' },
+    { name: 'Medical Emergency', number: '102', icon: 'heart-pulse' },
+    { name: 'Police Emergency', number: '100', icon: 'shield' },
+    { name: 'Fire Emergency', number: '101', icon: 'flame' },
+    { name: 'Women Helpline', number: '1091', icon: 'users' },
+    { name: 'Child Helpline', number: '1098', icon: 'baby' },
+];
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 

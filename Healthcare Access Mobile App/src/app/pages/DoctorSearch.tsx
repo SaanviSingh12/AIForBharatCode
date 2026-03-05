@@ -1,5 +1,5 @@
 import { ArrowLeft, Award, Building, MapPin, Phone, Search } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { getTranslations } from '../../i18n';
 import { BottomNav } from '../components/BottomNav';
@@ -7,9 +7,10 @@ import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Input } from '../components/ui/input';
+import { Skeleton } from '../components/ui/skeleton';
 import { useApp } from '../context/AppContext';
-import { Doctor, mockDoctors } from '../data/mockData';
-import type { HospitalDto } from '../services/api';
+import type { Doctor } from '../data/mockData';
+import { getDoctors, type DoctorDto, type HospitalDto } from '../services/api';
 
 export const DoctorSearch: React.FC = () => {
     const navigate = useNavigate();
@@ -17,21 +18,53 @@ export const DoctorSearch: React.FC = () => {
     const t = getTranslations(language);
 
     const [searchQuery, setSearchQuery] = useState('');
+    const [fetchedDoctors, setFetchedDoctors] = useState<Doctor[]>([]);
+    const [isLoadingDoctors, setIsLoadingDoctors] = useState(false);
+
+    // Fetch doctors from API on mount
+    useEffect(() => {
+        let cancelled = false;
+        const fetchDocs = async () => {
+            setIsLoadingDoctors(true);
+            try {
+                const data: DoctorDto[] = await getDoctors();
+                if (!cancelled) {
+                    setFetchedDoctors(
+                        data.map((d) => ({
+                            id: d.id,
+                            name: d.name,
+                            specialty: d.specialty,
+                            type: d.type as Doctor['type'],
+                            distance: d.distance,
+                            phone: d.phone,
+                            address: d.address,
+                            experience: d.experience,
+                            languages: d.languages || [],
+                        }))
+                    );
+                }
+            } catch {
+                // Fall back to mock data silently
+            } finally {
+                if (!cancelled) setIsLoadingDoctors(false);
+            }
+        };
+        fetchDocs();
+        return () => { cancelled = true; };
+    }, []);
 
     // Use API results if available, otherwise fall back to mock data
     const apiHospitals = triageResult?.hospitals;
     const useApiData = apiHospitals && apiHospitals.length > 0;
 
     // Map HospitalDto → Doctor shape for the existing UI
-    const apiDoctors: Doctor[] = useApiData
+    const triageDoctors: Doctor[] = useApiData
         ? apiHospitals.map((h: HospitalDto) => ({
             id: h.id,
             name: h.name,
             specialty: h.specialist || 'General Physician',
-            type: h.type === 'government' ? 'government' : 'commercial',
+            type: h.type === 'government' ? 'government' as const : 'commercial' as const,
             distance: h.distance,
-            available: true,
-            fee: h.free ? 0 : (h.fee ?? 500),
             phone: h.phone,
             address: h.address,
             experience: 0,
@@ -40,7 +73,12 @@ export const DoctorSearch: React.FC = () => {
             rating: 4.2,
             waitTime: h.hasEmergency ? '15 min' : '30 min',
         }))
-        : mockDoctors;
+        : [];
+
+    // Priority: triage results > fetched API doctors
+    const apiDoctors: Doctor[] = triageDoctors.length > 0
+        ? triageDoctors
+        : fetchedDoctors;
 
     const filteredDoctors = apiDoctors
         .filter(
@@ -114,7 +152,23 @@ export const DoctorSearch: React.FC = () => {
                     </p>
                 </div>
 
-                {filteredDoctors.map((doctor) => (
+                {isLoadingDoctors ? (
+                    [1, 2, 3].map((i) => (
+                        <Card key={i} className="p-4">
+                            <Skeleton className="h-5 w-3/4 mb-3" />
+                            <Skeleton className="h-4 w-1/2 mb-2" />
+                            <Skeleton className="h-4 w-full mb-2" />
+                            <Skeleton className="h-4 w-2/3 mb-2" />
+                            <Skeleton className="h-10 w-full mt-3" />
+                        </Card>
+                    ))
+                ) : filteredDoctors.length === 0 ? (
+                    <Card className="p-8 text-center">
+                        <p className="text-gray-500">{t.noResults}</p>
+                        <p className="text-sm text-gray-400 mt-1">{t.tryAgain}</p>
+                    </Card>
+                ) : (
+                filteredDoctors.map((doctor) => (
                     <Card key={doctor.id} className="overflow-hidden">
                         <div
                             className="p-4 cursor-pointer"
@@ -180,7 +234,8 @@ export const DoctorSearch: React.FC = () => {
                             </Button>
                         </div>
                     </Card>
-                ))}
+                ))
+                )}
             </div>
 
             <BottomNav />
