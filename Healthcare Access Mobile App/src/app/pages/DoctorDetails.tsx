@@ -1,15 +1,60 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { ArrowLeft, Phone, MapPin, Building, Award, Calendar, Clock, Languages } from 'lucide-react';
-import { mockDoctors } from '../data/mockData';
+import type { Doctor } from '../data/mockData';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
+import { Skeleton } from '../components/ui/skeleton';
+import { getDoctorById, type DoctorDto } from '../services/api';
 
 export const DoctorDetails: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const doctor = mockDoctors.find(d => d.id === id);
+
+  const [doctor, setDoctor] = useState<Doctor | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) return;
+    let cancelled = false;
+    const fetchDoctor = async () => {
+      setIsLoading(true);
+      try {
+        const data: DoctorDto = await getDoctorById(id);
+        if (!cancelled) {
+          setDoctor({
+            id: data.id,
+            name: data.name,
+            specialty: data.specialty,
+            type: data.type as Doctor['type'],
+            distance: data.distance,
+            phone: data.phone,
+            address: data.address,
+            experience: data.experience,
+            languages: data.languages || [],
+          });
+        }
+      } catch {
+        // Keep mock data fallback
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+    fetchDoctor();
+    return () => { cancelled = true; };
+  }, [id]);
+
+  if (isLoading && !doctor) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 p-6 space-y-4">
+        <Skeleton className="h-40 w-full rounded-b-3xl" />
+        <Skeleton className="h-10 w-1/2 mx-auto" />
+        <Skeleton className="h-48 w-full" />
+        <Skeleton className="h-32 w-full" />
+      </div>
+    );
+  }
 
   if (!doctor) {
     return (
@@ -19,7 +64,7 @@ export const DoctorDetails: React.FC = () => {
     );
   }
 
-  const getDoctorTypeColor = (type: typeof doctor.type) => {
+  const getDoctorTypeColor = (type: Doctor['type']) => {
     switch (type) {
       case 'government':
         return 'bg-green-100 text-green-800 border-green-300';
