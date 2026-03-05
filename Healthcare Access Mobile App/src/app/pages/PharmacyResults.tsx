@@ -1,14 +1,15 @@
 import { ArrowLeft, Building2, Clock, MapPin, Phone, TrendingDown, Volume2 } from 'lucide-react';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { getTranslations } from '../../i18n';
 import { BottomNav } from '../components/BottomNav';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
+import { Skeleton } from '../components/ui/skeleton';
 import { useApp } from '../context/AppContext';
 import { mockMedicines, mockPharmacies, Pharmacy } from '../data/mockData';
-import { playAudioResponse } from '../services/api';
+import { getNearbyPharmacies, PharmacyDto, playAudioResponse } from '../services/api';
 
 export const PharmacyResults: React.FC = () => {
     const navigate = useNavigate();
@@ -18,28 +19,65 @@ export const PharmacyResults: React.FC = () => {
 
     const fromPrescription = location.state?.fromPrescription || false;
 
+    const [fetchedPharmacies, setFetchedPharmacies] = useState<Pharmacy[]>([]);
+    const [isLoadingPharmacies, setIsLoadingPharmacies] = useState(false);
+
     // Use API results if available
     const apiMedicines = prescriptionResult?.medicines;
     const apiPharmacies = prescriptionResult?.janAushadhiLocations;
     const useApiData = prescriptionResult?.success && apiMedicines && apiMedicines.length > 0;
 
-    // Map API pharmacy → Pharmacy shape for the existing UI
-    const displayPharmacies = useApiData && apiPharmacies
-        ? apiPharmacies.map((p) => ({
+    // Fetch pharmacies from API on mount
+    useEffect(() => {
+        let cancelled = false;
+        const fetchPharmacies = async () => {
+            setIsLoadingPharmacies(true);
+            try {
+                const data: PharmacyDto[] = await getNearbyPharmacies();
+                if (!cancelled) {
+                    setFetchedPharmacies(
+                        data.map((p) => ({
+                            id: p.id,
+                            name: p.name,
+                            type: p.type === 'jan-aushadhi' ? 'government' : (p.type as Pharmacy['type']),
+                            distance: p.distance,
+                            phone: p.phone,
+                            address: p.address,
+                            timings: p.timings,
+                        }))
+                    );
+                }
+            } catch {
+                // Silently fall back to mock data
+            } finally {
+                if (!cancelled) setIsLoadingPharmacies(false);
+            }
+        };
+        fetchPharmacies();
+        return () => { cancelled = true; };
+    }, []);
+
+    // Priority: prescription API pharmacies > fetched API pharmacies > mock data
+    let displayPharmacies: Pharmacy[];
+    if (useApiData && apiPharmacies && apiPharmacies.length > 0) {
+        displayPharmacies = apiPharmacies.map((p) => ({
             id: p.id,
             name: p.name,
-            type: p.type === 'jan-aushadhi' ? 'government' : 'private',
+            type: (p.type === 'jan-aushadhi' ? 'government' : p.type) as Pharmacy['type'],
             distance: p.distance,
             phone: p.phone,
             address: p.address,
             timings: p.timings,
-            hasDelivery: false,
-        } as Pharmacy))
-        : [...mockPharmacies].sort((a, b) => {
+        }));
+    } else if (fetchedPharmacies.length > 0) {
+        displayPharmacies = fetchedPharmacies;
+    } else {
+        displayPharmacies = [...mockPharmacies].sort((a, b) => {
             if (a.type === 'government' && b.type !== 'government') return -1;
             if (a.type !== 'government' && b.type === 'government') return 1;
             return a.distance - b.distance;
         });
+    }
 
     const handleCall = (phone: string) => {
         window.location.href = `tel:${phone}`;
@@ -129,7 +167,7 @@ export const PharmacyResults: React.FC = () => {
                                         <div className="flex items-center gap-2">
                                             <TrendingDown className="w-4 h-4 text-green-600" />
                                             <span className="text-sm text-green-600 font-semibold">
-                                                Save {medicine.savings}%
+                                                Save {'savingsPercent' in medicine ? medicine.savingsPercent : medicine.savings}%
                                             </span>
                                         </div>
                                     </div>
@@ -154,7 +192,9 @@ export const PharmacyResults: React.FC = () => {
                                         <span className="font-bold">
                                             ₹{'savingsAmount' in medicine
                                                 ? medicine.savingsAmount
-                                                : (('brandPrice' in medicine ? medicine.brandPrice : medicine.brandedPrice) - medicine.genericPrice)}
+                                                : ('brandedPrice' in medicine
+                                                    ? medicine.brandedPrice - medicine.genericPrice
+                                                    : 0)}
                                         </span>{' '}
                                         {t.perPack}
                                     </p>
@@ -183,6 +223,18 @@ export const PharmacyResults: React.FC = () => {
                         </div>
                     </div>
 
+                    {isLoadingPharmacies ? (
+                        <div className="space-y-4">
+                            {[1, 2, 3].map((i) => (
+                                <Card key={i} className="p-4">
+                                    <Skeleton className="h-5 w-3/4 mb-3" />
+                                    <Skeleton className="h-4 w-1/2 mb-2" />
+                                    <Skeleton className="h-4 w-full mb-2" />
+                                    <Skeleton className="h-10 w-full mt-3" />
+                                </Card>
+                            ))}
+                        </div>
+                    ) : (
                     <div className="space-y-4">
                         {displayPharmacies.map((pharmacy) => (
                             <Card key={pharmacy.id} className="overflow-hidden">
@@ -249,6 +301,7 @@ export const PharmacyResults: React.FC = () => {
                             </Card>
                         ))}
                     </div>
+                    )}
                 </div>
 
                 {/* Info Card */}
