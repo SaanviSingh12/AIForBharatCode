@@ -1,0 +1,15 @@
+meta {
+  name: Doctor Search Query
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:8080/api/v1/doctors?query=cardiologist
+  body: none
+  auth: none
+}
+
+params:query {
+  query: cardiologist
+}
