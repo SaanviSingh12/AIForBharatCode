@@ -1,0 +1,16 @@
+meta {
+  name: ENTSymptoms
+  type: http
+  seq: 9
+}
+
+post {
+  url: http://localhost:8080/api/v1/triage
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  directText: I have severe back pain and knee joint pain
+  language: en-IN
+}

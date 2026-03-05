@@ -1,0 +1,16 @@
+meta {
+  name: PrescriptionTextOnly
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8080/api/v1/prescriptionText
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  prescription: Tab. Paracetamol 500mg - twice daily
+  language: hi-IN
+}

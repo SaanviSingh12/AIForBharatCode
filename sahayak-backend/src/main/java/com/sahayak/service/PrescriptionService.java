@@ -114,6 +114,69 @@ public class PrescriptionService {
         }
     }
 
+    /**
+     * Analyze prescription text directly (no image upload required).
+     * Useful when prescription text is already extracted or provided as input.
+     *
+     * @param prescription The prescription text to analyze
+     * @param language     Language code (e.g., "hi-IN", "en-IN")
+     * @return PrescriptionResponse with medicines, pricing, and audio response
+     */
+    public PrescriptionResponse analyzePrescription(String prescription, String language) {
+        try {
+            String extractedText = prescription;
+            String lang = language != null ? language : "hi-IN";
+
+            // AI analysis for generic alternatives
+            Map<String, Object> medicineData = bedrockService.processMedicines(extractedText, lang);
+
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> medicinesList =
+                    (List<Map<String, Object>>) medicineData.getOrDefault("medicines", List.of());
+
+            List<MedicineDto> medicines = medicinesList.stream()
+                    .map(this::toMedicineDto)
+                    .toList();
+
+            int totalBrandCost = ((Number) medicineData.getOrDefault("totalBrandCost", 0)).intValue();
+            int totalGenericCost = ((Number) medicineData.getOrDefault("totalGenericCost", 0)).intValue();
+            int totalSavingsPercent = ((Number) medicineData.getOrDefault("totalSavingsPercent", 0)).intValue();
+            String responseText = (String) medicineData.getOrDefault("responseInLanguage", "");
+
+            // Jan Aushadhi locations
+            List<PharmacyDto> janAushadhiLocations = mockDataService.getPharmacies();
+
+            // Audio response
+            String audioBase64 = null;
+            try {
+                audioBase64 = pollyService.synthesize(responseText, lang);
+            } catch (Exception e) {
+                log.warn("Polly TTS failed: {}", e.getMessage());
+            }
+
+            return PrescriptionResponse.builder()
+                    .success(true)
+                    .extractedText(extractedText)
+                    .medicines(medicines)
+                    .totalBrandCost(totalBrandCost)
+                    .totalGenericCost(totalGenericCost)
+                    .totalSavingsPercent(totalSavingsPercent)
+                    .responseText(responseText)
+                    .audioBase64(audioBase64)
+                    .janAushadhiLocations(janAushadhiLocations)
+                    .build();
+
+        } catch (Exception e) {
+            log.error("PrescriptionService error (text input): {}", e.getMessage(), e);
+            return PrescriptionResponse.builder()
+                    .success(false)
+                    .error("Failed to process prescription: " + e.getMessage())
+                    .build();
+        }
+    }
+
+    
+
     private MedicineDto toMedicineDto(Map<String, Object> m) {
         int brandPrice = ((Number) m.getOrDefault("brandPrice", 0)).intValue();
         int genericPrice = ((Number) m.getOrDefault("genericPrice", 0)).intValue();
@@ -129,5 +192,116 @@ public class PrescriptionService {
                 .savingsPercent(((Number) m.getOrDefault("savingsPercent", savingsPercent)).intValue())
                 .savingsAmount(((Number) m.getOrDefault("savingsAmount", savingsAmount)).intValue())
                 .build();
+    }
+
+    public List<MedicineDto> searchMedicines(String query, String language) {
+        log.info("Searching medicines for query: {}, language: {}", query, language);
+        
+        // Mock medicine data for demonstration
+        List<MedicineDto> allMedicines = List.of(
+                MedicineDto.builder()
+                        .brandName("Crocin")
+                        .genericName("Paracetamol")
+                        .dosage("500mg")
+                        .brandPrice(30)
+                        .genericPrice(5)
+                        .savingsPercent(83)
+                        .savingsAmount(25)
+                        .build(),
+                MedicineDto.builder()
+                        .brandName("Dolo 650")
+                        .genericName("Paracetamol")
+                        .dosage("650mg")
+                        .brandPrice(35)
+                        .genericPrice(8)
+                        .savingsPercent(77)
+                        .savingsAmount(27)
+                        .build(),
+                MedicineDto.builder()
+                        .brandName("Augmentin")
+                        .genericName("Amoxicillin + Clavulanic Acid")
+                        .dosage("625mg")
+                        .brandPrice(180)
+                        .genericPrice(45)
+                        .savingsPercent(75)
+                        .savingsAmount(135)
+                        .build(),
+                MedicineDto.builder()
+                        .brandName("Azithral")
+                        .genericName("Azithromycin")
+                        .dosage("500mg")
+                        .brandPrice(120)
+                        .genericPrice(25)
+                        .savingsPercent(79)
+                        .savingsAmount(95)
+                        .build(),
+                MedicineDto.builder()
+                        .brandName("Pan D")
+                        .genericName("Pantoprazole + Domperidone")
+                        .dosage("40mg")
+                        .brandPrice(150)
+                        .genericPrice(30)
+                        .savingsPercent(80)
+                        .savingsAmount(120)
+                        .build(),
+                MedicineDto.builder()
+                        .brandName("Omez")
+                        .genericName("Omeprazole")
+                        .dosage("20mg")
+                        .brandPrice(85)
+                        .genericPrice(12)
+                        .savingsPercent(86)
+                        .savingsAmount(73)
+                        .build(),
+                MedicineDto.builder()
+                        .brandName("Combiflam")
+                        .genericName("Ibuprofen + Paracetamol")
+                        .dosage("400mg+325mg")
+                        .brandPrice(45)
+                        .genericPrice(10)
+                        .savingsPercent(78)
+                        .savingsAmount(35)
+                        .build(),
+                MedicineDto.builder()
+                        .brandName("Allegra")
+                        .genericName("Fexofenadine")
+                        .dosage("120mg")
+                        .brandPrice(180)
+                        .genericPrice(35)
+                        .savingsPercent(81)
+                        .savingsAmount(145)
+                        .build()
+        );
+
+        // Filter medicines based on query (case-insensitive search on brand/generic name)
+        String searchTerm = query.toLowerCase().trim();
+        return allMedicines.stream()
+                .filter(m -> m.getBrandName().toLowerCase().contains(searchTerm) ||
+                             m.getGenericName().toLowerCase().contains(searchTerm))
+                .toList();
+    }
+
+    public List<PharmacyDto> getNearbyPharmacies(String lat, String lng) {
+        log.info("Getting nearby pharmacies for lat: {}, lng: {}", lat, lng);
+        // In a real implementation, you'd call an external API (like Google Places) to get nearby pharmacies based on lat/lng.
+        // For this mock, we'll return a static list of pharmacies.
+
+        return List.of(
+                PharmacyDto.builder()
+                        .name("Jan Aushadhi Kendra - City Center")
+                        .address("123 Main St, City Center")
+                        .distance(0.5)
+                        .build(),
+                PharmacyDto.builder()
+                        .name("Jan Aushadhi Kendra - Market Road")
+                        .address("456 Market Rd, Downtown")
+                        .distance(1.2)
+                        .build(),
+                PharmacyDto.builder()
+                        .name("Jan Aushadhi Kendra - Near Hospital")
+                        .address("789 Health Ave, Medical District")
+                        .distance(2.0)
+                        .build()
+        );
     }
 }

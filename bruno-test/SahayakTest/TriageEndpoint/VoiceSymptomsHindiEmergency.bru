@@ -1,0 +1,18 @@
+meta {
+  name: VoiceSymptomsHindiEmergency
+  type: http
+  seq: 12
+}
+
+post {
+  url: http://localhost:8080/api/v1/triage
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  language: hi-IN
+  audio: @file(TriageEndpoint/test-data/SymptomRecordingHindi.wav)
+  lat: 28.4595
+  lng: 77.0266
+}
