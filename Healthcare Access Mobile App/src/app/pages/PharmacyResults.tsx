@@ -8,8 +8,8 @@ import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Skeleton } from '../components/ui/skeleton';
 import { useApp } from '../context/AppContext';
-import { mockMedicines, mockPharmacies, Pharmacy } from '../data/mockData';
-import { getNearbyPharmacies, PharmacyDto, playAudioResponse } from '../services/api';
+import type { Pharmacy } from '../data/mockData';
+import { getNearbyPharmacies, type MedicineDto, type PharmacyDto, playAudioResponse } from '../services/api';
 
 export const PharmacyResults: React.FC = () => {
     const navigate = useNavigate();
@@ -57,7 +57,7 @@ export const PharmacyResults: React.FC = () => {
         return () => { cancelled = true; };
     }, []);
 
-    // Priority: prescription API pharmacies > fetched API pharmacies > mock data
+    // Priority: prescription API pharmacies > fetched API pharmacies
     let displayPharmacies: Pharmacy[];
     if (useApiData && apiPharmacies && apiPharmacies.length > 0) {
         displayPharmacies = apiPharmacies.map((p) => ({
@@ -69,14 +69,8 @@ export const PharmacyResults: React.FC = () => {
             address: p.address,
             timings: p.timings,
         }));
-    } else if (fetchedPharmacies.length > 0) {
-        displayPharmacies = fetchedPharmacies;
     } else {
-        displayPharmacies = [...mockPharmacies].sort((a, b) => {
-            if (a.type === 'government' && b.type !== 'government') return -1;
-            if (a.type !== 'government' && b.type === 'government') return 1;
-            return a.distance - b.distance;
-        });
+        displayPharmacies = fetchedPharmacies;
     }
 
     const handleCall = (phone: string) => {
@@ -159,15 +153,15 @@ export const PharmacyResults: React.FC = () => {
                             </div>
                         </div>
 
-                        {(useApiData ? apiMedicines! : mockMedicines).map((medicine, idx) => (
-                            <Card key={'id' in medicine ? medicine.id : idx} className="p-4">
+                        {(apiMedicines ?? []).map((medicine: MedicineDto, idx: number) => (
+                            <Card key={medicine.brandName || idx} className="p-4">
                                 <div className="flex items-start justify-between mb-3">
                                     <div>
                                         <h3 className="font-semibold text-gray-900 mb-1">{medicine.genericName}</h3>
                                         <div className="flex items-center gap-2">
                                             <TrendingDown className="w-4 h-4 text-green-600" />
                                             <span className="text-sm text-green-600 font-semibold">
-                                                Save {'savingsPercent' in medicine ? medicine.savingsPercent : medicine.savings}%
+                                                Save {medicine.savingsPercent}%
                                             </span>
                                         </div>
                                     </div>
@@ -177,7 +171,7 @@ export const PharmacyResults: React.FC = () => {
                                     <div className="bg-red-50 rounded-lg p-3">
                                         <p className="text-xs text-gray-600 mb-1">{t.branded}</p>
                                         <p className="text-lg font-bold text-red-600">
-                                            ₹{'brandPrice' in medicine ? medicine.brandPrice : medicine.brandedPrice}
+                                            ₹{medicine.brandPrice}
                                         </p>
                                     </div>
                                     <div className="bg-green-50 rounded-lg p-3">
@@ -190,11 +184,7 @@ export const PharmacyResults: React.FC = () => {
                                     <p className="text-sm text-orange-800">
                                         💰 {t.youSave}{' '}
                                         <span className="font-bold">
-                                            ₹{'savingsAmount' in medicine
-                                                ? medicine.savingsAmount
-                                                : ('brandedPrice' in medicine
-                                                    ? medicine.brandedPrice - medicine.genericPrice
-                                                    : 0)}
+                                            ₹{medicine.savingsAmount}
                                         </span>{' '}
                                         {t.perPack}
                                     </p>
@@ -234,6 +224,11 @@ export const PharmacyResults: React.FC = () => {
                                 </Card>
                             ))}
                         </div>
+                    ) : displayPharmacies.length === 0 ? (
+                        <Card className="p-8 text-center">
+                            <p className="text-gray-500">{t.noResults}</p>
+                            <p className="text-sm text-gray-400 mt-1">{t.tryAgain}</p>
+                        </Card>
                     ) : (
                     <div className="space-y-4">
                         {displayPharmacies.map((pharmacy) => (

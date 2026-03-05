@@ -46,9 +46,6 @@ export const PrescriptionSearch: React.FC = () => {
             const msg = err instanceof Error ? err.message : 'Network error';
             setErrorMsg(msg);
             setApiError(msg);
-            // Fallback: still navigate with mock data
-            setPrescription(searchText || 'Prescription uploaded');
-            navigate('/pharmacy-results', { state: { fromPrescription: true } });
         } finally {
             setIsProcessing(false);
             setIsLoading(false);
@@ -76,9 +73,6 @@ export const PrescriptionSearch: React.FC = () => {
             const msg = err instanceof Error ? err.message : 'Network error';
             setErrorMsg(msg);
             setApiError(msg);
-            // Fallback: navigate with text-only data
-            setPrescription(searchText);
-            navigate('/pharmacy-results', { state: { fromPrescription: true } });
         } finally {
             setIsProcessing(false);
             setIsLoading(false);
