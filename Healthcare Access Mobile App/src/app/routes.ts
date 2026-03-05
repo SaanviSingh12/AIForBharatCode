@@ -2,6 +2,9 @@ import { createBrowserRouter } from "react-router";
 import { LanguageSelection } from "./pages/LanguageSelection";
 import { Home } from "./pages/Home";
 import { SymptomEntry } from "./pages/SymptomEntry";
+import { SymptomVoice } from "./pages/SymptomVoice";
+import { SymptomText } from "./pages/SymptomText";
+import { SymptomAnalysis } from "./pages/SymptomAnalysis";
 import { DoctorSearch } from "./pages/DoctorSearch";
 import { DoctorDetails } from "./pages/DoctorDetails";
 import { PrescriptionSearch } from "./pages/PrescriptionSearch";
@@ -21,6 +24,18 @@ export const router = createBrowserRouter([
   {
     path: "/symptom-entry",
     Component: SymptomEntry,
+  },
+  {
+    path: "/symptom-voice",
+    Component: SymptomVoice,
+  },
+  {
+    path: "/symptom-text",
+    Component: SymptomText,
+  },
+  {
+    path: "/symptom-analysis",
+    Component: SymptomAnalysis,
   },
   {
     path: "/doctor-search",

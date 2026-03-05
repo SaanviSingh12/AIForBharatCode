@@ -14,8 +14,9 @@ export const BottomNav: React.FC = () => {
     { path: '/profile', icon: User, label: 'Profile' },
   ];
 
-  // Don't show on language selection or emergency mode
-  if (location.pathname === '/' || location.pathname === '/emergency') {
+  // Don't show on language selection, emergency mode, or dedicated symptom sub-pages
+  const hiddenPaths = ['/', '/emergency', '/symptom-voice', '/symptom-text', '/symptom-analysis'];
+  if (hiddenPaths.includes(location.pathname)) {
     return null;
   }
 

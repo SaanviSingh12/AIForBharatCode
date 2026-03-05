@@ -69,6 +69,9 @@ export const DoctorSearch: React.FC = () => {
             address: h.address,
             experience: 0,
             languages: [],
+            pmjay: !!h.pmjayStatus,
+            rating: 4.2,
+            waitTime: h.hasEmergency ? '15 min' : '30 min',
         }))
         : [];
 
@@ -194,23 +197,27 @@ export const DoctorSearch: React.FC = () => {
                                     <Building className="w-4 h-4 mt-0.5 flex-shrink-0" />
                                     <span>{doctor.address}</span>
                                 </div>
-                                <div className="flex items-center gap-2 text-gray-600">
-                                    <Award className="w-4 h-4 flex-shrink-0" />
-                                    <span>{doctor.experience} years experience</span>
-                                </div>
+                                {doctor.experience > 0 && (
+                                    <div className="flex items-center gap-2 text-gray-600">
+                                        <Award className="w-4 h-4 flex-shrink-0" />
+                                        <span>{doctor.experience} years experience</span>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Languages */}
-                            <div className="flex flex-wrap gap-2 mt-3">
-                                {doctor.languages.map((lang, idx) => (
-                                    <span
-                                        key={idx}
-                                        className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded"
-                                    >
-                                        {lang}
-                                    </span>
-                                ))}
-                            </div>
+                            {doctor.languages && doctor.languages.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mt-3">
+                                    {doctor.languages.map((lang, idx) => (
+                                        <span
+                                            key={idx}
+                                            className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded"
+                                        >
+                                            {lang}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
                         {/* Call Button */}
