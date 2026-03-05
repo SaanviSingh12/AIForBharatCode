@@ -14,6 +14,9 @@ interface AppContextType {
   setSymptoms: (symptoms: string) => void;
   prescription: string;
   setPrescription: (prescription: string) => void;
+  // Pending audio blob for cross-page transfer (Blobs can't go through router state)
+  pendingAudioBlob: Blob | null;
+  setPendingAudioBlob: (blob: Blob | null) => void;
   // API results
   triageResult: TriageApiResponse | null;
   setTriageResult: (result: TriageApiResponse | null) => void;
@@ -36,6 +39,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   });
   const [symptoms, setSymptoms] = useState('');
   const [prescription, setPrescription] = useState('');
+  const [pendingAudioBlob, setPendingAudioBlob] = useState<Blob | null>(null);
   const [triageResult, setTriageResult] = useState<TriageApiResponse | null>(null);
   const [prescriptionResult, setPrescriptionResult] = useState<PrescriptionApiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -52,6 +56,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setSymptoms,
         prescription,
         setPrescription,
+        pendingAudioBlob,
+        setPendingAudioBlob,
         triageResult,
         setTriageResult,
         prescriptionResult,
