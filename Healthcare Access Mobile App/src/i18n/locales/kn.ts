@@ -10,6 +10,7 @@ export const kn: TranslationKeys = {
 
     // Symptom Entry
     speakSymptoms: 'ನಿಮ್ಮ ಲಕ್ಷಣಗಳನ್ನು ಹೇಳಿ',
+    typeYourSymptoms: 'ನಿಮ್ಮ ಲಕ್ಷಣಗಳನ್ನು ಟೈಪ್ ಮಾಡಿ',
     typeSymptoms: 'ಅಥವಾ ನಿಮ್ಮ ಲಕ್ಷಣಗಳನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ...',
     analyzing: 'ವಿಶ್ಲೇಷಿಸಲಾಗುತ್ತಿದೆ...',
     startRecording: 'ರೆಕಾರ್ಡಿಂಗ್ ಪ್ರಾರಂಭಿಸಲು ಟ್ಯಾಪ್ ಮಾಡಿ',

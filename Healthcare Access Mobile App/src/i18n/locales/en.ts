@@ -8,6 +8,7 @@ export const en = {
 
     // Symptom Entry
     speakSymptoms: 'Speak Your Symptoms',
+    typeYourSymptoms: 'Type Your Symptoms',
     typeSymptoms: 'Or type your symptoms here...',
     analyzing: 'Analyzing...',
     startRecording: 'Tap to Start Recording',

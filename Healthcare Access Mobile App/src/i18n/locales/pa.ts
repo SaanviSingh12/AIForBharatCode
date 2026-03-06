@@ -10,6 +10,7 @@ export const pa: TranslationKeys = {
 
     // Symptom Entry
     speakSymptoms: 'ਆਪਣੇ ਲੱਛਣ ਦੱਸੋ',
+    typeYourSymptoms: 'ਆਪਣੇ ਲੱਛਣ ਟਾਈਪ ਕਰੋ',
     typeSymptoms: 'ਜਾਂ ਆਪਣੇ ਲੱਛਣ ਇੱਥੇ ਟਾਈਪ ਕਰੋ...',
     analyzing: 'ਵਿਸ਼ਲੇਸ਼ਣ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...',
     startRecording: 'ਰਿਕਾਰਡਿੰਗ ਸ਼ੁਰੂ ਕਰਨ ਲਈ ਟੈਪ ਕਰੋ',

@@ -10,6 +10,7 @@ export const ta: TranslationKeys = {
 
     // Symptom Entry
     speakSymptoms: 'உங்கள் அறிகுறிகளைப் பேசுங்கள்',
+    typeYourSymptoms: 'உங்கள் அறிகுறிகளை தட்டச்சு செய்யவும்',
     typeSymptoms: 'அல்லது உங்கள் அறிகுறிகளை இங்கே தட்டச்சு செய்யவும்...',
     analyzing: 'பகுப்பாய்வு செய்கிறது...',
     startRecording: 'பதிவைத் தொடங்க தட்டவும்',

@@ -9,8 +9,7 @@ export const ml: TranslationKeys = {
     profile: 'പ്രൊഫൈൽ',
 
     // Symptom Entry
-    speakSymptoms: 'നിങ്ങളുടെ ലക്ഷണങ്ങൾ പറയുക',
-    typeSymptoms: 'അല്ലെങ്കിൽ നിങ്ങളുടെ ലക്ഷണങ്ങൾ ഇവിടെ ടൈപ്പ് ചെയ്യുക...',
+    speakSymptoms: 'നിങ്ങളുടെ ലക്ഷണങ്ങൾ പറയുക', typeYourSymptoms: 'നിങ്ങളുടെ ലക്ഷണങ്ങള്‍ ടൈപ്പ് ചെയ്യുക', typeSymptoms: 'അല്ലെങ്കിൽ നിങ്ങളുടെ ലക്ഷണങ്ങൾ ഇവിടെ ടൈപ്പ് ചെയ്യുക...',
     analyzing: 'വിശകലനം നടത്തുന്നു...',
     startRecording: 'റെക്കോർഡിംഗ് ആരംഭിക്കാൻ ടാപ്പ് ചെയ്യുക',
     recording: 'റെക്കോർഡിംഗ്... നിർത്താൻ ടാപ്പ് ചെയ്യുക',

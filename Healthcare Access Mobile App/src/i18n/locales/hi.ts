@@ -10,6 +10,7 @@ export const hi: TranslationKeys = {
 
     // Symptom Entry
     speakSymptoms: 'अपने लक्षण बोलें',
+    typeYourSymptoms: 'अपने लक्षण टाइप करें',
     typeSymptoms: 'या यहाँ अपने लक्षण टाइप करें...',
     analyzing: 'विश्लेषण हो रहा है...',
     startRecording: 'रिकॉर्डिंग शुरू करने के लिए टैप करें',
