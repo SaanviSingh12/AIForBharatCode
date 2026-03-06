@@ -10,6 +10,7 @@ export const gu: TranslationKeys = {
 
     // Symptom Entry
     speakSymptoms: 'તમારા લક્ષણો બોલો',
+    typeYourSymptoms: 'તમારા લક્ષણો લખો',
     typeSymptoms: 'અથવા તમારા લક્ષણો અહીં લખો...',
     analyzing: 'વિશ્લેષણ કરી રહ્યા છીએ...',
     startRecording: 'રેકોર્ડિંગ શરૂ કરવા ટેપ કરો',

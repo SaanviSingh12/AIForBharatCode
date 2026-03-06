@@ -61,7 +61,7 @@ export const UserProfile: React.FC = () => {
             <div className="p-6 space-y-4">
                 {/* Personal Information */}
                 <Card className="p-6">
-                    <h3 className="font-semibold text-gray-900 mb-1">{t.personalInformation}</h3>
+                    <h3 className="font-semibold text-gray-900">{t.personalInformation}</h3>
                     {language !== 'en' && (
                         <p className="text-xs text-gray-500 italic">Personal Information</p>
                     )}
@@ -133,7 +133,7 @@ export const UserProfile: React.FC = () => {
 
                 {/* Contact Information (Mock) */}
                 <Card className="p-6">
-                    <h3 className="font-semibold text-gray-900 mb-1">{t.contactInformation}</h3>
+                    <h3 className="font-semibold text-gray-900">{t.contactInformation}</h3>
                     {language !== 'en' && (
                         <p className="text-xs text-gray-500 italic">Contact Information</p>
                     )}
@@ -163,7 +163,7 @@ export const UserProfile: React.FC = () => {
                             <Award className="w-6 h-6 text-white" />
                         </div>
                         <div className="flex-1">
-                            <h3 className="font-semibold text-orange-900 mb-1">{t.pmjayStatus}</h3>
+                            <h3 className="font-semibold text-orange-900">{t.pmjayStatus}</h3>
                             {language !== 'en' && (
                                 <p className="text-xs text-orange-600 italic">PM-JAY Status</p>
                             )}
@@ -186,7 +186,7 @@ export const UserProfile: React.FC = () => {
 
                 {/* Medical History (Mock) */}
                 <Card className="p-6">
-                    <h3 className="font-semibold text-gray-900 mb-1">{t.medicalHistory}</h3>
+                    <h3 className="font-semibold text-gray-900">{t.medicalHistory}</h3>
                     {language !== 'en' && (
                         <p className="text-xs text-gray-500 italic">Medical History</p>
                     )}
@@ -211,7 +211,7 @@ export const UserProfile: React.FC = () => {
 
                 {/* App Settings */}
                 <Card className="p-6">
-                    <h3 className="font-semibold text-gray-900 mb-1">{t.appSettings}</h3>
+                    <h3 className="font-semibold text-gray-900">{t.appSettings}</h3>
                     {language !== 'en' && (
                         <p className="text-xs text-gray-500 italic">App Settings</p>
                     )}

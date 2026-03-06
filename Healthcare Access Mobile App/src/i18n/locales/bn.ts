@@ -10,6 +10,7 @@ export const bn: TranslationKeys = {
 
     // Symptom Entry
     speakSymptoms: 'আপনার লক্ষণগুলি বলুন',
+    typeYourSymptoms: 'আপনার লক্ষণগুলি টাইপ করুন',
     typeSymptoms: 'অথবা এখানে আপনার লক্ষণগুলি টাইপ করুন...',
     analyzing: 'বিশ্লেষণ করা হচ্ছে...',
     startRecording: 'রেকর্ডিং শুরু করতে ট্যাপ করুন',

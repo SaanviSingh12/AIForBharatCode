@@ -83,7 +83,7 @@ export const Home: React.FC = () => {
 
             {/* Main Menu */}
             <div className="px-6 mt-6">
-                <h2 className="font-semibold text-gray-900 mb-1">{t.services}</h2>
+                <h2 className="font-semibold text-gray-900">{t.services}</h2>
                 {language !== 'en' && (
                     <p className="text-xs text-gray-500 italic">Services</p>
                 )}
@@ -98,7 +98,7 @@ export const Home: React.FC = () => {
                             <div className={`w-14 h-14 bg-gradient-to-br ${item.color} rounded-2xl flex items-center justify-center mb-4`}>
                                 <item.icon className="w-7 h-7 text-white" />
                             </div>
-                            <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
+                            <h3 className="font-semibold text-gray-900">{item.title}</h3>
                             {language !== 'en' && (
                                 <p className="text-xs text-gray-500 italic">
                                     {['Symptom Entry', 'Find Doctor', 'Prescription', 'Profile'][index]}
@@ -112,14 +112,14 @@ export const Home: React.FC = () => {
 
             {/* Government Schemes */}
             <div className="px-6 mt-6">
-                <h2 className="font-semibold text-gray-900 mb-1">{t.governmentSchemes}</h2>
+                <h2 className="font-semibold text-gray-900">{t.governmentSchemes}</h2>
                 {language !== 'en' && (
                     <p className="text-xs text-gray-500 italic">Government Schemes</p>
                 )}
                 {language === 'en' && <div className="mb-3" />}
                 <div className="space-y-3">
                     <Card className="p-4 bg-gradient-to-r from-orange-50 to-orange-100">
-                        <h3 className="font-semibold text-orange-900 mb-1">{t.pmjayTitle}</h3>
+                        <h3 className="font-semibold text-orange-900">{t.pmjayTitle}</h3>
                         {language !== 'en' && (
                             <p className="text-xs text-orange-600 italic">PM-JAY</p>
                         )}
@@ -128,7 +128,7 @@ export const Home: React.FC = () => {
                         </p>
                     </Card>
                     <Card className="p-4 bg-gradient-to-r from-green-50 to-green-100">
-                        <h3 className="font-semibold text-green-900 mb-1">{t.janAushadhiTitle}</h3>
+                        <h3 className="font-semibold text-green-900">{t.janAushadhiTitle}</h3>
                         {language !== 'en' && (
                             <p className="text-xs text-green-600 italic">Jan Aushadhi</p>
                         )}

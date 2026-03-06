@@ -10,6 +10,7 @@ export const te: TranslationKeys = {
 
     // Symptom Entry
     speakSymptoms: 'మీ లక్షణాలను చెప్పండి',
+    typeYourSymptoms: 'మీ లక్షణాలను టైప్ చేయండి',
     typeSymptoms: 'లేదా మీ లక్షణాలను ఇక్కడ టైప్ చేయండి...',
     analyzing: 'విశ్లేషిస్తోంది...',
     startRecording: 'రికార్డింగ్ ప్రారంభించడానికి ట్యాప్ చేయండి',
