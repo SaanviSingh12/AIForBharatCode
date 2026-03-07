@@ -10,6 +10,7 @@ export const bn: TranslationKeys = {
 
     // Symptom Entry
     speakSymptoms: 'আপনার লক্ষণগুলি বলুন',
+    typeYourSymptoms: 'আপনার লক্ষণগুলি টাইপ করুন',
     typeSymptoms: 'অথবা এখানে আপনার লক্ষণগুলি টাইপ করুন...',
     analyzing: 'বিশ্লেষণ করা হচ্ছে...',
     startRecording: 'রেকর্ডিং শুরু করতে ট্যাপ করুন',
@@ -39,6 +40,23 @@ export const bn: TranslationKeys = {
     emergency: 'জরুরী',
     call: 'কল করুন',
     emergencyServices: 'জরুরী সেবা',
+    emergencyMode: 'জরুরী মোড',
+    lifeThreatening: 'যদি আপনি প্রাণঘাতী জরুরী অবস্থার সম্মুখীন হন, তাহলে অবিলম্বে অ্যাম্বুলেন্স কল করুন',
+    emergencyNumbers: 'জরুরী নম্বর',
+    ambulanceNational: 'অ্যাম্বুলেন্স (জাতীয়)',
+    medicalEmergency: 'চিকিৎসা জরুরী',
+    policeEmergency: 'পুলিশ জরুরী',
+    fireEmergency: 'অগ্নিনির্বাপক জরুরী',
+    womenHelpline: 'মহিলা হেল্পলাইন',
+    childHelpline: 'শিশু হেল্পলাইন',
+    importantGuidelines: 'গুরুত্বপূর্ণ নির্দেশিকা',
+    stayCalm: 'শান্ত থাকুন এবং কল করার সময় স্পষ্টভাবে কথা বলুন',
+    provideLocation: 'আপনার সঠিক অবস্থান প্রদান করুন',
+    describeEmergency: 'জরুরী পরিস্থিতি বর্ণনা করুন',
+    followInstructions: 'অপারেটরের নির্দেশাবলী অনুসরণ করুন',
+    dontHangUp: 'বলা না হওয়া পর্যন্ত ফোন রাখবেন না',
+    medicalEmergencySymptoms: 'চিকিৎসা জরুরী লক্ষণ',
+    emergencySymptomsDesc: 'বুকে ব্যথা, শ্বাসকষ্ট, গুরুতর রক্তপাত, অজ্ঞান হওয়া, স্ট্রোকের লক্ষণ, গুরুতর পোড়া, বা সন্দেহজনক হার্ট অ্যাটাক - অবিলম্বে 108 এ কল করুন!',
 
     // Profile
     changeLanguage: 'ভাষা পরিবর্তন করুন',
