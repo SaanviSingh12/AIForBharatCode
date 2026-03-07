@@ -57,9 +57,12 @@ public class VoiceTriageService {
                         .build();
             }
 
-            // Step 2: AI analysis via Bedrock
+            // Step 2: AI analysis via Bedrock (with location context for hospital-aware responses)
             String language = request.getLanguage() != null ? request.getLanguage() : "hi-IN";
-            Map<String, Object> analysis = bedrockService.analyzeSymptoms(symptomText, language);
+            Double userLat = safeParseDbl(request.getLat());
+            Double userLng = safeParseDbl(request.getLng());
+            Map<String, Object> analysis = bedrockService.analyzeSymptoms(
+                    symptomText, language, userLat, userLng);
 
             String specialist = (String) analysis.getOrDefault("specialist", "General Physician");
             boolean isEmergency = Boolean.parseBoolean(
@@ -69,7 +72,8 @@ public class VoiceTriageService {
             String responseText = (String) analysis.getOrDefault("responseInLanguage", summary);
 
             // Step 3: Get hospitals
-            List<HospitalDto> hospitals = mockDataService.getHospitals(specialist, isEmergency);
+            List<HospitalDto> hospitals = mockDataService.getHospitals(
+                    specialist, isEmergency, request.getLat(), request.getLng());
 
             // Step 4: Generate audio response (TTS)
             String audioBase64 = null;
@@ -116,6 +120,15 @@ public class VoiceTriageService {
             // Mock: return a simulated transcription based on file name
             log.info("Mock mode: simulating transcription");
             return "मुझे बुखार और सिरदर्द है"; // "I have fever and headache" in Hindi
+        }
+    }
+
+    private Double safeParseDbl(String value) {
+        if (value == null || value.isBlank()) return null;
+        try {
+            return Double.parseDouble(value);
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
 }

@@ -1,5 +1,10 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import type { TriageApiResponse, PrescriptionApiResponse } from '../services/api';
+
+export interface UserLocation {
+  lat: string;
+  lng: string;
+}
 
 interface AppContextType {
   language: string;
@@ -17,6 +22,10 @@ interface AppContextType {
   // Pending audio blob for cross-page transfer (Blobs can't go through router state)
   pendingAudioBlob: Blob | null;
   setPendingAudioBlob: (blob: Blob | null) => void;
+  // User location from browser geolocation
+  userLocation: UserLocation | null;
+  locationError: string | null;
+  requestLocation: () => void;
   // API results
   triageResult: TriageApiResponse | null;
   setTriageResult: (result: TriageApiResponse | null) => void;
@@ -45,6 +54,36 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
+  // ── Geolocation ────────────────────────────
+  const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
+
+  const requestLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      setLocationError('Geolocation is not supported by your browser');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          lat: position.coords.latitude.toString(),
+          lng: position.coords.longitude.toString(),
+        });
+        setLocationError(null);
+      },
+      (error) => {
+        console.warn('Geolocation error:', error.message);
+        setLocationError(error.message);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+    );
+  }, []);
+
+  // Request location on app start
+  useEffect(() => {
+    requestLocation();
+  }, [requestLocation]);
+
   return (
     <AppContext.Provider
       value={{
@@ -58,6 +97,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setPrescription,
         pendingAudioBlob,
         setPendingAudioBlob,
+        userLocation,
+        locationError,
+        requestLocation,
         triageResult,
         setTriageResult,
         prescriptionResult,
