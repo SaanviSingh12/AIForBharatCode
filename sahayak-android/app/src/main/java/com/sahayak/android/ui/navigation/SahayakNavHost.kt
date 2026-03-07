@@ -1,9 +1,19 @@
 package com.sahayak.android.ui.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -23,6 +33,51 @@ import com.sahayak.android.ui.screens.SymptomEntryScreen
 import com.sahayak.android.ui.screens.TriageResultsScreen
 import com.sahayak.android.ui.screens.UserProfileScreen
 
+// ── Transition constants ────────────────────────────────────
+private const val NAV_ANIM_DURATION = 350
+private const val NAV_ANIM_OFFSET_RATIO = 4  // 1/4 of screen width
+
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideInFromRight(): EnterTransition =
+    slideIntoContainer(
+        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+        animationSpec = tween(NAV_ANIM_DURATION, easing = EaseInOut),
+        initialOffset = { it / NAV_ANIM_OFFSET_RATIO },
+    ) + fadeIn(tween(NAV_ANIM_DURATION, easing = EaseInOut))
+
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideOutToLeft(): ExitTransition =
+    slideOutOfContainer(
+        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+        animationSpec = tween(NAV_ANIM_DURATION, easing = EaseInOut),
+        targetOffset = { it / NAV_ANIM_OFFSET_RATIO },
+    ) + fadeOut(tween(NAV_ANIM_DURATION, easing = EaseInOut))
+
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideInFromLeft(): EnterTransition =
+    slideIntoContainer(
+        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+        animationSpec = tween(NAV_ANIM_DURATION, easing = EaseInOut),
+        initialOffset = { it / NAV_ANIM_OFFSET_RATIO },
+    ) + fadeIn(tween(NAV_ANIM_DURATION, easing = EaseInOut))
+
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideOutToRight(): ExitTransition =
+    slideOutOfContainer(
+        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+        animationSpec = tween(NAV_ANIM_DURATION, easing = EaseInOut),
+        targetOffset = { it / NAV_ANIM_OFFSET_RATIO },
+    ) + fadeOut(tween(NAV_ANIM_DURATION, easing = EaseInOut))
+
+// Emergency: scale + fade (alert feel)
+private fun emergencyEnter(): EnterTransition =
+    scaleIn(
+        animationSpec = tween(300, easing = EaseInOut),
+        initialScale = 0.85f,
+    ) + fadeIn(tween(300))
+
+private fun emergencyExit(): ExitTransition =
+    scaleOut(
+        animationSpec = tween(250, easing = EaseInOut),
+        targetScale = 0.85f,
+    ) + fadeOut(tween(250))
+
 @Composable
 fun SahayakNavHost(
     navController: NavHostController,
@@ -35,9 +90,18 @@ fun SahayakNavHost(
         navController = navController,
         startDestination = Routes.LANGUAGE_SELECTION,
         modifier = modifier,
+        // Default transitions for all routes
+        enterTransition = { slideInFromRight() },
+        exitTransition = { slideOutToLeft() },
+        popEnterTransition = { slideInFromLeft() },
+        popExitTransition = { slideOutToRight() },
     ) {
 
-        composable(Routes.LANGUAGE_SELECTION) {
+        composable(
+            Routes.LANGUAGE_SELECTION,
+            enterTransition = { fadeIn(tween(500)) },
+            exitTransition = { fadeOut(tween(300)) },
+        ) {
             LanguageSelectionScreen(
                 strings = uiState.strings,
                 onLanguageSelected = { code ->
@@ -143,7 +207,13 @@ fun SahayakNavHost(
             )
         }
 
-        composable(Routes.EMERGENCY) {
+        composable(
+            Routes.EMERGENCY,
+            enterTransition = { emergencyEnter() },
+            exitTransition = { emergencyExit() },
+            popEnterTransition = { fadeIn(tween(300)) },
+            popExitTransition = { emergencyExit() },
+        ) {
             EmergencyScreen(
                 strings = uiState.strings,
                 triageResult = uiState.triageResult,

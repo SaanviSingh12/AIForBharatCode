@@ -1,7 +1,13 @@
 package com.sahayak.android.ui.screens
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.EaseOutCubic
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +17,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,17 +36,28 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sahayak.android.i18n.Strings
 import com.sahayak.android.ui.theme.EmergencyRed
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -50,6 +68,30 @@ fun HomeScreen(
     onNavigateToEmergency: () -> Unit,
     onNavigateToProfile: () -> Unit,
 ) {
+    // ── Staggered entrance animation (6 items) ──
+    val itemCount = 6
+    val alphas = remember { List(itemCount) { Animatable(0f) } }
+    val offsets = remember { List(itemCount) { Animatable(40f) } }
+
+    LaunchedEffect(Unit) {
+        for (i in 0 until itemCount) {
+            delay(i * 60L)
+            launch {
+                alphas[i].animateTo(1f, tween(400, easing = EaseOutCubic))
+            }
+            launch {
+                offsets[i].animateTo(0f, tween(400, easing = EaseOutCubic))
+            }
+        }
+    }
+
+    fun Modifier.staggerAnim(index: Int): Modifier {
+        val idx = index.coerceIn(0, itemCount - 1)
+        return this
+            .alpha(alphas[idx].value)
+            .offset { IntOffset(0, offsets[idx].value.toInt()) }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -57,17 +99,19 @@ fun HomeScreen(
             .padding(20.dp),
     ) {
         // Header
-        Text(
-            text = strings.welcome,
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-        )
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text = strings.healthcareForAll,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        Column(modifier = Modifier.staggerAnim(0)) {
+            Text(
+                text = strings.welcome,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = strings.healthcareForAll,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
 
         Spacer(Modifier.height(20.dp))
 
@@ -75,6 +119,7 @@ fun HomeScreen(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
+                .staggerAnim(1)
                 .clickable(onClick = onNavigateToEmergency),
             colors = CardDefaults.cardColors(containerColor = EmergencyRed.copy(alpha = 0.12f)),
             shape = MaterialTheme.shapes.large,
@@ -122,6 +167,7 @@ fun HomeScreen(
             text = "Services",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
+            modifier = Modifier.staggerAnim(2),
         )
         Spacer(Modifier.height(12.dp))
 
@@ -130,7 +176,7 @@ fun HomeScreen(
 
         // Row 1: Symptoms | Doctors
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().staggerAnim(3),
             horizontalArrangement = Arrangement.spacedBy(gridSpacing),
         ) {
             SquareCard(
@@ -157,7 +203,7 @@ fun HomeScreen(
 
         // Row 2: Prescription | Profile
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().staggerAnim(4),
             horizontalArrangement = Arrangement.spacedBy(gridSpacing),
         ) {
             SquareCard(
@@ -183,6 +229,7 @@ fun HomeScreen(
         Spacer(Modifier.height(28.dp))
 
         // ── Government Schemes section ──
+        Column(modifier = Modifier.staggerAnim(5)) {
         Text(
             text = "Government Schemes",
             style = MaterialTheme.typography.titleMedium,
@@ -237,6 +284,7 @@ fun HomeScreen(
                 )
             }
         }
+        }
     }
 }
 
@@ -250,10 +298,30 @@ private fun SquareCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var isPressed by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.94f else 1f,
+        animationSpec = spring(dampingRatio = 0.6f, stiffness = 400f),
+        label = "cardScale",
+    )
+
     Card(
         modifier = modifier
             .aspectRatio(1f)
-            .clickable(onClick = onClick),
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = {
+                        isPressed = true
+                        tryAwaitRelease()
+                        isPressed = false
+                        onClick()
+                    },
+                )
+            },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         ),

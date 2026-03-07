@@ -1,6 +1,12 @@
 package com.sahayak.android.ui.screens
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.EaseOutCubic
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.WindowInsets
@@ -10,6 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -32,6 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,9 +47,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sahayak.android.data.model.HospitalDto
@@ -49,6 +59,8 @@ import com.sahayak.android.ui.SahayakViewModel
 import com.sahayak.android.ui.audio.AudioRecorderManager
 import com.sahayak.android.ui.theme.EmergencyRed
 import com.sahayak.android.ui.theme.GovernmentGreen
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -100,6 +112,30 @@ fun TriageResultsScreen(
                 )
             }
         } else {
+            // Staggered entrance — 4 sections: banner, analysis, listen btn, hospitals
+            val sectionCount = 4
+            val sectionAlphas = remember { List(sectionCount) { Animatable(0f) } }
+            val sectionOffsets = remember { List(sectionCount) { Animatable(30f) } }
+
+            LaunchedEffect(Unit) {
+                for (i in 0 until sectionCount) {
+                    delay(i * 80L)
+                    launch {
+                        sectionAlphas[i].animateTo(1f, tween(400, easing = EaseOutCubic))
+                    }
+                    launch {
+                        sectionOffsets[i].animateTo(0f, tween(400, easing = EaseOutCubic))
+                    }
+                }
+            }
+
+            fun Modifier.sectionAnim(idx: Int): Modifier {
+                val i = idx.coerceIn(0, sectionCount - 1)
+                return this
+                    .alpha(sectionAlphas[i].value)
+                    .offset { IntOffset(0, sectionOffsets[i].value.toInt()) }
+            }
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -109,7 +145,7 @@ fun TriageResultsScreen(
             ) {
                 // ── Specialist recommendation banner ─────
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().sectionAnim(0),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                     ),
@@ -155,7 +191,7 @@ fun TriageResultsScreen(
                 // ── Explanation / response text ──────────
                 result.responseText?.let { text ->
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().sectionAnim(1),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                         ),
@@ -189,7 +225,7 @@ fun TriageResultsScreen(
                                 audioManager.playBase64Audio(audio) { isPlayingTts = false }
                             }
                         },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().sectionAnim(2),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (isPlayingTts) EmergencyRed
                             else MaterialTheme.colorScheme.primary,
@@ -208,15 +244,23 @@ fun TriageResultsScreen(
 
                 // ── Nearby hospitals ─────────────────────
                 if (result.hospitals.isNotEmpty()) {
+                    Column(modifier = Modifier.sectionAnim(3)) {
                     Text(
                         text = "Nearby Hospitals",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                     )
                     Spacer(Modifier.height(10.dp))
-                    result.hospitals.forEach { hospital ->
-                        TriageHospitalCard(hospital, onClick = { onHospitalClick(hospital.id) })
+                    result.hospitals.forEachIndexed { index, hospital ->
+                        AnimatedVisibility(
+                            visible = true,
+                            enter = fadeIn(tween(350, delayMillis = index * 60, easing = EaseOutCubic)) +
+                                slideInVertically(tween(350, delayMillis = index * 60, easing = EaseOutCubic)) { it / 3 },
+                        ) {
+                            TriageHospitalCard(hospital, onClick = { onHospitalClick(hospital.id) })
+                        }
                         Spacer(Modifier.height(8.dp))
+                    }
                     }
                 }
             }

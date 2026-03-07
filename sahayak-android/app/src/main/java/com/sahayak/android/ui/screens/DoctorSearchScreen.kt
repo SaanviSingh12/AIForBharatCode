@@ -1,5 +1,10 @@
 package com.sahayak.android.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.EaseOutCubic
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.WindowInsets
@@ -13,7 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.LocationOn
@@ -44,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.sahayak.android.data.model.DoctorDto
 import com.sahayak.android.ui.SahayakViewModel
+import com.sahayak.android.ui.components.ShimmerLoadingList
 import com.sahayak.android.ui.theme.GovernmentGreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -115,10 +121,9 @@ fun DoctorSearchScreen(
             Spacer(Modifier.height(12.dp))
 
             if (uiState.doctorsLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(32.dp),
+                ShimmerLoadingList(
+                    itemCount = 4,
+                    modifier = Modifier.padding(top = 8.dp),
                 )
             } else {
                 val filtered = uiState.doctors.filter {
@@ -135,12 +140,18 @@ fun DoctorSearchScreen(
                     )
                 } else {
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        items(filtered, key = { it.id }) { doctor ->
-                            DoctorCard(
-                                doctor = doctor,
-                                strings = strings,
-                                onClick = { onDoctorClick(doctor.id) },
-                            )
+                        itemsIndexed(filtered, key = { _, d -> d.id }) { index, doctor ->
+                            AnimatedVisibility(
+                                visible = true,
+                                enter = fadeIn(tween(350, delayMillis = index * 50, easing = EaseOutCubic)) +
+                                    slideInVertically(tween(350, delayMillis = index * 50, easing = EaseOutCubic)) { it / 3 },
+                            ) {
+                                DoctorCard(
+                                    doctor = doctor,
+                                    strings = strings,
+                                    onClick = { onDoctorClick(doctor.id) },
+                                )
+                            }
                         }
                     }
                 }

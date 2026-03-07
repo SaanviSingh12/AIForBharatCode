@@ -2,6 +2,11 @@ package com.sahayak.android.ui.screens
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.EaseOutCubic
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.Column
@@ -14,7 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Call
@@ -94,8 +99,14 @@ fun PharmacyResultsScreen(
                     .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                items(pharmacies, key = { it.id }) { pharmacy ->
-                    PharmacyCard(pharmacy, strings)
+                itemsIndexed(pharmacies, key = { _, p -> p.id }) { index, pharmacy ->
+                    AnimatedVisibility(
+                        visible = true,
+                        enter = fadeIn(tween(350, delayMillis = index * 50, easing = EaseOutCubic)) +
+                            slideInVertically(tween(350, delayMillis = index * 50, easing = EaseOutCubic)) { it / 3 },
+                    ) {
+                        PharmacyCard(pharmacy, strings)
+                    }
                 }
             }
         }

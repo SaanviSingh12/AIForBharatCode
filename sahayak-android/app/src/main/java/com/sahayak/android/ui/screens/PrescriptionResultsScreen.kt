@@ -1,6 +1,13 @@
 package com.sahayak.android.ui.screens
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.EaseOutCubic
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.Column
@@ -9,6 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -28,13 +36,18 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sahayak.android.data.model.MedicineDto
@@ -42,6 +55,8 @@ import com.sahayak.android.data.model.PrescriptionResponse
 import com.sahayak.android.ui.SahayakViewModel
 import com.sahayak.android.ui.theme.GovernmentGreen
 import com.sahayak.android.ui.theme.SavingsGreen
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,6 +100,44 @@ fun PrescriptionResultsScreen(
                 )
             }
         } else {
+            // ── Stagger entrance animation ──
+            val sectionCount = 3  // banner, medicines, button
+            val sectionAlphas = remember { List(sectionCount) { Animatable(0f) } }
+            val sectionOffsets = remember { List(sectionCount) { Animatable(30f) } }
+
+            LaunchedEffect(Unit) {
+                for (i in 0 until sectionCount) {
+                    delay(i * 80L)
+                    launch {
+                        sectionAlphas[i].animateTo(1f, tween(400, easing = EaseOutCubic))
+                    }
+                    launch {
+                        sectionOffsets[i].animateTo(0f, tween(400, easing = EaseOutCubic))
+                    }
+                }
+            }
+
+            fun Modifier.sectionAnim(idx: Int): Modifier {
+                val i = idx.coerceIn(0, sectionCount - 1)
+                return this
+                    .alpha(sectionAlphas[i].value)
+                    .offset { IntOffset(0, sectionOffsets[i].value.toInt()) }
+            }
+
+            // ── Animated savings counter ──
+            val targetSavings = remember { mutableIntStateOf(0) }
+            val targetBrand = remember { mutableIntStateOf(0) }
+            val targetGeneric = remember { mutableIntStateOf(0) }
+            val animatedSavings by animateIntAsState(targetSavings.intValue, tween(800, easing = EaseOutCubic), label = "savings")
+            val animatedBrand by animateIntAsState(targetBrand.intValue, tween(800, easing = EaseOutCubic), label = "brand")
+            val animatedGeneric by animateIntAsState(targetGeneric.intValue, tween(800, easing = EaseOutCubic), label = "generic")
+
+            LaunchedEffect(result) {
+                targetSavings.intValue = result.totalSavingsPercent
+                targetBrand.intValue = result.totalBrandCost
+                targetGeneric.intValue = result.totalGenericCost
+            }
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -94,7 +147,7 @@ fun PrescriptionResultsScreen(
             ) {
                 // ── Savings summary banner ───────────
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().sectionAnim(0),
                     colors = CardDefaults.cardColors(
                         containerColor = SavingsGreen.copy(alpha = 0.1f),
                     ),
@@ -109,7 +162,7 @@ fun PrescriptionResultsScreen(
                         Text(text = "💰", fontSize = 48.sp)
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            text = "You can save ${result.totalSavingsPercent}%",
+                            text = "You can save $animatedSavings%",
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
                             color = SavingsGreen,
@@ -127,7 +180,7 @@ fun PrescriptionResultsScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                                 Text(
-                                    text = "₹${result.totalBrandCost}",
+                                    text = "₹$animatedBrand",
                                     style = MaterialTheme.typography.titleLarge,
                                     fontWeight = FontWeight.Bold,
                                 )
@@ -139,7 +192,7 @@ fun PrescriptionResultsScreen(
                                     color = SavingsGreen,
                                 )
                                 Text(
-                                    text = "₹${result.totalGenericCost}",
+                                    text = "₹$animatedGeneric",
                                     style = MaterialTheme.typography.titleLarge,
                                     fontWeight = FontWeight.Bold,
                                     color = SavingsGreen,
@@ -152,6 +205,7 @@ fun PrescriptionResultsScreen(
                 Spacer(Modifier.height(20.dp))
 
                 // ── Medicine list header ─────────────
+                Column(modifier = Modifier.sectionAnim(1)) {
                 Text(
                     text = "Medicines (${result.medicines.size})",
                     style = MaterialTheme.typography.titleMedium,
@@ -160,9 +214,16 @@ fun PrescriptionResultsScreen(
                 Spacer(Modifier.height(12.dp))
 
                 // ── Medicine cards ───────────────────
-                result.medicines.forEach { medicine ->
-                    ResultMedicineCard(medicine, strings)
+                result.medicines.forEachIndexed { index, medicine ->
+                    AnimatedVisibility(
+                        visible = true,
+                        enter = fadeIn(tween(350, delayMillis = index * 60, easing = EaseOutCubic)) +
+                            slideInVertically(tween(350, delayMillis = index * 60, easing = EaseOutCubic)) { it / 3 },
+                    ) {
+                        ResultMedicineCard(medicine, strings)
+                    }
                     Spacer(Modifier.height(10.dp))
+                }
                 }
 
                 // ── Response text ────────────────────
@@ -187,7 +248,7 @@ fun PrescriptionResultsScreen(
                     Spacer(Modifier.height(20.dp))
                     Button(
                         onClick = onPharmacyResults,
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().sectionAnim(2),
                     ) {
                         Icon(
                             Icons.Default.Savings,
