@@ -80,14 +80,16 @@ public class PrescriptionService {
             int totalGenericCost = ((Number) medicineData.getOrDefault("totalGenericCost", 0)).intValue();
             int totalSavingsPercent = ((Number) medicineData.getOrDefault("totalSavingsPercent", 0)).intValue();
             String responseText = (String) medicineData.getOrDefault("responseInLanguage", "");
+            // For audio: use Hindi version if available (Polly only supports Hindi/English)
+            String audioText = (String) medicineData.getOrDefault("responseForAudio", responseText);
 
             // Jan Aushadhi locations (filtered by user location)
             List<PharmacyDto> janAushadhiLocations = mockDataService.getPharmacies(lat, lng);
 
-            // Audio response
+            // Audio response — use Hindi text for TTS when original language isn't supported
             String audioBase64 = null;
             try {
-                audioBase64 = pollyService.synthesize(responseText, lang);
+                audioBase64 = pollyService.synthesize(audioText, lang);
             } catch (Exception e) {
                 log.warn("Polly TTS failed: {}", e.getMessage());
             }
@@ -148,14 +150,16 @@ public class PrescriptionService {
             int totalGenericCost = ((Number) medicineData.getOrDefault("totalGenericCost", 0)).intValue();
             int totalSavingsPercent = ((Number) medicineData.getOrDefault("totalSavingsPercent", 0)).intValue();
             String responseText = (String) medicineData.getOrDefault("responseInLanguage", "");
+            // For audio: use Hindi version if available (Polly only supports Hindi/English)
+            String audioText = (String) medicineData.getOrDefault("responseForAudio", responseText);
 
             // Jan Aushadhi locations (filtered by user location)
             List<PharmacyDto> janAushadhiLocations = mockDataService.getPharmacies(lat, lng);
 
-            // Audio response
+            // Audio response — use Hindi text for TTS when original language isn't supported
             String audioBase64 = null;
             try {
-                audioBase64 = pollyService.synthesize(responseText, lang);
+                audioBase64 = pollyService.synthesize(audioText, lang);
             } catch (Exception e) {
                 log.warn("Polly TTS failed: {}", e.getMessage());
             }

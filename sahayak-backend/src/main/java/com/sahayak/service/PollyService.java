@@ -20,8 +20,11 @@ public class PollyService {
 
     /**
      * Synthesizes text to speech and returns a Base64 encoded MP3.
+     * Kajal (Neural) supports hi-IN natively and en-IN.
+     * For other Indian languages, Bedrock generates the text in the correct script;
+     * Polly uses hi-IN for Devanagari-script languages and en-IN for others.
      * @param text     Text to speak
-     * @param language Language code: "hi-IN" | "ta-IN" | "en-IN"
+     * @param language Language code: "hi-IN" | "te-IN" | "ta-IN" | "kn-IN" | etc.
      * @return Base64 encoded MP3 string, or null if TTS fails (graceful degradation)
      */
     public String synthesize(String text, String language) {
@@ -63,11 +66,12 @@ public class PollyService {
         };
     }
 
+    /**
+     * Resolves the Polly language code. Kajal supports hi-IN and en-IN natively.
+     * For all non-English Indian languages, the audio text is already translated
+     * to Hindi by Bedrock (via responseForAudio), so we always use hi-IN.
+     */
     private String resolveLanguageCode(String language) {
-        return switch (language) {
-            case "hi-IN" -> "hi-IN";
-            case "ta-IN" -> "en-IN";   // Polly Tamil uses en-IN with Kajal
-            default      -> "en-IN";
-        };
+        return "en-IN".equals(language) ? "en-IN" : "hi-IN";
     }
 }

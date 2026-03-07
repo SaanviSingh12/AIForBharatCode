@@ -139,7 +139,12 @@ export async function analyzeSymptoms(
     throw new Error(`Triage API error ${res.status}: ${text}`);
   }
 
-  return res.json();
+  const data = await res.json();
+  // Normalize: Lombok + Jackson may serialize `boolean isEmergency` as "emergency"
+  if (data.isEmergency === undefined && data.emergency !== undefined) {
+    data.isEmergency = data.emergency;
+  }
+  return data;
 }
 
 /**
