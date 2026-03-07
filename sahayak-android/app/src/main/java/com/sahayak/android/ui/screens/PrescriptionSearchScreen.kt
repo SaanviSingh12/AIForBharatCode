@@ -170,7 +170,7 @@ fun PrescriptionSearchScreen(
                 onClick = { launchCamera() },
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                 ),
             ) {
                 Row(
@@ -265,6 +265,7 @@ fun PrescriptionSearchScreen(
                     .fillMaxWidth()
                     .height(100.dp),
                 maxLines = 4,
+                shape = MaterialTheme.shapes.medium,
             )
 
             Spacer(Modifier.height(12.dp))
@@ -295,6 +296,7 @@ fun PrescriptionSearchScreen(
                 colors = CardDefaults.cardColors(
                     containerColor = Color(0xFFE8F5E9),
                 ),
+                shape = MaterialTheme.shapes.large,
             ) {
                 Row(
                     modifier = Modifier

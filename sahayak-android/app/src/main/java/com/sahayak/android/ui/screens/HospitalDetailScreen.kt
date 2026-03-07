@@ -138,8 +138,9 @@ private fun HospitalDetailContent(
             colors = CardDefaults.cardColors(
                 containerColor = if (hospital.type == "government")
                     GovernmentGreen.copy(alpha = 0.08f)
-                else MaterialTheme.colorScheme.surfaceVariant,
+                else MaterialTheme.colorScheme.surfaceContainerHigh,
             ),
+            shape = MaterialTheme.shapes.large,
         ) {
             Column(Modifier.padding(20.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {

@@ -103,7 +103,9 @@ private fun SahayakBottomBar(
     strings: com.sahayak.android.i18n.Strings,
     onItemClick: (BottomNavItem) -> Unit,
 ) {
-    NavigationBar {
+    NavigationBar(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+    ) {
         BottomNavItem.entries.forEach { item ->
             val selected = currentRoute == item.route
             val label = when (item) {

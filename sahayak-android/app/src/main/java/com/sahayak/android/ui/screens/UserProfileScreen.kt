@@ -88,6 +88,7 @@ fun UserProfileScreen(
                 label = { Text("Name") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
+                shape = MaterialTheme.shapes.medium,
             )
 
             Spacer(Modifier.height(16.dp))
@@ -98,6 +99,7 @@ fun UserProfileScreen(
                 label = { Text("Age") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
+                shape = MaterialTheme.shapes.medium,
             )
 
             Spacer(Modifier.height(16.dp))
@@ -116,6 +118,7 @@ fun UserProfileScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                    shape = MaterialTheme.shapes.medium,
                 )
                 ExposedDropdownMenu(
                     expanded = genderExpanded,

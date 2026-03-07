@@ -98,6 +98,7 @@ fun PrescriptionResultsScreen(
                     colors = CardDefaults.cardColors(
                         containerColor = SavingsGreen.copy(alpha = 0.1f),
                     ),
+                    shape = MaterialTheme.shapes.large,
                 ) {
                     Column(
                         modifier = Modifier
@@ -170,7 +171,7 @@ fun PrescriptionResultsScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                         ),
                     ) {
                         Text(

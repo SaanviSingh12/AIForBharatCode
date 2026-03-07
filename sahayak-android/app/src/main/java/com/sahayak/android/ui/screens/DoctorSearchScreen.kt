@@ -90,6 +90,7 @@ fun DoctorSearchScreen(
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
+                shape = MaterialTheme.shapes.medium,
             )
 
             Spacer(Modifier.height(12.dp))

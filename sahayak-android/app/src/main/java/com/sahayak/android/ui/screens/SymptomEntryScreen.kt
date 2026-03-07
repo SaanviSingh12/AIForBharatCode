@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -217,7 +216,7 @@ fun SymptomEntryScreen(
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.secondaryContainer,
                         ),
-                        shape = RoundedCornerShape(16.dp),
+                        shape = MaterialTheme.shapes.large,
                     ) {
                         Column(Modifier.padding(16.dp)) {
                             // Frozen waveform snapshot
@@ -334,6 +333,7 @@ fun SymptomEntryScreen(
                     .fillMaxWidth()
                     .height(120.dp),
                 maxLines = 5,
+                shape = MaterialTheme.shapes.medium,
             )
 
             Spacer(Modifier.height(16.dp))
@@ -373,7 +373,7 @@ fun SymptomEntryScreen(
                 colors = CardDefaults.cardColors(
                     containerColor = EmergencyRed.copy(alpha = 0.08f),
                 ),
-                shape = RoundedCornerShape(16.dp),
+                shape = MaterialTheme.shapes.large,
             ) {
                 Row(
                     modifier = Modifier

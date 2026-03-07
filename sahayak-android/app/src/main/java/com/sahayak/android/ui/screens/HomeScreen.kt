@@ -77,6 +77,7 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .clickable(onClick = onNavigateToEmergency),
             colors = CardDefaults.cardColors(containerColor = EmergencyRed.copy(alpha = 0.12f)),
+            shape = MaterialTheme.shapes.large,
         ) {
             Row(
                 modifier = Modifier.padding(20.dp),
@@ -194,6 +195,7 @@ fun HomeScreen(
             colors = CardDefaults.cardColors(
                 containerColor = Color(0xFFE3F2FD),
             ),
+            shape = MaterialTheme.shapes.large,
         ) {
             Column(Modifier.padding(16.dp)) {
                 Text(
@@ -218,6 +220,7 @@ fun HomeScreen(
             colors = CardDefaults.cardColors(
                 containerColor = Color(0xFFE8F5E9),
             ),
+            shape = MaterialTheme.shapes.large,
         ) {
             Column(Modifier.padding(16.dp)) {
                 Text(
@@ -252,7 +255,7 @@ private fun SquareCard(
             .aspectRatio(1f)
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         ),
     ) {
         Column(
