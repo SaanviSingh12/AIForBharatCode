@@ -91,6 +91,11 @@ export const SymptomAnalysis: React.FC = () => {
         // Step 2: Analyzing
         updateStep(1, 'active');
 
+        // DEMO: Show mock response text at 1.5 seconds (before API completes)
+        setTimeout(() => {
+            setSummary('आपके लक्षणों के आधार पर, मैं एक सामान्य चिकित्सक से परामर्श करने की सलाह देता हूं। आपके लक्षण हल्के श्वसन संक्रमण का संकेत देते हैं। कृपया जल्द ही एक अपॉइंटमेंट शेड्यूल करें।');
+        }, 1500);
+
         try {
             // Run API call and minimum display time in parallel
             const [result] = await Promise.all([
@@ -118,10 +123,13 @@ export const SymptomAnalysis: React.FC = () => {
                 // Brief pause to let user see everything completed
                 await delay(1200);
 
+                const responseTextToPass = result.responseText || result.summary || '';
+                const audioToPass = result.audioBase64 || null;
+
                 if (result.isEmergency) {
-                    navigate('/emergency', { replace: true });
+                    navigate('/emergency', { replace: true, state: { responseText: responseTextToPass, audioBase64: audioToPass } });
                 } else {
-                    navigate('/doctor-search', { replace: true, state: { fromSymptoms: true } });
+                    navigate('/doctor-search', { replace: true, state: { fromSymptoms: true, responseText: responseTextToPass, audioBase64: audioToPass } });
                 }
             } else {
                 updateStep(1, 'error');
