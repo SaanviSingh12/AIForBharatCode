@@ -5,11 +5,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.MedicalServices
-import androidx.compose.material.icons.filled.Medication
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -20,7 +15,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -115,17 +112,23 @@ private fun SahayakBottomBar(
             NavigationBarItem(
                 selected = selected,
                 onClick = { onItemClick(item) },
-                icon = { Icon(imageVector = item.iconVector(), contentDescription = label) },
+                icon = {
+                    Text(
+                        text = item.emoji(),
+                        fontSize = 22.sp,
+                        modifier = Modifier.alpha(if (selected) 1f else 0.6f),
+                    )
+                },
                 label = { Text(label) },
             )
         }
     }
 }
 
-private fun BottomNavItem.iconVector(): ImageVector = when (this) {
-    BottomNavItem.HOME         -> Icons.Default.Home
-    BottomNavItem.SYMPTOMS     -> Icons.Default.Favorite
-    BottomNavItem.DOCTORS      -> Icons.Default.MedicalServices
-    BottomNavItem.PRESCRIPTION -> Icons.Default.Medication
-    BottomNavItem.PROFILE      -> Icons.Default.Person
+private fun BottomNavItem.emoji(): String = when (this) {
+    BottomNavItem.HOME         -> "\uD83C\uDFE0"
+    BottomNavItem.SYMPTOMS     -> "\uD83E\uDE7A"
+    BottomNavItem.DOCTORS      -> "\uD83D\uDC68\u200D\u2695\uFE0F"
+    BottomNavItem.PRESCRIPTION -> "\uD83D\uDC8A"
+    BottomNavItem.PROFILE      -> "\uD83D\uDC64"
 }
