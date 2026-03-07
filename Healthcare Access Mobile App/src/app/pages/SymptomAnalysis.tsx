@@ -29,12 +29,22 @@ export const SymptomAnalysis: React.FC = () => {
     const [audioBase64, setAudioBase64] = useState<string | null>(null);
     const [summary, setSummary] = useState<string | null>(null);
     const [failed, setFailed] = useState(false);
+    const [showUserInput, setShowUserInput] = useState(true);
 
     const hasRun = useRef(false);
 
     const updateStep = (index: number, status: Step['status']) => {
         setSteps((prev) => prev.map((s, i) => (i === index ? { ...s, status } : s)));
     };
+
+    // Hide user input after 5 seconds
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setShowUserInput(false);
+        }, 5000);
+
+        return () => clearTimeout(timer);
+    }, []);
 
     useEffect(() => {
         if (hasRun.current) return;
@@ -142,32 +152,51 @@ export const SymptomAnalysis: React.FC = () => {
             </div>
 
             <div className="flex-1 flex flex-col items-center justify-center px-6 py-10">
+                {/* User Input Display (shown for 5 seconds) */}
+                {showUserInput && (directText || audioBlob) && (
+                    <div className="w-full max-w-sm bg-gradient-to-r from-blue-100 to-green-100 rounded-xl border border-blue-200 p-4 mb-6 shadow-md animate-fade-in">
+                        <div className="flex items-start gap-3">
+                            <div className="bg-white rounded-full p-2 mt-0.5">
+                                {audioBlob ? (
+                                    <Mic className="w-4 h-4 text-blue-600" />
+                                ) : (
+                                    <Search className="w-4 h-4 text-blue-600" />
+                                )}
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-xs font-medium text-gray-600 mb-1">Your Input:</p>
+                                <p className="text-sm text-gray-800 font-medium">
+                                    {directText || 'Voice recording received'}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Steps list */}
                 <div className="w-full max-w-sm space-y-4 mb-8">
                     {steps.map((step, i) => (
                         <div
                             key={i}
-                            className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-500 ${
-                                step.status === 'active'
+                            className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-500 ${step.status === 'active'
                                     ? 'bg-blue-50 border border-blue-200 shadow-sm'
                                     : step.status === 'done'
-                                    ? 'bg-green-50 border border-green-200'
-                                    : step.status === 'error'
-                                    ? 'bg-red-50 border border-red-200'
-                                    : 'bg-white border border-gray-100'
-                            }`}
+                                        ? 'bg-green-50 border border-green-200'
+                                        : step.status === 'error'
+                                            ? 'bg-red-50 border border-red-200'
+                                            : 'bg-white border border-gray-100'
+                                }`}
                         >
                             {stepIcon(step)}
                             <span
-                                className={`text-sm font-medium ${
-                                    step.status === 'active'
+                                className={`text-sm font-medium ${step.status === 'active'
                                         ? 'text-blue-700'
                                         : step.status === 'done'
-                                        ? 'text-green-700'
-                                        : step.status === 'error'
-                                        ? 'text-red-700'
-                                        : 'text-gray-400'
-                                }`}
+                                            ? 'text-green-700'
+                                            : step.status === 'error'
+                                                ? 'text-red-700'
+                                                : 'text-gray-400'
+                                    }`}
                             >
                                 {step.label}
                             </span>
