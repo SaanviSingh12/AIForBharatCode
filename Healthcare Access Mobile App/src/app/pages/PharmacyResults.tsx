@@ -96,10 +96,12 @@ export const PharmacyResults: React.FC = () => {
                         <ArrowLeft className="w-5 h-5" />
                     </Button>
                     <div>
-                        <h1 className="font-semibold text-lg">{t.nearbyPharmacies}</h1>
-                        {language !== 'en' && (
-                            <p className="text-xs text-gray-500 italic">Nearby Pharmacies</p>
-                        )}
+                        <h1 className="font-semibold text-lg">
+                            {t.nearbyPharmacies}
+                            {language !== 'en' && (
+                                <span className="text-xs text-gray-500 italic ml-2">Nearby Pharmacies</span>
+                            )}
+                        </h1>
                         {fromPrescription && prescription && (
                             <p className="text-xs text-gray-600">{t.resultsFor} {prescription}</p>
                         )}
@@ -143,10 +145,12 @@ export const PharmacyResults: React.FC = () => {
                 {fromPrescription && (
                     <div className="space-y-4 mb-6">
                         <div>
-                            <h2 className="font-semibold text-gray-900 mb-1">{t.genericMedicinePrices}</h2>
-                            {language !== 'en' && (
-                                <p className="text-xs text-gray-500 italic">Generic Medicine Prices</p>
-                            )}
+                            <h2 className="font-semibold text-gray-900">
+                                {t.genericMedicinePrices}
+                                {language !== 'en' && (
+                                    <span className="text-xs text-gray-500 italic ml-2">Generic Medicine Prices</span>
+                                )}
+                            </h2>
                             <div className="flex items-center justify-between">
                                 <div></div>
                                 <Badge className="bg-green-100 text-green-800">{t.saveUpTo85}</Badge>
@@ -199,12 +203,12 @@ export const PharmacyResults: React.FC = () => {
                 {/* Pharmacy List */}
                 <div>
                     <div>
-                        <h2 className="font-semibold text-gray-900 mb-1">
+                        <h2 className="font-semibold text-gray-900">
                             {displayPharmacies.length} {t.pharmaciesWithin10km}
+                            {language !== 'en' && (
+                                <span className="text-xs text-gray-500 italic ml-2">pharmacies within 10 km</span>
+                            )}
                         </h2>
-                        {language !== 'en' && (
-                            <p className="text-xs text-gray-500 italic">pharmacies within 10 km</p>
-                        )}
                         <div className="flex items-center justify-between mb-4">
                             <div></div>
                             <p className="text-xs text-green-600">
@@ -230,72 +234,72 @@ export const PharmacyResults: React.FC = () => {
                             <p className="text-sm text-gray-400 mt-1">{t.tryAgain}</p>
                         </Card>
                     ) : (
-                    <div className="space-y-4">
-                        {displayPharmacies.map((pharmacy) => (
-                            <Card key={pharmacy.id} className="overflow-hidden">
-                                <div className="p-4">
-                                    {/* Pharmacy Header */}
-                                    <div className="flex items-start justify-between mb-3">
-                                        <div className="flex-1">
-                                            <div className="flex items-start gap-2 mb-2">
-                                                {pharmacy.type === 'government' && (
-                                                    <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                        <Building2 className="w-4 h-4 text-white" />
+                        <div className="space-y-4">
+                            {displayPharmacies.map((pharmacy) => (
+                                <Card key={pharmacy.id} className="overflow-hidden">
+                                    <div className="p-4">
+                                        {/* Pharmacy Header */}
+                                        <div className="flex items-start justify-between mb-3">
+                                            <div className="flex-1">
+                                                <div className="flex items-start gap-2 mb-2">
+                                                    {pharmacy.type === 'government' && (
+                                                        <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                            <Building2 className="w-4 h-4 text-white" />
+                                                        </div>
+                                                    )}
+                                                    <div className="flex-1">
+                                                        <h3 className="font-semibold text-gray-900 mb-1">{pharmacy.name}</h3>
+                                                        <Badge className={`${getPharmacyTypeColor(pharmacy.type)} text-xs`}>
+                                                            {pharmacy.type === 'government' ? t.governmentPharmacy : t.commercialPharmacy}
+                                                        </Badge>
                                                     </div>
-                                                )}
-                                                <div className="flex-1">
-                                                    <h3 className="font-semibold text-gray-900 mb-1">{pharmacy.name}</h3>
-                                                    <Badge className={`${getPharmacyTypeColor(pharmacy.type)} text-xs`}>
-                                                        {pharmacy.type === 'government' ? t.governmentPharmacy : t.commercialPharmacy}
-                                                    </Badge>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="flex items-center gap-1 text-gray-600">
+                                                    <MapPin className="w-4 h-4" />
+                                                    <span className="text-sm font-semibold">{pharmacy.distance} km</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="text-right">
-                                            <div className="flex items-center gap-1 text-gray-600">
-                                                <MapPin className="w-4 h-4" />
-                                                <span className="text-sm font-semibold">{pharmacy.distance} km</span>
+
+                                        {/* Pharmacy Details */}
+                                        <div className="space-y-2 text-sm">
+                                            <div className="flex items-start gap-2 text-gray-600">
+                                                <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                                <span>{pharmacy.address}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2 text-gray-600">
+                                                <Clock className="w-4 h-4 flex-shrink-0" />
+                                                <span>{pharmacy.timings}</span>
                                             </div>
                                         </div>
+
+                                        {/* Government Pharmacy Benefits */}
+                                        {pharmacy.type === 'government' && (
+                                            <div className="mt-3 bg-green-50 rounded-lg p-3">
+                                                <p className="text-xs text-green-800">
+                                                    ✓ {t.qualityGenericMedicines}<br />
+                                                    ✓ {t.upTo85Savings}<br />
+                                                    ✓ {t.partOfPMJanAushadhi}
+                                                </p>
+                                            </div>
+                                        )}
                                     </div>
 
-                                    {/* Pharmacy Details */}
-                                    <div className="space-y-2 text-sm">
-                                        <div className="flex items-start gap-2 text-gray-600">
-                                            <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                                            <span>{pharmacy.address}</span>
-                                        </div>
-                                        <div className="flex items-center gap-2 text-gray-600">
-                                            <Clock className="w-4 h-4 flex-shrink-0" />
-                                            <span>{pharmacy.timings}</span>
-                                        </div>
+                                    {/* Call Button */}
+                                    <div className="border-t border-gray-200 p-3 bg-gray-50">
+                                        <Button
+                                            onClick={() => handleCall(pharmacy.phone)}
+                                            className="w-full bg-green-600 hover:bg-green-700"
+                                        >
+                                            <Phone className="w-4 h-4 mr-2" />
+                                            {t.call} {pharmacy.phone}
+                                        </Button>
                                     </div>
-
-                                    {/* Government Pharmacy Benefits */}
-                                    {pharmacy.type === 'government' && (
-                                        <div className="mt-3 bg-green-50 rounded-lg p-3">
-                                            <p className="text-xs text-green-800">
-                                                ✓ {t.qualityGenericMedicines}<br />
-                                                ✓ {t.upTo85Savings}<br />
-                                                ✓ {t.partOfPMJanAushadhi}
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Call Button */}
-                                <div className="border-t border-gray-200 p-3 bg-gray-50">
-                                    <Button
-                                        onClick={() => handleCall(pharmacy.phone)}
-                                        className="w-full bg-green-600 hover:bg-green-700"
-                                    >
-                                        <Phone className="w-4 h-4 mr-2" />
-                                        {t.call} {pharmacy.phone}
-                                    </Button>
-                                </div>
-                            </Card>
-                        ))}
-                    </div>
+                                </Card>
+                            ))}
+                        </div>
                     )}
                 </div>
 

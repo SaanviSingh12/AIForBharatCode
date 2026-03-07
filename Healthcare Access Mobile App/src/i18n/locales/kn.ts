@@ -10,6 +10,7 @@ export const kn: TranslationKeys = {
 
     // Symptom Entry
     speakSymptoms: 'ನಿಮ್ಮ ಲಕ್ಷಣಗಳನ್ನು ಹೇಳಿ',
+    typeYourSymptoms: 'ನಿಮ್ಮ ಲಕ್ಷಣಗಳನ್ನು ಟೈಪ್ ಮಾಡಿ',
     typeSymptoms: 'ಅಥವಾ ನಿಮ್ಮ ಲಕ್ಷಣಗಳನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ...',
     analyzing: 'ವಿಶ್ಲೇಷಿಸಲಾಗುತ್ತಿದೆ...',
     startRecording: 'ರೆಕಾರ್ಡಿಂಗ್ ಪ್ರಾರಂಭಿಸಲು ಟ್ಯಾಪ್ ಮಾಡಿ',
@@ -38,8 +39,23 @@ export const kn: TranslationKeys = {
     // Emergency
     emergency: 'ತುರ್ತು',
     call: 'ಕರೆ ಮಾಡಿ',
-    emergencyServices: 'ತುರ್ತು ಸೇವೆಗಳು',
-
+    emergencyServices: 'ತುರ್ತು ಸೇವೆಗಳು', emergencyMode: 'ತುರ್ತು ಮೋಡ್',
+    lifeThreatening: 'ನಿமಗೆ ಪ್ರಾಣಘಾತಕ ತುರ್ತು ಪರಿಸ್ಥಿತಿயನ್ನು ಎದುರಿಸುತ್ತಿದ್ದರೆ, ತಕ್ಷಣ ಆಂಬುಲೆನ್ಸ್‌ಗೆ ಕರೆ ಮಾಡಿ',
+    emergencyNumbers: 'ತುರ್ತು ಸಂಖ್யೆಗಳು',
+    ambulanceNational: 'ಆಂಬುಲೆನ್ಸ್ (ರಾಷ್ಟ್ರಿய)',
+    medicalEmergency: 'வೈದ್யಕೀய ತುರ್ತು',
+    policeEmergency: 'ಪೋಲಿಸು ತುರ್ತು',
+    fireEmergency: 'ಅಗ್ನಿಶಾಮಕ ತುರ್ತು',
+    womenHelpline: 'ಮಹಿಳೆயರ ಸಹಾயವಾಣಿ',
+    childHelpline: 'ಬಾಲರ ಸಹಾயವಾಣಿ',
+    importantGuidelines: 'ಮಹತ್வದ ಮಾರ್ಗದರ್ಶಕಗಳು',
+    stayCalm: 'ಶಾಂತರாಗಿರಿ ಮತ್ತು ಕರೆ ಮಾಡುவಾಗ ಸ್ಪಷ್ಟವಾಗಿ ಮಾತನಾಡಿ',
+    provideLocation: 'ನಿಮ್ಮ ಸರಿயಾದ ಸ್ಥಳವನ್ನು ತಿಳಿಸಿ',
+    describeEmergency: 'ತುರ್ತು ಪರಿಸ್ಥಿತಿயನ್ನು வರ್ಣಿಸಿ',
+    followInstructions: 'ಆಪರೇಟರ್ ಸೂಚನೆಗಳನ್ನು ಅನುಸರಿಸಿ',
+    dontHangUp: 'ಹೇಳುவರೆಗೆ ಫೋನ್ ಇಡ್ಡುಕೆಾಂಡಿರಬೇಡಿ',
+    medicalEmergencySymptoms: 'வೈದ್யಕೀய ತುರ್ತು ಲಕ್ಷಣಗಳು',
+    emergencySymptomsDesc: '೎ದೆய ನೋவು, ಮೂಚುಗುவಿಕೆயಲ್ಲಿ ಕಷ್ಟ, ಗಂಭೀರವಾದ ರಕ್ತಸ್ರಾவ, ಜ್ಞಾನ ಇಲ್ಲದಿರುவಿಕೆ, ಪಕ್ಷವಾತ ಲಕ್ಷಣಗಳು, ಗಂಭೀರವಾದ ಸುಟ್ಟುಗಳು, ಅಥவಾ ಸಂದೇಹಾಸ್ಪದ ಹೃದயಾಘಾತ - ತಕ್ಷಣ 108 ಕ್ಕೆ ಕರೆ ಮಾಡಿ!',
     // Profile
     changeLanguage: 'ಭಾಷೆ ಬದಲಿಸಿ',
     settings: 'ಸೆಟ್ಟಿಂಗ್‌ಗಳು',

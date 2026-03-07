@@ -9,8 +9,7 @@ export const ml: TranslationKeys = {
     profile: 'പ്രൊഫൈൽ',
 
     // Symptom Entry
-    speakSymptoms: 'നിങ്ങളുടെ ലക്ഷണങ്ങൾ പറയുക',
-    typeSymptoms: 'അല്ലെങ്കിൽ നിങ്ങളുടെ ലക്ഷണങ്ങൾ ഇവിടെ ടൈപ്പ് ചെയ്യുക...',
+    speakSymptoms: 'നിങ്ങളുടെ ലക്ഷണങ്ങൾ പറയുക', typeYourSymptoms: 'നിങ്ങളുടെ ലക്ഷണങ്ങള്‍ ടൈപ്പ് ചെയ്യുക', typeSymptoms: 'അല്ലെങ്കിൽ നിങ്ങളുടെ ലക്ഷണങ്ങൾ ഇവിടെ ടൈപ്പ് ചെയ്യുക...',
     analyzing: 'വിശകലനം നടത്തുന്നു...',
     startRecording: 'റെക്കോർഡിംഗ് ആരംഭിക്കാൻ ടാപ്പ് ചെയ്യുക',
     recording: 'റെക്കോർഡിംഗ്... നിർത്താൻ ടാപ്പ് ചെയ്യുക',
@@ -38,8 +37,23 @@ export const ml: TranslationKeys = {
     // Emergency
     emergency: 'അടിയന്തരം',
     call: 'വിളിക്കുക',
-    emergencyServices: 'അടിയന്തര സേവനങ്ങൾ',
-
+    emergencyServices: 'അടിയന്തര സേവനങ്ങൾ', emergencyMode: 'അടിയന്തര മോഡ്',
+    lifeThreatening: 'നിങ്ങള്‍ ജീവന്‍ അപായകരമായ അടിയന്തരവസ്ഥ അനുഭവപ്പെടുന്നുണ്ടെങ്കില്‍, ഉടന്‍ ആംബുലന്സിന്‍ വിളിക്കുക',
+    emergencyNumbers: 'അടിയന്തര നംബരുകള്‍',
+    ambulanceNational: 'ആംബുലന്സ് (രാഷ്ട്രീയം)',
+    medicalEmergency: 'വൈദ്യാടിയന്തരം',
+    policeEmergency: 'പൊലീസ് അടിയന്തരം',
+    fireEmergency: 'അഗ്നിശമന അടിയന്തരം',
+    womenHelpline: 'സ്ത്രീ ഹെല്‍പ്പ്ലൈന്‍',
+    childHelpline: 'കുട്ടികളുടെ ഹെല്‍പ്പ്ലൈന്‍',
+    importantGuidelines: 'പ്രധാനപ്പെട്ട മാര്‍ഗ്ഗനിര്‍ദ്ദേശങ്ങള്‍',
+    stayCalm: 'ശാന്തരായിരിക്കുക മറ്റും വിളിക്കുമ്പോള്‍ സ്പഷ്ടമായി സംസാരിക്കുക',
+    provideLocation: 'നിങ്ങളുടെ സരിയായ സ്ഥലം നല്‍കുക',
+    describeEmergency: 'അടിയന്തര സ്ഥിതി വിവരിക്കുക',
+    followInstructions: 'ഓപ്പറേറ്റരുടെ നിര്‍ദ്ദേശങ്ങള്‍ അനുസരിക്കുക',
+    dontHangUp: 'പറയുന്നത് വരെ ഫോണ്‍ വയ്ക്കരുത്',
+    medicalEmergencySymptoms: 'വൈദ്യാടിയന്തര ലക്ഷണങ്ങള്‍',
+    emergencySymptomsDesc: 'മാരുവേദന, ശ്വാസത്തിനുള്ള പ്രശ്‍നം, ഗുരുതരമായ രക്തപ്രവാഹം, അചേതനയാവസ്ഥ, സ്ട്രോക്ക് ലക്ഷണങ്ങള്‍, ഗുരുതരബാധകള്‍, അല്ലെങ്കില്‍ ഹൃദയാഘാതം സംശയം - ഉടന്‍ 108-ല്‍ വിളിക്കുക!',
     // Profile
     changeLanguage: 'ഭാഷ മാറ്റുക',
     settings: 'ക്രമീകരണങ്ങൾ',

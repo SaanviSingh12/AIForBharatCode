@@ -61,10 +61,12 @@ export const UserProfile: React.FC = () => {
             <div className="p-6 space-y-4">
                 {/* Personal Information */}
                 <Card className="p-6">
-                    <h3 className="font-semibold text-gray-900 mb-1">{t.personalInformation}</h3>
-                    {language !== 'en' && (
-                        <p className="text-xs text-gray-500 italic">Personal Information</p>
-                    )}
+                    <h3 className="font-semibold text-gray-900">
+                        {t.personalInformation}
+                        {language !== 'en' && (
+                            <span className="text-xs text-gray-500 italic ml-2">Personal Information</span>
+                        )}
+                    </h3>
                     {language === 'en' && <div className="mb-3" />}
 
                     {isEditing ? (
@@ -133,10 +135,12 @@ export const UserProfile: React.FC = () => {
 
                 {/* Contact Information (Mock) */}
                 <Card className="p-6">
-                    <h3 className="font-semibold text-gray-900 mb-1">{t.contactInformation}</h3>
-                    {language !== 'en' && (
-                        <p className="text-xs text-gray-500 italic">Contact Information</p>
-                    )}
+                    <h3 className="font-semibold text-gray-900">
+                        {t.contactInformation}
+                        {language !== 'en' && (
+                            <span className="text-xs text-gray-500 italic ml-2">Contact Information</span>
+                        )}
+                    </h3>
                     {language === 'en' && <div className="mb-3" />}
                     <div className="space-y-3">
                         <div className="flex items-center gap-3">
@@ -163,10 +167,12 @@ export const UserProfile: React.FC = () => {
                             <Award className="w-6 h-6 text-white" />
                         </div>
                         <div className="flex-1">
-                            <h3 className="font-semibold text-orange-900 mb-1">{t.pmjayStatus}</h3>
-                            {language !== 'en' && (
-                                <p className="text-xs text-orange-600 italic">PM-JAY Status</p>
-                            )}
+                            <h3 className="font-semibold text-orange-900">
+                                {t.pmjayStatus}
+                                {language !== 'en' && (
+                                    <span className="text-xs text-orange-600 italic ml-2">PM-JAY Status</span>
+                                )}
+                            </h3>
                             <p className="text-sm text-orange-800 mb-3">
                                 {t.ayushmanHealthCard}
                             </p>
@@ -186,10 +192,12 @@ export const UserProfile: React.FC = () => {
 
                 {/* Medical History (Mock) */}
                 <Card className="p-6">
-                    <h3 className="font-semibold text-gray-900 mb-1">{t.medicalHistory}</h3>
-                    {language !== 'en' && (
-                        <p className="text-xs text-gray-500 italic">Medical History</p>
-                    )}
+                    <h3 className="font-semibold text-gray-900">
+                        {t.medicalHistory}
+                        {language !== 'en' && (
+                            <span className="text-xs text-gray-500 italic ml-2">Medical History</span>
+                        )}
+                    </h3>
                     {language === 'en' && <div className="mb-3" />}
                     <div className="space-y-3">
                         <div className="flex items-start gap-3 bg-blue-50 rounded-lg p-3">
@@ -211,10 +219,12 @@ export const UserProfile: React.FC = () => {
 
                 {/* App Settings */}
                 <Card className="p-6">
-                    <h3 className="font-semibold text-gray-900 mb-1">{t.appSettings}</h3>
-                    {language !== 'en' && (
-                        <p className="text-xs text-gray-500 italic">App Settings</p>
-                    )}
+                    <h3 className="font-semibold text-gray-900">
+                        {t.appSettings}
+                        {language !== 'en' && (
+                            <span className="text-xs text-gray-500 italic ml-2">App Settings</span>
+                        )}
+                    </h3>
                     {language === 'en' && <div className="mb-3" />}
                     <Button
                         variant="outline"
