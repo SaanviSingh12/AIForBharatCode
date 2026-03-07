@@ -20,8 +20,13 @@ aws:
     bucket: sahayak-prescriptions-temp
   dynamodb:
     table-name: sahayak-sessions
+    hospital-table: sahayak-hospitals
+    kendra-table: sahayak-kendras
   bedrock:
-    model-id: anthropic.claude-3-5-sonnet-20240620-v1:0
+    # Amazon Nova Lite — best price/quality ratio, no Marketplace subscription needed
+    model-id: amazon.nova-lite-v1:0
+    # Bedrock region
+    region: ${BEDROCK_REGION:us-east-1}
 
 # ─────────────────────────────────────────
 # App Feature Flags

@@ -278,11 +278,14 @@ export async function getNearbyPharmacies(
  * Get all doctors. Optional query/specialty filters.
  */
 export async function getDoctors(
-  filters: { query?: string; specialty?: string } = {}
+  filters: { query?: string; specialty?: string } = {},
+  location: { lat?: string; lng?: string } = {}
 ): Promise<DoctorDto[]> {
   const params = new URLSearchParams();
   if (filters.query) params.append('query', filters.query);
   if (filters.specialty) params.append('specialty', filters.specialty);
+  if (location.lat) params.append('lat', location.lat);
+  if (location.lng) params.append('lng', location.lng);
 
   const url = params.toString()
     ? `${API_BASE}/api/v1/doctors?${params}`

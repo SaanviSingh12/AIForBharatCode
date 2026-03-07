@@ -45,7 +45,7 @@ public class PrescriptionController {
                 imageFile.getOriginalFilename(),
                 imageFile.getSize());
 
-        PrescriptionResponse response = prescriptionService.analyzePrescription(imageFile, language);
+        PrescriptionResponse response = prescriptionService.analyzePrescription(imageFile, language, lat, lng);
         return ResponseEntity.ok(response);
     }
 
@@ -69,7 +69,7 @@ public class PrescriptionController {
                 language,
                 prescription.length());
 
-        PrescriptionResponse response = prescriptionService.analyzePrescription(prescription, language);
+        PrescriptionResponse response = prescriptionService.analyzePrescription(prescription, language, lat, lng);
         return ResponseEntity.ok(response);
     }
 

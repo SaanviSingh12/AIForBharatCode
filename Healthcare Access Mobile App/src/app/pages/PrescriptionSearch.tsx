@@ -11,7 +11,7 @@ import { analyzePrescription as apiAnalyzePrescription, analyzePrescriptionText 
 
 export const PrescriptionSearch: React.FC = () => {
     const navigate = useNavigate();
-    const { language, setPrescription, setPrescriptionResult, setIsLoading, setApiError } = useApp();
+    const { language, setPrescription, setPrescriptionResult, setIsLoading, setApiError, userLocation } = useApp();
     const t = getTranslations(language);
 
     const [searchText, setSearchText] = useState('');
@@ -33,7 +33,7 @@ export const PrescriptionSearch: React.FC = () => {
         setErrorMsg(null);
 
         try {
-            const result = await apiAnalyzePrescription(file, language);
+            const result = await apiAnalyzePrescription(file, language, userLocation ?? {});
             setPrescriptionResult(result);
 
             if (result.success) {
@@ -60,7 +60,7 @@ export const PrescriptionSearch: React.FC = () => {
         setErrorMsg(null);
 
         try {
-            const result = await analyzePrescriptionText(searchText, language);
+            const result = await analyzePrescriptionText(searchText, language, userLocation ?? {});
             setPrescriptionResult(result);
 
             if (result.success) {
