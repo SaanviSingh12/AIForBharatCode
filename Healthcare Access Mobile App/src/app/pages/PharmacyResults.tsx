@@ -1,4 +1,4 @@
-import { ArrowLeft, Building2, Clock, MapPin, Phone, TrendingDown, Volume2 } from 'lucide-react';
+import { ArrowLeft, Building2, Clock, MapPin, Navigation, Phone, TrendingDown, Volume2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { getTranslations } from '../../i18n';
@@ -14,7 +14,7 @@ import { getNearbyPharmacies, type MedicineDto, type PharmacyDto, playAudioRespo
 export const PharmacyResults: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { language, prescription, prescriptionResult } = useApp();
+    const { language, prescription, prescriptionResult, userLocation } = useApp();
     const t = getTranslations(language);
 
     const fromPrescription = location.state?.fromPrescription || false;
@@ -33,7 +33,10 @@ export const PharmacyResults: React.FC = () => {
         const fetchPharmacies = async () => {
             setIsLoadingPharmacies(true);
             try {
-                const data: PharmacyDto[] = await getNearbyPharmacies();
+                const loc = userLocation
+                    ? { lat: String(userLocation.lat), lng: String(userLocation.lng) }
+                    : {};
+                const data: PharmacyDto[] = await getNearbyPharmacies(loc);
                 if (!cancelled) {
                     setFetchedPharmacies(
                         data.map((p) => ({
@@ -55,7 +58,7 @@ export const PharmacyResults: React.FC = () => {
         };
         fetchPharmacies();
         return () => { cancelled = true; };
-    }, []);
+    }, [userLocation]);
 
     // Priority: prescription API pharmacies > fetched API pharmacies
     let displayPharmacies: Pharmacy[];
@@ -75,6 +78,11 @@ export const PharmacyResults: React.FC = () => {
 
     const handleCall = (phone: string) => {
         window.location.href = `tel:${phone}`;
+    };
+
+    const handleGetDirections = (name: string, address: string) => {
+        const query = encodeURIComponent(`${name}, ${address}`);
+        window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
     };
 
     const getPharmacyTypeColor = (type: Pharmacy['type']) => {
@@ -110,20 +118,29 @@ export const PharmacyResults: React.FC = () => {
             </div>
 
             <div className="p-4 space-y-4">
-                {/* AI Audio Response */}
-                {prescriptionResult?.audioBase64 && (
-                    <Card className="p-3 bg-blue-50 border-blue-200">
-                        <div className="flex items-center justify-between">
-                            <p className="text-sm text-blue-800">{prescriptionResult.responseText}</p>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => playAudioResponse(prescriptionResult.audioBase64!)}
-                            >
-                                <Volume2 className="w-4 h-4" />
-                            </Button>
+                {/* AI Audio Response — styled like DoctorSearch response card */}
+                {prescriptionResult?.responseText && (
+                    <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-200 p-4 shadow-sm">
+                        <div className="flex items-start gap-3">
+                            <div className="bg-green-100 rounded-full p-2 mt-0.5">
+                                <Volume2 className="w-4 h-4 text-green-600" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-xs font-semibold text-green-600 uppercase tracking-wide mb-1">Response for Patient</p>
+                                <p className="text-sm text-gray-800 leading-relaxed mb-2">{prescriptionResult.responseText}</p>
+                                {prescriptionResult.audioBase64 && (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => playAudioResponse(prescriptionResult.audioBase64!)}
+                                    >
+                                        <Volume2 className="w-4 h-4 mr-2" />
+                                        Play Audio
+                                    </Button>
+                                )}
+                            </div>
                         </div>
-                    </Card>
+                    </div>
                 )}
 
                 {/* Savings Summary (API) */}
@@ -258,7 +275,7 @@ export const PharmacyResults: React.FC = () => {
                                             <div className="text-right">
                                                 <div className="flex items-center gap-1 text-gray-600">
                                                     <MapPin className="w-4 h-4" />
-                                                    <span className="text-sm font-semibold">{pharmacy.distance} km</span>
+                                                    <span className="text-sm font-semibold">~{pharmacy.distance} km</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -287,14 +304,22 @@ export const PharmacyResults: React.FC = () => {
                                         )}
                                     </div>
 
-                                    {/* Call Button */}
-                                    <div className="border-t border-gray-200 p-3 bg-gray-50">
+                                    {/* Action Buttons */}
+                                    <div className="border-t border-gray-200 p-3 bg-gray-50 flex gap-2">
+                                        <Button
+                                            onClick={() => handleGetDirections(pharmacy.name, pharmacy.address)}
+                                            variant="outline"
+                                            className="flex-1 border-blue-300 text-blue-700 hover:bg-blue-50"
+                                        >
+                                            <Navigation className="w-4 h-4 mr-2" />
+                                            Directions
+                                        </Button>
                                         <Button
                                             onClick={() => handleCall(pharmacy.phone)}
-                                            className="w-full bg-green-600 hover:bg-green-700"
+                                            className="flex-1 bg-green-600 hover:bg-green-700"
                                         >
                                             <Phone className="w-4 h-4 mr-2" />
-                                            {t.call} {pharmacy.phone}
+                                            {t.call}
                                         </Button>
                                     </div>
                                 </Card>

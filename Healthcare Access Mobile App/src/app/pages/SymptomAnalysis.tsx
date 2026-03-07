@@ -29,38 +29,15 @@ export const SymptomAnalysis: React.FC = () => {
     const [audioBase64, setAudioBase64] = useState<string | null>(null);
     const [summary, setSummary] = useState<string | null>(null);
     const [failed, setFailed] = useState(false);
-    const [showUserInput, setShowUserInput] = useState(true);
     const [hasAudioInput] = useState<boolean>(!!audioBlob);
-    const [showResponseText, setShowResponseText] = useState(false);
 
     const hasRun = useRef(false);
-    const mockResponseTextRef = useRef<string | null>(null);
-    const mockAudioRef = useRef<string | null>(null);
 
     const updateStep = (index: number, status: Step['status']) => {
         setSteps((prev) => prev.map((s, i) => (i === index ? { ...s, status } : s)));
     };
 
-    // Hide user input after 5 seconds
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setShowUserInput(false);
-        }, 5000);
-
-        return () => clearTimeout(timer);
-    }, []);
-
-    // Hide response text after 5 seconds
-    useEffect(() => {
-        if (summary) {
-            setShowResponseText(true);
-            const timer = setTimeout(() => {
-                setShowResponseText(false);
-            }, 5000);
-
-            return () => clearTimeout(timer);
-        }
-    }, [summary]);
+    // No auto-hide timers — user input stays visible throughout analysis
 
     useEffect(() => {
         if (hasRun.current) return;
@@ -90,25 +67,8 @@ export const SymptomAnalysis: React.FC = () => {
         await delay(600);
         updateStep(0, 'done');
 
-        // Step 2: Analyzing
+        // Step 2: Analyzing with AI
         updateStep(1, 'active');
-
-        // DEMO: Show mock response text and audio at 1.5 seconds (before API completes)
-        const mockResponseText = 'आपके लक्षणों के आधार पर, मैं एक सामान्य चिकित्सक से परामर्श करने की सलाह देता हूं। आपके लक्षण हल्के श्वसन संक्रमण का संकेत देते हैं। कृपया जल्द ही एक अपॉइंटमेंट शेड्यूल करें।';
-        // Mock audio base64 (minimal MP3 file simulating AWS Polly response)
-        // NOTE: This is a very short silent MP3 for demo purposes.
-        // To test with real audio, see MOCK_AUDIO_GUIDE.md in the project root
-        // Replace this with a real base64-encoded MP3 for actual audio playback
-        const mockAudio = 'SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADhAC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7v////////////////////////////////////////////////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//sQZAAP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAETEFN//sQZDIP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ==';
-
-        // Store in refs so they're immediately accessible
-        mockResponseTextRef.current = mockResponseText;
-        mockAudioRef.current = mockAudio;
-
-        setTimeout(() => {
-            setSummary(mockResponseText);
-            setAudioBase64(mockAudio);
-        }, 1500);
 
         try {
             // Run API call and minimum display time in parallel
@@ -138,16 +98,13 @@ export const SymptomAnalysis: React.FC = () => {
                 await delay(1200);
 
                 // Use the mock values from refs (set immediately) or API response
-                const responseTextToPass = result.responseText || result.summary || mockResponseTextRef.current || '';
-                const audioToPass = result.audioBase64 || mockAudioRef.current || null;
+                const responseTextToPass = result.responseText || result.summary || '';
+                const audioToPass = result.audioBase64 || null;
 
                 console.log('Navigating with:', { responseTextToPass, audioToPass: audioToPass ? 'present' : 'null' });
 
-                if (result.isEmergency) {
-                    navigate('/emergency', { replace: true, state: { responseText: responseTextToPass, audioBase64: audioToPass } });
-                } else {
-                    navigate('/doctor-search', { replace: true, state: { fromSymptoms: true, responseText: responseTextToPass, audioBase64: audioToPass } });
-                }
+                // Always go to doctor-search — emergency banner will show there if needed
+                navigate('/doctor-search', { replace: true, state: { fromSymptoms: true, responseText: responseTextToPass, audioBase64: audioToPass } });
             } else {
                 updateStep(1, 'error');
                 setApiError(result.error || 'Analysis failed');
@@ -164,7 +121,7 @@ export const SymptomAnalysis: React.FC = () => {
                 const isEmergency = emergencyKeywords.some((kw) => directText.toLowerCase().includes(kw));
                 if (isEmergency) {
                     await delay(800);
-                    navigate('/emergency', { replace: true });
+                    navigate('/doctor-search', { replace: true, state: { fromSymptoms: true } });
                     return;
                 }
             }
@@ -191,8 +148,8 @@ export const SymptomAnalysis: React.FC = () => {
             </div>
 
             <div className="flex-1 flex flex-col items-center justify-center px-6 py-10">
-                {/* User Input Display (shown for 5 seconds) */}
-                {showUserInput && (directText || hasAudioInput) && (
+                {/* User Input Display (stays visible during analysis) */}
+                {(directText || hasAudioInput) && (
                     <div className="w-full max-w-sm bg-gradient-to-r from-blue-100 to-green-100 rounded-xl border border-blue-200 p-4 mb-6 shadow-md animate-fade-in">
                         <div className="flex items-start gap-3">
                             <div className="bg-white rounded-full p-2 mt-0.5">
@@ -243,8 +200,8 @@ export const SymptomAnalysis: React.FC = () => {
                     ))}
                 </div>
 
-                {/* Response Text (shown for 5 seconds) */}
-                {summary && showResponseText && (
+                {/* Analysis Result (shown when ready) */}
+                {summary && (
                     <div className="w-full max-w-sm bg-gradient-to-r from-green-100 to-blue-100 rounded-xl border border-green-200 p-4 mb-6 shadow-md animate-fade-in">
                         <div className="flex items-start gap-3">
                             <div className="bg-white rounded-full p-2 mt-0.5">

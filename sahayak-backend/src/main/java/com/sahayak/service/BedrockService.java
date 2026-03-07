@@ -27,12 +27,40 @@ public class BedrockService {
     @Value("${sahayak.use-real-aws:false}")
     private boolean useRealAws;
 
+    /**
+     * Maps BCP-47 language codes to full language names for Bedrock prompts.
+     * Without this, the AI sees "te-IN" instead of "Telugu" and defaults to Hindi.
+     */
+    private String getLanguageName(String languageCode) {
+        return switch (languageCode) {
+            case "hi-IN" -> "Hindi";
+            case "en-IN" -> "English";
+            case "te-IN" -> "Telugu";
+            case "ta-IN" -> "Tamil";
+            case "kn-IN" -> "Kannada";
+            case "mr-IN" -> "Marathi";
+            case "bn-IN" -> "Bengali";
+            case "gu-IN" -> "Gujarati";
+            case "ml-IN" -> "Malayalam";
+            case "pa-IN" -> "Punjabi";
+            default      -> "Hindi";  // safe fallback
+        };
+    }
+
     public BedrockService(BedrockRuntimeClient bedrockClient,
                           DynamoDbHospitalService dynamoDbHospitalService,
                           DynamoDbKendraService dynamoDbKendraService) {
         this.bedrockClient = bedrockClient;
         this.dynamoDbHospitalService = dynamoDbHospitalService;
         this.dynamoDbKendraService = dynamoDbKendraService;
+    }
+
+    /**
+     * Returns true if AWS Polly can directly speak this language.
+     * Polly's Kajal voice only supports Hindi (hi-IN) and English (en-IN).
+     */
+    private boolean isPollySupported(String language) {
+        return "hi-IN".equals(language) || "en-IN".equals(language);
     }
 
     /**
@@ -75,31 +103,55 @@ public class BedrockService {
         }
 
         String prompt = """
-            You are Sahayak, an AI health triage assistant for rural India.
-            A patient describes their symptoms in %s language: "%s"
+            You are Sahayak, an expert AI health triage assistant for rural India.
+            A patient describes their symptoms in %s: "%s"
             %s
-            Analyze carefully and respond ONLY with this exact JSON (no extra text):
+            
+            STEP 1: Identify the most appropriate specialist based on these rules:
+            
+            SYMPTOM → SPECIALIST MAPPING (follow strictly):
+            - Headache, migraine, dizziness, seizure, numbness, tingling, memory loss, fainting → Neurologist
+            - Chest pain, palpitations, high BP, shortness of breath with chest tightness → Cardiologist
+            - Skin rash, acne, eczema, itching, fungal infection, hair loss → Dermatologist
+            - Child fever, child cough, infant issues, vaccination → Pediatrician
+            - Pregnancy, menstrual problems, PCOS, breast lump → Gynecologist
+            - Joint pain, fracture, back pain, sprain, arthritis, knee pain → Orthopedic
+            - Ear pain, sore throat, sinus, hearing loss, tonsils, voice hoarseness → ENT
+            - Eye pain, blurred vision, redness in eye, cataract → Ophthalmologist
+            - Tooth pain, gum bleeding, cavity, jaw pain → Dentist
+            - Anxiety, depression, insomnia, panic attacks, stress → Psychiatrist
+            - Stomach pain, acidity, vomiting, diarrhea, constipation, bloating → Gastroenterologist
+            - Cough, cold, fever, body ache, general weakness, fatigue → General Physician
+            
+            IMPORTANT: Do NOT default to General Physician unless symptoms truly don't match any specialist above.
+            For example: "migraine" or "extreme headache" → Neurologist (NOT General Physician).
+            
+            STEP 2: Determine urgency:
+            - isEmergency=true + urgencyLevel="emergency" for: chest pain, difficulty breathing,
+              severe bleeding, loss of consciousness, stroke symptoms, heart attack, poisoning,
+              severe allergic reaction, very high fever (>104°F)
+            - urgencyLevel="urgent" for symptoms needing same-day care
+            - urgencyLevel="low" for routine consultations
+            
+            STEP 3: Respond ONLY with this exact JSON (no extra text, no markdown):
             {
-              "specialist": "General Physician",
+              "specialist": "<specialist from the mapping above>",
               "isEmergency": false,
               "urgencyLevel": "low",
-              "summary": "Brief English clinical summary of the issue",
-              "responseInLanguage": "Friendly response to patient in %s language"
+              "summary": "Brief clinical summary in English explaining the likely condition and recommended specialist",
+              "responseInLanguage": "Warm, simple response to the patient in %s. Mention the recommended specialist type and any nearby hospital if available."%s
             }
             
-            specialist must be exactly one of: General Physician, Cardiologist, Dermatologist,
-            Pediatrician, Gynecologist, Orthopedic, ENT, Ophthalmologist, Dentist,
-            Psychiatrist, Gastroenterologist, Neurologist
+            The "summary" field MUST be a clear 1-2 sentence clinical explanation in English.
+            Example: "Patient reports severe migraine symptoms. Neurologist consultation recommended for proper diagnosis and treatment plan."
             
-            Set isEmergency=true and urgencyLevel="emergency" for: chest pain, difficulty breathing,
-            severe bleeding, loss of consciousness, stroke symptoms (facial drooping, arm weakness,
-            speech difficulty), severe allergic reaction, poisoning.
-            Set urgencyLevel="urgent" for symptoms needing same-day care.
-            Set urgencyLevel="low" for routine consultations.
-            
-            responseInLanguage should be warm, simple, and in plain spoken %s.
+            The "responseInLanguage" should be warm, empathetic, and in simple spoken %s.
             IMPORTANT: Return ONLY the JSON object, nothing else.
-            """.formatted(language, symptomText, hospitalContext, language, language);
+            """.formatted(getLanguageName(language), symptomText, hospitalContext,
+                          getLanguageName(language),
+                          isPollySupported(language) ? "" :
+                              ",\n              \"responseForAudio\": \"Same response as responseInLanguage but translated to Hindi (Devanagari script). This will be used for text-to-speech since audio is only available in Hindi.\"",
+                          getLanguageName(language));
 
         try {
             String payload = buildNovaPayload(prompt, 800);
@@ -182,7 +234,7 @@ public class BedrockService {
               "totalBrandCost": 150,
               "totalGenericCost": 28,
               "totalSavingsPercent": 81,
-              "responseInLanguage": "Friendly savings summary for patient in %s"
+              "responseInLanguage": "Friendly savings summary for patient in %s"%s
             }
             
             Rules:
@@ -191,10 +243,13 @@ public class BedrockService {
             - savingsPercent = round(((brandPrice - genericPrice) / brandPrice) * 100)
             - savingsAmount = brandPrice - genericPrice
             - If you cannot identify a medicine name clearly, use best guess but keep it
-            - responseInLanguage should mention total savings in %s language
+            - responseInLanguage should mention total savings in %s
             %s
             IMPORTANT: Return ONLY the JSON object, nothing else.
-            """.formatted(extractedText, language, language, kendraContext);
+            """.formatted(extractedText, getLanguageName(language),
+                          isPollySupported(language) ? "" :
+                              ",\n              \"responseForAudio\": \"Same content as responseInLanguage but translated to Hindi (Devanagari). Used for text-to-speech audio since audio is only available in Hindi.\"",
+                          getLanguageName(language), kendraContext);
 
         try {
             String payload = buildNovaPayload(prompt, 1500);
@@ -247,11 +302,18 @@ public class BedrockService {
     }
 
     private Map<String, Object> getFallbackTriageResponse(String language) {
-        String response = language.startsWith("hi")
-                ? "Aapke lakshan note kar liye gaye hain. Kripya ek General Physician se mile."
-                : language.startsWith("ta")
-                ? "உங்கள் அறிகுறிகள் பதிவு செய்யப்பட்டன. ஒரு மருத்துவரை சந்திக்கவும்."
-                : "Your symptoms have been noted. Please consult a General Physician.";
+        String response = switch (language) {
+            case "hi-IN" -> "आपके लक्षण नोट कर लिए गए हैं। कृपया एक जनरल फिजिशियन से मिलें।";
+            case "te-IN" -> "మీ లక్షణాలు నమోదు చేయబడ్డాయి. దయచేసి జనరల్ ఫిజీషియన్‌ను సంప్రదించండి.";
+            case "ta-IN" -> "உங்கள் அறிகுறிகள் பதிவு செய்யப்பட்டன. ஒரு மருத்துவரை சந்திக்கவும்.";
+            case "kn-IN" -> "ನಿಮ್ಮ ಲಕ್ಷಣಗಳನ್ನು ದಾಖಲಿಸಲಾಗಿದೆ. ದಯವಿಟ್ಟು ಜನರಲ್ ಫಿಸಿಶಿಯನ್ ಅನ್ನು ಸಂಪರ್ಕಿಸಿ.";
+            case "mr-IN" -> "तुमची लक्षणे नोंदवली गेली आहेत. कृपया जनरल फिजिशियनला भेटा.";
+            case "bn-IN" -> "আপনার উপসর্গগুলি নথিভুক্ত করা হয়েছে। অনুগ্রহ করে একজন জেনারেল ফিজিশিয়ানের সাথে পরামর্শ করুন।";
+            case "gu-IN" -> "તમારા લક્ષણો નોંધવામાં આવ્યા છે. કૃપા કરીને જનરલ ફિઝિશિયનનો સંપર્ક કરો.";
+            case "ml-IN" -> "നിങ്ങളുടെ ലക്ഷണങ്ങൾ രേഖപ്പെടുത്തിയിട്ടുണ്ട്. ദയവായി ഒരു ജനറൽ ഫിസിഷ്യനെ സമീപിക്കുക.";
+            case "pa-IN" -> "ਤੁਹਾਡੇ ਲੱਛਣ ਨੋਟ ਕਰ ਲਏ ਗਏ ਹਨ। ਕਿਰਪਾ ਕਰਕੇ ਜਨਰਲ ਫਿਜ਼ੀਸ਼ੀਅਨ ਨੂੰ ਮਿਲੋ।";
+            default -> "Your symptoms have been noted. Please consult a General Physician.";
+        };
 
         return Map.of(
                 "specialist", "General Physician",
