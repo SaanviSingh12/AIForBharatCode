@@ -27,7 +27,7 @@ export const SymptomText: React.FC = () => {
                 <Button variant="ghost" size="icon" onClick={() => navigate('/symptom-entry')}>
                     <ArrowLeft className="w-5 h-5" />
                 </Button>
-                <h1 className="font-semibold text-lg">Type Your Symptoms</h1>
+                <h1 className="font-semibold text-lg">{t.typeYourSymptoms}</h1>
             </div>
 
             <div className="flex-1 flex flex-col p-6">

@@ -84,6 +84,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     requestLocation();
   }, [requestLocation]);
 
+  // Save language to localStorage
+  useEffect(() => {
+    localStorage.setItem('sahayak-language', language);
+  }, [language]);
+
   return (
     <AppContext.Provider
       value={{
