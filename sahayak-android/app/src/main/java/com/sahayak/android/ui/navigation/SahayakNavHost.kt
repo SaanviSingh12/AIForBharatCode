@@ -17,6 +17,7 @@ import com.sahayak.android.ui.screens.HomeScreen
 import com.sahayak.android.ui.screens.HospitalDetailScreen
 import com.sahayak.android.ui.screens.LanguageSelectionScreen
 import com.sahayak.android.ui.screens.PharmacyResultsScreen
+import com.sahayak.android.ui.screens.PrescriptionResultsScreen
 import com.sahayak.android.ui.screens.PrescriptionSearchScreen
 import com.sahayak.android.ui.screens.SymptomEntryScreen
 import com.sahayak.android.ui.screens.UserProfileScreen
@@ -54,6 +55,7 @@ fun SahayakNavHost(
                 onNavigateToDoctors = { navController.navigate(Routes.DOCTOR_SEARCH) },
                 onNavigateToPrescription = { navController.navigate(Routes.PRESCRIPTION_SEARCH) },
                 onNavigateToEmergency = { navController.navigate(Routes.EMERGENCY) },
+                onNavigateToProfile = { navController.navigate(Routes.USER_PROFILE) },
             )
         }
 
@@ -106,7 +108,19 @@ fun SahayakNavHost(
             PrescriptionSearchScreen(
                 viewModel = viewModel,
                 onPharmacyResults = { navController.navigate(Routes.PHARMACY_RESULTS) },
+                onPrescriptionResults = { navController.navigate(Routes.PRESCRIPTION_RESULTS) },
                 onBack = { navController.popBackStack() },
+            )
+        }
+
+        composable(Routes.PRESCRIPTION_RESULTS) {
+            PrescriptionResultsScreen(
+                viewModel = viewModel,
+                onPharmacyResults = { navController.navigate(Routes.PHARMACY_RESULTS) },
+                onBack = {
+                    viewModel.clearPrescriptionResult()
+                    navController.popBackStack()
+                },
             )
         }
 

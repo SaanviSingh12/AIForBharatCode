@@ -43,6 +43,7 @@ data class Strings(
     val government: String,
     val free: String,
     val distance: String,
+    val viewProfile: String,
 )
 
 private val en = Strings(
@@ -52,9 +53,9 @@ private val en = Strings(
     prescription = "Prescription",
     profile = "Profile",
     speakSymptoms = "Speak Your Symptoms",
-    typeSymptoms = "Or type your symptoms here…",
+    typeSymptoms = "Type what you're feeling…",
     analyzing = "Analyzing…",
-    startRecording = "Tap to Start Recording",
+    startRecording = "Play",
     recording = "Recording… Tap to Stop",
     findDoctors = "Find Doctors",
     searchDoctors = "Search doctors…",
@@ -75,7 +76,7 @@ private val en = Strings(
     savings = "Savings",
     genericAlternative = "Generic Alternative",
     typeMedicine = "Type medicine name",
-    orTypeMedicine = "Or type medicine name…",
+    orTypeMedicine = "Type medicine name",
     prescriptionScan = "Prescription Scan",
     nearbyPharmacies = "Nearby Pharmacies",
     callEmergency = "Call Emergency",
@@ -84,6 +85,7 @@ private val en = Strings(
     government = "Government",
     free = "Free",
     distance = "km away",
+    viewProfile = "View your profile",
 )
 
 private val hi = Strings(
@@ -125,6 +127,7 @@ private val hi = Strings(
     government = "सरकारी",
     free = "मुफ्त",
     distance = "किमी दूर",
+    viewProfile = "अपनी प्रोफ़ाइल देखें",
 )
 
 private val translationMap: Map<String, Strings> = mapOf(

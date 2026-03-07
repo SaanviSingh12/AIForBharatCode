@@ -12,6 +12,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -137,35 +139,6 @@ fun SymptomEntryScreen(
                 },
             )
         },
-        floatingActionButton = {
-            if (!hasRecordedPreview) {              // hide FAB while preview card is shown
-                FloatingActionButton(
-                    onClick = {
-                        if (!hasMicPermission) {
-                            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                            return@FloatingActionButton
-                        }
-                        if (isRecording) {
-                            // Stop recording → show preview (don't send yet)
-                            audioManager.stopRecording()
-                            isRecording = false
-                            hasRecordedPreview = true
-                        } else {
-                            // Start recording
-                            amplitudes.clear()
-                            audioManager.startRecording()
-                            isRecording = true
-                        }
-                    },
-                    containerColor = if (isRecording) EmergencyRed else MaterialTheme.colorScheme.primary,
-                ) {
-                    Icon(
-                        imageVector = if (isRecording) Icons.Default.Stop else Icons.Default.Mic,
-                        contentDescription = if (isRecording) strings.recording else strings.startRecording,
-                    )
-                }
-            }
-        },
     ) { padding ->
         Column(
             modifier = Modifier
@@ -173,14 +146,50 @@ fun SymptomEntryScreen(
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(
-                text = strings.speakSymptoms,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-            )
-
-            Spacer(Modifier.height(16.dp))
+            // ── Large microphone button ──────────
+            if (!hasRecordedPreview) {
+                Spacer(Modifier.height(16.dp))
+                Button(
+                    onClick = {
+                        if (!hasMicPermission) {
+                            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                            return@Button
+                        }
+                        if (isRecording) {
+                            audioManager.stopRecording()
+                            isRecording = false
+                            hasRecordedPreview = true
+                        } else {
+                            amplitudes.clear()
+                            audioManager.startRecording()
+                            isRecording = true
+                        }
+                    },
+                    modifier = Modifier.size(160.dp),
+                    shape = CircleShape,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isRecording) EmergencyRed
+                            else MaterialTheme.colorScheme.primary,
+                    ),
+                ) {
+                    Icon(
+                        imageVector = if (isRecording) Icons.Default.Stop else Icons.Default.Mic,
+                        contentDescription = if (isRecording) strings.recording else strings.startRecording,
+                        modifier = Modifier.size(64.dp),
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                    )
+                }
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    text = if (isRecording) strings.recording else strings.speakSymptoms,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                )
+                Spacer(Modifier.height(16.dp))
+            }
 
             // ── Live recording waveform ──────────
             AnimatedVisibility(visible = isRecording) {
@@ -282,6 +291,39 @@ fun SymptomEntryScreen(
                 }
             }
 
+            Spacer(Modifier.height(24.dp))
+
+            // ── OR divider ────────────────────
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                androidx.compose.material3.HorizontalDivider(
+                    modifier = Modifier.weight(1f),
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                )
+                Text(
+                    text = "OR",
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                androidx.compose.material3.HorizontalDivider(
+                    modifier = Modifier.weight(1f),
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                )
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            Text(
+                text = "Type your symptoms",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+            )
+
+            Spacer(Modifier.height(8.dp))
+
             OutlinedTextField(
                 value = symptomText,
                 onValueChange = { symptomText = it },
@@ -320,6 +362,43 @@ fun SymptomEntryScreen(
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall,
                 )
+            }
+
+            // ── Emergency attention card ─────────
+            Spacer(Modifier.height(24.dp))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = EmergencyRed.copy(alpha = 0.08f),
+                ),
+                shape = RoundedCornerShape(16.dp),
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.Top,
+                ) {
+                    Text(
+                        text = "⚠️",
+                        style = MaterialTheme.typography.headlineMedium,
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            text = "ATTENTION!",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = EmergencyRed,
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = "If you are experiencing severe or life-threatening symptoms, please call emergency services immediately at 108",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                }
             }
 
             // Results

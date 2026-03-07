@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.sahayak.android.data.api.SahayakRepository
 import com.sahayak.android.data.model.DoctorDto
+import com.sahayak.android.data.model.PharmacyDto
 import com.sahayak.android.data.model.PrescriptionResponse
 import com.sahayak.android.data.model.TriageResponse
 import com.sahayak.android.data.model.UserProfile
@@ -43,6 +44,10 @@ data class SahayakUiState(
     // Prescription
     val prescriptionResult: PrescriptionResponse? = null,
     val prescriptionLoading: Boolean = false,
+
+    // Pharmacies
+    val pharmacies: List<PharmacyDto> = emptyList(),
+    val pharmaciesLoading: Boolean = false,
 
     // Doctors
     val doctors: List<DoctorDto> = emptyList(),
@@ -190,6 +195,23 @@ class SahayakViewModel @Inject constructor(
                 }
                 .onFailure { ex ->
                     _state.update { it.copy(prescriptionLoading = false, error = ex.message) }
+                }
+        }
+    }
+
+    // ── Nearby Pharmacies ──────────────────
+
+    fun fetchNearbyPharmacies() {
+        viewModelScope.launch {
+            _state.update { it.copy(pharmaciesLoading = true, error = null) }
+            val la = lat ?: 0.0
+            val ln = lng ?: 0.0
+            repo.nearbyPharmacies(la, ln)
+                .onSuccess { list ->
+                    _state.update { it.copy(pharmacies = list, pharmaciesLoading = false) }
+                }
+                .onFailure { ex ->
+                    _state.update { it.copy(pharmaciesLoading = false, error = ex.message) }
                 }
         }
     }

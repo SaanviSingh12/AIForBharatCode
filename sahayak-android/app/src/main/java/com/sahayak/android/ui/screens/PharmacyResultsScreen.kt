@@ -30,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -49,7 +50,16 @@ fun PharmacyResultsScreen(
 ) {
     val uiState by viewModel.state.collectAsState()
     val strings = uiState.strings
-    val pharmacies = uiState.prescriptionResult?.janAushadhiLocations ?: emptyList()
+
+    // Merge pharmacies from prescription result + standalone fetch
+    val pharmacies = uiState.pharmacies.ifEmpty {
+        uiState.prescriptionResult?.janAushadhiLocations ?: emptyList()
+    }
+
+    // Fetch nearby pharmacies on entry
+    LaunchedEffect(Unit) {
+        viewModel.fetchNearbyPharmacies()
+    }
 
     Scaffold(
         topBar = {
