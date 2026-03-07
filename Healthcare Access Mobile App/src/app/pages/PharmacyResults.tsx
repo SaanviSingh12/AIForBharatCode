@@ -96,10 +96,12 @@ export const PharmacyResults: React.FC = () => {
                         <ArrowLeft className="w-5 h-5" />
                     </Button>
                     <div>
-                        <h1 className="font-semibold text-lg">{t.nearbyPharmacies}</h1>
-                        {language !== 'en' && (
-                            <p className="text-xs text-gray-500 italic">Nearby Pharmacies</p>
-                        )}
+                        <h1 className="font-semibold text-lg">
+                            {t.nearbyPharmacies}
+                            {language !== 'en' && (
+                                <span className="text-xs text-gray-500 italic ml-2">Nearby Pharmacies</span>
+                            )}
+                        </h1>
                         {fromPrescription && prescription && (
                             <p className="text-xs text-gray-600">{t.resultsFor} {prescription}</p>
                         )}
@@ -143,10 +145,12 @@ export const PharmacyResults: React.FC = () => {
                 {fromPrescription && (
                     <div className="space-y-4 mb-6">
                         <div>
-                            <h2 className="font-semibold text-gray-900">{t.genericMedicinePrices}</h2>
-                            {language !== 'en' && (
-                                <p className="text-xs text-gray-500 italic">Generic Medicine Prices</p>
-                            )}
+                            <h2 className="font-semibold text-gray-900">
+                                {t.genericMedicinePrices}
+                                {language !== 'en' && (
+                                    <span className="text-xs text-gray-500 italic ml-2">Generic Medicine Prices</span>
+                                )}
+                            </h2>
                             <div className="flex items-center justify-between">
                                 <div></div>
                                 <Badge className="bg-green-100 text-green-800">{t.saveUpTo85}</Badge>
@@ -201,10 +205,10 @@ export const PharmacyResults: React.FC = () => {
                     <div>
                         <h2 className="font-semibold text-gray-900">
                             {displayPharmacies.length} {t.pharmaciesWithin10km}
+                            {language !== 'en' && (
+                                <span className="text-xs text-gray-500 italic ml-2">pharmacies within 10 km</span>
+                            )}
                         </h2>
-                        {language !== 'en' && (
-                            <p className="text-xs text-gray-500 italic">pharmacies within 10 km</p>
-                        )}
                         <div className="flex items-center justify-between mb-4">
                             <div></div>
                             <p className="text-xs text-green-600">

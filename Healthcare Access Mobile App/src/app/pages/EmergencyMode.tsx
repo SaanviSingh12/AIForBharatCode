@@ -60,10 +60,12 @@ export const EmergencyMode: React.FC = () => {
                     <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
                         <AlertTriangle className="w-12 h-12 text-white" />
                     </div>
-                    <h1 className="font-bold text-3xl mb-2">{t.emergencyMode}</h1>
-                    {language !== 'en' && (
-                        <p className="text-red-100 text-sm">EMERGENCY MODE</p>
-                    )}
+                    <h1 className="font-bold text-3xl mb-2">
+                        {t.emergencyMode}
+                        {language !== 'en' && (
+                            <span className="text-red-100 text-sm ml-2">EMERGENCY MODE</span>
+                        )}
+                    </h1>
                 </div>
             </div>
 

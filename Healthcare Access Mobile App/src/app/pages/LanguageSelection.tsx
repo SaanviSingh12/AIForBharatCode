@@ -35,10 +35,10 @@ export const LanguageSelection: React.FC = () => {
                 <div className="max-w-md mx-auto">
                     <h2 className="text-xl font-semibold text-gray-900 text-center">
                         {t.chooseYourLanguage}
+                        {language !== 'en' && (
+                            <span className="text-sm text-gray-500 italic ml-2">Choose Your Language</span>
+                        )}
                     </h2>
-                    {language !== 'en' && (
-                        <p className="text-sm text-gray-500 italic text-center">Choose Your Language</p>
-                    )}
                     <p className="text-gray-600 text-center mb-6">
                         {t.selectLanguage}
                     </p>
