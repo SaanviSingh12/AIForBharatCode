@@ -20,6 +20,7 @@ import com.sahayak.android.ui.screens.PharmacyResultsScreen
 import com.sahayak.android.ui.screens.PrescriptionResultsScreen
 import com.sahayak.android.ui.screens.PrescriptionSearchScreen
 import com.sahayak.android.ui.screens.SymptomEntryScreen
+import com.sahayak.android.ui.screens.TriageResultsScreen
 import com.sahayak.android.ui.screens.UserProfileScreen
 
 @Composable
@@ -67,8 +68,19 @@ fun SahayakNavHost(
                         popUpTo(Routes.HOME)
                     }
                 },
-                onHospitalClick = { id -> navController.navigate(Routes.hospitalDetail(id)) },
+                onTriageResults = { navController.navigate(Routes.TRIAGE_RESULTS) },
                 onBack = { navController.popBackStack() },
+            )
+        }
+
+        composable(Routes.TRIAGE_RESULTS) {
+            TriageResultsScreen(
+                viewModel = viewModel,
+                onHospitalClick = { id -> navController.navigate(Routes.hospitalDetail(id)) },
+                onBack = {
+                    viewModel.clearTriageResult()
+                    navController.popBackStack()
+                },
             )
         }
 

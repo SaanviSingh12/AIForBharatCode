@@ -10,7 +10,6 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,14 +32,12 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Stop
-import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -66,31 +63,28 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import com.sahayak.android.data.model.HospitalDto
-import com.sahayak.android.data.model.TriageResponse
 import com.sahayak.android.ui.SahayakViewModel
 import com.sahayak.android.ui.audio.AudioRecorderManager
 import com.sahayak.android.ui.audio.WaveformVisualizer
 import com.sahayak.android.ui.theme.EmergencyRed
-import com.sahayak.android.ui.theme.GovernmentGreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SymptomEntryScreen(
     viewModel: SahayakViewModel,
     onEmergencyDetected: () -> Unit,
-    onHospitalClick: (String) -> Unit,
+    onTriageResults: () -> Unit,
     onBack: () -> Unit,
 ) {
     val uiState by viewModel.state.collectAsState()
     val strings = uiState.strings
     var symptomText by rememberSaveable { mutableStateOf("") }
+    var hasNavigatedToResults by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
 
     // Audio recorder — retained across recompositions, released on dispose
     val audioManager = remember { AudioRecorderManager(context) }
     var isRecording by remember { mutableStateOf(false) }
-    var isPlayingTts by remember { mutableStateOf(false) }
     var isPlayingPreview by remember { mutableStateOf(false) }
     var hasRecordedPreview by remember { mutableStateOf(false) }
 
@@ -120,11 +114,17 @@ fun SymptomEntryScreen(
         }
     }
 
-    // Check for emergency redirect — fires once when triageResult changes
+    // Check for emergency redirect or navigate to results
     val triageResult = uiState.triageResult
     LaunchedEffect(triageResult) {
         if (triageResult?.isEmergency == true) {
             onEmergencyDetected()
+        } else if (triageResult != null && !hasNavigatedToResults) {
+            hasNavigatedToResults = true
+            onTriageResults()
+        }
+        if (triageResult == null) {
+            hasNavigatedToResults = false
         }
     }
 
@@ -397,158 +397,6 @@ fun SymptomEntryScreen(
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
-                    }
-                }
-            }
-
-            // Results
-            AnimatedVisibility(visible = triageResult != null && triageResult.isEmergency == false) {
-                triageResult?.let { result ->
-                    Spacer(Modifier.height(24.dp))
-                    TriageResultCard(result = result, strings = strings, onHospitalClick = onHospitalClick)
-
-                    // Play audio response button
-                    result.audioBase64?.let { audio ->
-                        Spacer(Modifier.height(12.dp))
-                        Button(
-                            onClick = {
-                                if (isPlayingTts) {
-                                    audioManager.stopPlayback()
-                                    isPlayingTts = false
-                                } else {
-                                    isPlayingTts = true
-                                    audioManager.playBase64Audio(audio) { isPlayingTts = false }
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Icon(
-                                imageVector = if (isPlayingTts) Icons.Default.Stop else Icons.Default.VolumeUp,
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp),
-                            )
-                            Spacer(Modifier.width(8.dp))
-                            Text(if (isPlayingTts) strings.cancel else "🔊 Listen")
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun TriageResultCard(
-    result: TriageResponse,
-    strings: com.sahayak.android.i18n.Strings,
-    onHospitalClick: (String) -> Unit,
-) {
-    Column {
-        // Summary
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-            ),
-        ) {
-            Column(Modifier.padding(16.dp)) {
-                result.specialist?.let {
-                    Text(
-                        text = "Recommended: $it",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
-                result.urgencyLevel?.let {
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        text = "Urgency: $it",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = if (it == "emergency") EmergencyRed
-                        else MaterialTheme.colorScheme.onPrimaryContainer,
-                    )
-                }
-                result.responseText?.let {
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = it,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                }
-            }
-        }
-
-        // Hospitals list
-        if (result.hospitals.isNotEmpty()) {
-            Spacer(Modifier.height(16.dp))
-            Text(
-                text = "Nearby Hospitals",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-            )
-            Spacer(Modifier.height(8.dp))
-            result.hospitals.forEach { hospital ->
-                HospitalCard(hospital, onClick = { onHospitalClick(hospital.id) })
-                Spacer(Modifier.height(8.dp))
-            }
-        }
-    }
-}
-
-@Composable
-private fun HospitalCard(hospital: HospitalDto, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-    ) {
-        Column(Modifier.padding(12.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = hospital.name,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.weight(1f),
-                )
-                if (hospital.type == "government") {
-                    Text(
-                        text = "Govt",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = GovernmentGreen,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
-            }
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text = hospital.address,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text(
-                    text = "${hospital.distance} km",
-                    style = MaterialTheme.typography.labelSmall,
-                )
-                if (hospital.free) {
-                    Text(
-                        text = "FREE",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = GovernmentGreen,
-                        fontWeight = FontWeight.Bold,
-                    )
-                } else {
-                    hospital.fee?.let {
-                        Text("₹$it", style = MaterialTheme.typography.labelSmall)
                     }
                 }
             }

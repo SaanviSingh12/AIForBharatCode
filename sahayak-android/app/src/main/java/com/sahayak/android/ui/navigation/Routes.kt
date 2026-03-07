@@ -5,6 +5,7 @@ object Routes {
     const val LANGUAGE_SELECTION = "language_selection"
     const val HOME               = "home"
     const val SYMPTOM_ENTRY      = "symptom_entry"
+    const val TRIAGE_RESULTS     = "triage_results"
     const val DOCTOR_SEARCH      = "doctor_search"
     const val DOCTOR_DETAILS     = "doctor_details/{doctorId}"
     const val PRESCRIPTION_SEARCH  = "prescription_search"
