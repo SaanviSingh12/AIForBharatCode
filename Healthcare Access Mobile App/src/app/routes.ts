@@ -11,6 +11,7 @@ import { PrescriptionSearch } from "./pages/PrescriptionSearch";
 import { PharmacyResults } from "./pages/PharmacyResults";
 import { UserProfile } from "./pages/UserProfile";
 import { EmergencyMode } from "./pages/EmergencyMode";
+import DoctorProfile from "./pages/DoctorProfile";
 
 export const router = createBrowserRouter([
   {
@@ -44,6 +45,10 @@ export const router = createBrowserRouter([
   {
     path: "/doctor/:id",
     Component: DoctorDetails,
+  },
+  {
+    path: "/doctor-profile/:id",
+    Component: DoctorProfile,
   },
   {
     path: "/prescription-search",

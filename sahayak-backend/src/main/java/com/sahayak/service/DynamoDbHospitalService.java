@@ -122,11 +122,11 @@ public class DynamoDbHospitalService {
                     exprValues.put(":emergency", AttributeValue.fromBool(true));
                 }
 
-                if (specialist != null && !specialist.isBlank()) {
-                    filterExpr.append(" AND (specialist = :spec OR specialist = :gp)");
-                    exprValues.put(":spec", AttributeValue.fromS(specialist));
-                    exprValues.put(":gp", AttributeValue.fromS("General Physician"));
-                }
+                // NOTE: We intentionally do NOT filter by specialist here.
+                // The data.gov.in hospital directory does not include specialist info —
+                // all 22,000+ hospitals default to "General Physician".
+                // Instead, we return all nearby hospitals and let the caller
+                // (VoiceTriageService) stamp the AI-recommended specialist.
 
                 Map<String, AttributeValue> lastEvaluatedKey = null;
 
