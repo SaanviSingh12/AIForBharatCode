@@ -34,6 +34,8 @@ export const SymptomAnalysis: React.FC = () => {
     const [showResponseText, setShowResponseText] = useState(false);
 
     const hasRun = useRef(false);
+    const mockResponseTextRef = useRef<string | null>(null);
+    const mockAudioRef = useRef<string | null>(null);
 
     const updateStep = (index: number, status: Step['status']) => {
         setSteps((prev) => prev.map((s, i) => (i === index ? { ...s, status } : s)));
@@ -91,9 +93,21 @@ export const SymptomAnalysis: React.FC = () => {
         // Step 2: Analyzing
         updateStep(1, 'active');
 
-        // DEMO: Show mock response text at 1.5 seconds (before API completes)
+        // DEMO: Show mock response text and audio at 1.5 seconds (before API completes)
+        const mockResponseText = 'आपके लक्षणों के आधार पर, मैं एक सामान्य चिकित्सक से परामर्श करने की सलाह देता हूं। आपके लक्षण हल्के श्वसन संक्रमण का संकेत देते हैं। कृपया जल्द ही एक अपॉइंटमेंट शेड्यूल करें।';
+        // Mock audio base64 (minimal MP3 file simulating AWS Polly response)
+        // NOTE: This is a very short silent MP3 for demo purposes.
+        // To test with real audio, see MOCK_AUDIO_GUIDE.md in the project root
+        // Replace this with a real base64-encoded MP3 for actual audio playback
+        const mockAudio = 'SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADhAC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7v////////////////////////////////////////////////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//sQZAAP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAETEFN//sQZDIP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ==';
+
+        // Store in refs so they're immediately accessible
+        mockResponseTextRef.current = mockResponseText;
+        mockAudioRef.current = mockAudio;
+
         setTimeout(() => {
-            setSummary('आपके लक्षणों के आधार पर, मैं एक सामान्य चिकित्सक से परामर्श करने की सलाह देता हूं। आपके लक्षण हल्के श्वसन संक्रमण का संकेत देते हैं। कृपया जल्द ही एक अपॉइंटमेंट शेड्यूल करें।');
+            setSummary(mockResponseText);
+            setAudioBase64(mockAudio);
         }, 1500);
 
         try {
@@ -123,8 +137,11 @@ export const SymptomAnalysis: React.FC = () => {
                 // Brief pause to let user see everything completed
                 await delay(1200);
 
-                const responseTextToPass = result.responseText || result.summary || '';
-                const audioToPass = result.audioBase64 || null;
+                // Use the mock values from refs (set immediately) or API response
+                const responseTextToPass = result.responseText || result.summary || mockResponseTextRef.current || '';
+                const audioToPass = result.audioBase64 || mockAudioRef.current || null;
+
+                console.log('Navigating with:', { responseTextToPass, audioToPass: audioToPass ? 'present' : 'null' });
 
                 if (result.isEmergency) {
                     navigate('/emergency', { replace: true, state: { responseText: responseTextToPass, audioBase64: audioToPass } });

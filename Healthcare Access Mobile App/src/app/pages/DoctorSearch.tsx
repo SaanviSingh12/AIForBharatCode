@@ -22,6 +22,9 @@ export const DoctorSearch: React.FC = () => {
     const audioBase64 = (location.state as any)?.audioBase64 || null;
     const [showResponseBanner, setShowResponseBanner] = useState(!!responseText);
 
+    // Debug: Log received data
+    console.log('DoctorSearch received:', { responseText, audioBase64: audioBase64 ? 'present' : 'null', showResponseBanner });
+
     const [searchQuery, setSearchQuery] = useState('');
     const [fetchedDoctors, setFetchedDoctors] = useState<Doctor[]>([]);
     const [isLoadingDoctors, setIsLoadingDoctors] = useState(false);
