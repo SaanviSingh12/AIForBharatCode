@@ -14,9 +14,11 @@ object Routes {
     const val EMERGENCY          = "emergency"
     const val USER_PROFILE       = "user_profile"
     const val HOSPITAL_DETAIL    = "hospital_detail/{hospitalId}"
+    const val PHARMACY_DETAIL      = "pharmacy_detail/{pharmacyId}"
 
     fun doctorDetails(id: String) = "doctor_details/$id"
     fun hospitalDetail(id: String) = "hospital_detail/$id"
+    fun pharmacyDetail(id: String) = "pharmacy_detail/$id"
 }
 
 /** Bottom-navigation destinations shown on the main scaffold. */

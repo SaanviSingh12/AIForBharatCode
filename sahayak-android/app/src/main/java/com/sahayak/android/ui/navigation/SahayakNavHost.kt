@@ -26,6 +26,7 @@ import com.sahayak.android.ui.screens.EmergencyScreen
 import com.sahayak.android.ui.screens.HomeScreen
 import com.sahayak.android.ui.screens.HospitalDetailScreen
 import com.sahayak.android.ui.screens.LanguageSelectionScreen
+import com.sahayak.android.ui.screens.PharmacyDetailScreen
 import com.sahayak.android.ui.screens.PharmacyResultsScreen
 import com.sahayak.android.ui.screens.PrescriptionResultsScreen
 import com.sahayak.android.ui.screens.PrescriptionSearchScreen
@@ -202,6 +203,19 @@ fun SahayakNavHost(
 
         composable(Routes.PHARMACY_RESULTS) {
             PharmacyResultsScreen(
+                viewModel = viewModel,
+                onPharmacyClick = { id -> navController.navigate(Routes.pharmacyDetail(id)) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+
+        composable(
+            route = Routes.PHARMACY_DETAIL,
+            arguments = listOf(navArgument("pharmacyId") { type = NavType.StringType }),
+        ) { backStackEntry ->
+            val pharmacyId = backStackEntry.arguments?.getString("pharmacyId") ?: ""
+            PharmacyDetailScreen(
+                pharmacyId = pharmacyId,
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
             )

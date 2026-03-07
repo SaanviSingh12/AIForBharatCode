@@ -7,6 +7,7 @@ import androidx.compose.animation.core.EaseOutCubic
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.Column
@@ -52,6 +53,7 @@ import com.sahayak.android.ui.theme.GovernmentGreen
 @Composable
 fun PharmacyResultsScreen(
     viewModel: SahayakViewModel,
+    onPharmacyClick: (String) -> Unit,
     onBack: () -> Unit,
 ) {
     val uiState by viewModel.state.collectAsState()
@@ -105,7 +107,11 @@ fun PharmacyResultsScreen(
                         enter = fadeIn(tween(350, delayMillis = index * 50, easing = EaseOutCubic)) +
                             slideInVertically(tween(350, delayMillis = index * 50, easing = EaseOutCubic)) { it / 3 },
                     ) {
-                        PharmacyCard(pharmacy, strings)
+                        PharmacyCard(
+                            pharmacy = pharmacy,
+                            strings = strings,
+                            onClick = { onPharmacyClick(pharmacy.id) },
+                        )
                     }
                 }
             }
@@ -117,10 +123,15 @@ fun PharmacyResultsScreen(
 private fun PharmacyCard(
     pharmacy: PharmacyDto,
     strings: com.sahayak.android.i18n.Strings,
+    onClick: () -> Unit,
 ) {
     val context = LocalContext.current
 
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+    ) {
         Column(Modifier.padding(16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
