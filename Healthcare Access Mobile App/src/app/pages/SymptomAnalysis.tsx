@@ -30,6 +30,8 @@ export const SymptomAnalysis: React.FC = () => {
     const [summary, setSummary] = useState<string | null>(null);
     const [failed, setFailed] = useState(false);
     const [showUserInput, setShowUserInput] = useState(true);
+    const [hasAudioInput] = useState<boolean>(!!audioBlob);
+    const [showResponseText, setShowResponseText] = useState(false);
 
     const hasRun = useRef(false);
 
@@ -45,6 +47,18 @@ export const SymptomAnalysis: React.FC = () => {
 
         return () => clearTimeout(timer);
     }, []);
+
+    // Hide response text after 5 seconds
+    useEffect(() => {
+        if (summary) {
+            setShowResponseText(true);
+            const timer = setTimeout(() => {
+                setShowResponseText(false);
+            }, 5000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [summary]);
 
     useEffect(() => {
         if (hasRun.current) return;
@@ -153,18 +167,18 @@ export const SymptomAnalysis: React.FC = () => {
 
             <div className="flex-1 flex flex-col items-center justify-center px-6 py-10">
                 {/* User Input Display (shown for 5 seconds) */}
-                {showUserInput && (directText || audioBlob) && (
+                {showUserInput && (directText || hasAudioInput) && (
                     <div className="w-full max-w-sm bg-gradient-to-r from-blue-100 to-green-100 rounded-xl border border-blue-200 p-4 mb-6 shadow-md animate-fade-in">
                         <div className="flex items-start gap-3">
                             <div className="bg-white rounded-full p-2 mt-0.5">
-                                {audioBlob ? (
+                                {hasAudioInput ? (
                                     <Mic className="w-4 h-4 text-blue-600" />
                                 ) : (
                                     <Search className="w-4 h-4 text-blue-600" />
                                 )}
                             </div>
                             <div className="flex-1">
-                                <p className="text-xs font-medium text-gray-600 mb-1">Your Input:</p>
+                                <p className="text-xs font-medium text-gray-600 mb-1">Input:</p>
                                 <p className="text-sm text-gray-800 font-medium">
                                     {directText || 'Voice recording received'}
                                 </p>
@@ -179,23 +193,23 @@ export const SymptomAnalysis: React.FC = () => {
                         <div
                             key={i}
                             className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-500 ${step.status === 'active'
-                                    ? 'bg-blue-50 border border-blue-200 shadow-sm'
-                                    : step.status === 'done'
-                                        ? 'bg-green-50 border border-green-200'
-                                        : step.status === 'error'
-                                            ? 'bg-red-50 border border-red-200'
-                                            : 'bg-white border border-gray-100'
+                                ? 'bg-blue-50 border border-blue-200 shadow-sm'
+                                : step.status === 'done'
+                                    ? 'bg-green-50 border border-green-200'
+                                    : step.status === 'error'
+                                        ? 'bg-red-50 border border-red-200'
+                                        : 'bg-white border border-gray-100'
                                 }`}
                         >
                             {stepIcon(step)}
                             <span
                                 className={`text-sm font-medium ${step.status === 'active'
-                                        ? 'text-blue-700'
-                                        : step.status === 'done'
-                                            ? 'text-green-700'
-                                            : step.status === 'error'
-                                                ? 'text-red-700'
-                                                : 'text-gray-400'
+                                    ? 'text-blue-700'
+                                    : step.status === 'done'
+                                        ? 'text-green-700'
+                                        : step.status === 'error'
+                                            ? 'text-red-700'
+                                            : 'text-gray-400'
                                     }`}
                             >
                                 {step.label}
@@ -204,21 +218,29 @@ export const SymptomAnalysis: React.FC = () => {
                     ))}
                 </div>
 
-                {/* Summary + audio (shown briefly if available) */}
-                {summary && (
-                    <div className="w-full max-w-sm bg-white rounded-xl border border-gray-200 p-4 mb-4">
-                        <p className="text-sm text-gray-700">{summary}</p>
-                        {audioBase64 && (
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="mt-3"
-                                onClick={() => playAudioResponse(audioBase64)}
-                            >
-                                <Volume2 className="w-4 h-4 mr-2" />
-                                Play Audio Response
-                            </Button>
-                        )}
+                {/* Response Text (shown for 5 seconds) */}
+                {summary && showResponseText && (
+                    <div className="w-full max-w-sm bg-gradient-to-r from-green-100 to-blue-100 rounded-xl border border-green-200 p-4 mb-6 shadow-md animate-fade-in">
+                        <div className="flex items-start gap-3">
+                            <div className="bg-white rounded-full p-2 mt-0.5">
+                                <Stethoscope className="w-4 h-4 text-green-600" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-xs font-medium text-gray-600 mb-1">Analysis Result:</p>
+                                <p className="text-sm text-gray-800 font-medium">{summary}</p>
+                                {audioBase64 && (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="mt-3"
+                                        onClick={() => playAudioResponse(audioBase64)}
+                                    >
+                                        <Volume2 className="w-4 h-4 mr-2" />
+                                        Play Audio Response
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 )}
 
