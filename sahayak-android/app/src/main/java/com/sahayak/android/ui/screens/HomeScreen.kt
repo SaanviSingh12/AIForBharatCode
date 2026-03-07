@@ -114,6 +114,15 @@ fun HomeScreen(
         }
 
         Spacer(Modifier.height(16.dp))
+//        Spacer(Modifier.height(12.dp))
+
+        // ── Services section ──
+        Text(
+            text = "Services",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+        )
+        Spacer(Modifier.height(12.dp))
 
         // ── 2-column grid of square cards ──
         val gridSpacing = 12.dp
@@ -168,6 +177,62 @@ fun HomeScreen(
                 onClick = onNavigateToProfile,
                 modifier = Modifier.weight(1f),
             )
+        }
+
+        Spacer(Modifier.height(28.dp))
+
+        // ── Government Schemes section ──
+        Text(
+            text = "Government Schemes",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+        )
+        Spacer(Modifier.height(12.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFFE3F2FD),
+            ),
+        ) {
+            Column(Modifier.padding(16.dp)) {
+                Text(
+                    text = "PM-JAY",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1565C0),
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = "Ayushman Bharat – Free healthcare up to ₹5 lakhs.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF1976D2),
+                )
+            }
+        }
+
+        Spacer(Modifier.height(10.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFFE8F5E9),
+            ),
+        ) {
+            Column(Modifier.padding(16.dp)) {
+                Text(
+                    text = "Jan Aushadhi",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF2E7D32),
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = "Generic medicines at affordable prices. Save upto 85%.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF388E3C),
+                )
+            }
         }
     }
 }
