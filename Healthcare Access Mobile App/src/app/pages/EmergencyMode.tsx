@@ -1,15 +1,21 @@
-import { AlertTriangle, Ambulance, ArrowLeft, Baby, Flame, Heart, Phone, Shield, Users } from 'lucide-react';
-import React from 'react';
-import { useNavigate } from 'react-router';
+import { AlertTriangle, Ambulance, ArrowLeft, Baby, Flame, Heart, Phone, Shield, Stethoscope, Users, Volume2, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 import { getTranslations } from '../../i18n';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { useApp } from '../context/AppContext';
+import { playAudioResponse } from '../services/api';
 
 export const EmergencyMode: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { language } = useApp();
     const t = getTranslations(language);
+
+    const responseText = (location.state as any)?.responseText || null;
+    const audioBase64 = (location.state as any)?.audioBase64 || null;
+    const [showResponseBanner, setShowResponseBanner] = useState(!!responseText);
 
     const emergencyNumbers = [
         { name: t.ambulanceNational, nameEn: 'Ambulance (National)', number: '108', icon: 'ambulance' },
@@ -77,6 +83,39 @@ export const EmergencyMode: React.FC = () => {
                     </p>
                 </Card>
             </div>
+
+            {/* Response Text Banner */}
+            {showResponseBanner && responseText && (
+                <div className="px-4 mb-6">
+                    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-md animate-fade-in relative">
+                        <button
+                            onClick={() => setShowResponseBanner(false)}
+                            className="absolute top-2 right-2 p-1 hover:bg-gray-100 rounded-full transition-colors"
+                        >
+                            <X className="w-4 h-4 text-gray-600" />
+                        </button>
+                        <div className="flex items-start gap-3 pr-6">
+                            <div className="bg-gradient-to-r from-green-100 to-blue-100 rounded-full p-2 mt-0.5">
+                                <Stethoscope className="w-4 h-4 text-green-600" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-xs font-medium text-gray-600 mb-1">Analysis Result:</p>
+                                <p className="text-sm text-gray-800 font-medium mb-2">{responseText}</p>
+                                {audioBase64 && (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => playAudioResponse(audioBase64)}
+                                    >
+                                        <Volume2 className="w-4 h-4 mr-2" />
+                                        Play Audio
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Emergency Contacts */}
             <div className="px-4 pb-6 space-y-3">

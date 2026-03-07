@@ -1,6 +1,6 @@
-import { ArrowLeft, Award, Building, MapPin, Phone, Search } from 'lucide-react';
+import { ArrowLeft, Award, Building, MapPin, Phone, Search, Stethoscope, Volume2, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { getTranslations } from '../../i18n';
 import { BottomNav } from '../components/BottomNav';
 import { Badge } from '../components/ui/badge';
@@ -10,12 +10,19 @@ import { Input } from '../components/ui/input';
 import { Skeleton } from '../components/ui/skeleton';
 import { useApp } from '../context/AppContext';
 import type { Doctor } from '../data/mockData';
-import { getDoctors, type DoctorDto, type HospitalDto } from '../services/api';
+import { getDoctors, playAudioResponse, type DoctorDto, type HospitalDto } from '../services/api';
 
 export const DoctorSearch: React.FC = () => {
     const navigate = useNavigate();
     const { language, triageResult, userLocation } = useApp();
     const t = getTranslations(language);
+
+    const responseText = (location.state as any)?.responseText || null;
+    const audioBase64 = (location.state as any)?.audioBase64 || null;
+    const [showResponseBanner, setShowResponseBanner] = useState(!!responseText);
+
+    // Debug: Log received data
+    console.log('DoctorSearch received:', { responseText, audioBase64: audioBase64 ? 'present' : 'null', showResponseBanner });
 
     const [searchQuery, setSearchQuery] = useState('');
     const [fetchedDoctors, setFetchedDoctors] = useState<Doctor[]>([]);
@@ -141,6 +148,39 @@ export const DoctorSearch: React.FC = () => {
                 </div>
             </div>
 
+            {/* Response Text Banner */}
+            {showResponseBanner && responseText && (
+                <div className="p-4 pb-0">
+                    <div className="bg-gradient-to-r from-green-100 to-blue-100 rounded-xl border border-green-200 p-4 shadow-md animate-fade-in relative">
+                        <button
+                            onClick={() => setShowResponseBanner(false)}
+                            className="absolute top-2 right-2 p-1 hover:bg-white/50 rounded-full transition-colors"
+                        >
+                            <X className="w-4 h-4 text-gray-600" />
+                        </button>
+                        <div className="flex items-start gap-3 pr-6">
+                            <div className="bg-white rounded-full p-2 mt-0.5">
+                                <Stethoscope className="w-4 h-4 text-green-600" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-xs font-medium text-gray-600 mb-1">Analysis Result:</p>
+                                <p className="text-sm text-gray-800 font-medium mb-2">{responseText}</p>
+                                {audioBase64 && (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => playAudioResponse(audioBase64)}
+                                    >
+                                        <Volume2 className="w-4 h-4 mr-2" />
+                                        Play Audio
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Doctor List */}
             <div className="p-4 space-y-4">
                 <div className="flex items-center justify-between">
@@ -168,73 +208,73 @@ export const DoctorSearch: React.FC = () => {
                         <p className="text-sm text-gray-400 mt-1">{t.tryAgain}</p>
                     </Card>
                 ) : (
-                filteredDoctors.map((doctor) => (
-                    <Card key={doctor.id} className="overflow-hidden">
-                        <div
-                            className="p-4 cursor-pointer"
-                            onClick={() => navigate(`/doctor/${doctor.id}`)}
-                        >
-                            {/* Doctor Header */}
-                            <div className="flex items-start justify-between mb-3">
-                                <div className="flex-1">
-                                    <h3 className="font-semibold text-gray-900 mb-1">{doctor.name}</h3>
-                                    <p className="text-sm text-blue-600 mb-2">{doctor.specialty}</p>
-                                    <Badge className={`${getDoctorTypeColor(doctor.type)} text-xs`}>
-                                        {getDoctorTypeLabel(doctor.type)}
-                                    </Badge>
-                                </div>
-                                <div className="text-right">
-                                    <div className="flex items-center gap-1 text-gray-600 mb-1">
-                                        <MapPin className="w-4 h-4" />
-                                        <span className="text-sm font-semibold">{doctor.distance} km</span>
+                    filteredDoctors.map((doctor) => (
+                        <Card key={doctor.id} className="overflow-hidden">
+                            <div
+                                className="p-4 cursor-pointer"
+                                onClick={() => navigate(`/doctor/${doctor.id}`)}
+                            >
+                                {/* Doctor Header */}
+                                <div className="flex items-start justify-between mb-3">
+                                    <div className="flex-1">
+                                        <h3 className="font-semibold text-gray-900 mb-1">{doctor.name}</h3>
+                                        <p className="text-sm text-blue-600 mb-2">{doctor.specialty}</p>
+                                        <Badge className={`${getDoctorTypeColor(doctor.type)} text-xs`}>
+                                            {getDoctorTypeLabel(doctor.type)}
+                                        </Badge>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="flex items-center gap-1 text-gray-600 mb-1">
+                                            <MapPin className="w-4 h-4" />
+                                            <span className="text-sm font-semibold">{doctor.distance} km</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Doctor Details */}
-                            <div className="space-y-2 text-sm">
-                                <div className="flex items-start gap-2 text-gray-600">
-                                    <Building className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                                    <span>{doctor.address}</span>
+                                {/* Doctor Details */}
+                                <div className="space-y-2 text-sm">
+                                    <div className="flex items-start gap-2 text-gray-600">
+                                        <Building className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                        <span>{doctor.address}</span>
+                                    </div>
+                                    {doctor.experience > 0 && (
+                                        <div className="flex items-center gap-2 text-gray-600">
+                                            <Award className="w-4 h-4 flex-shrink-0" />
+                                            <span>{doctor.experience} years experience</span>
+                                        </div>
+                                    )}
                                 </div>
-                                {doctor.experience > 0 && (
-                                    <div className="flex items-center gap-2 text-gray-600">
-                                        <Award className="w-4 h-4 flex-shrink-0" />
-                                        <span>{doctor.experience} years experience</span>
+
+                                {/* Languages */}
+                                {doctor.languages && doctor.languages.length > 0 && (
+                                    <div className="flex flex-wrap gap-2 mt-3">
+                                        {doctor.languages.map((lang, idx) => (
+                                            <span
+                                                key={idx}
+                                                className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded"
+                                            >
+                                                {lang}
+                                            </span>
+                                        ))}
                                     </div>
                                 )}
                             </div>
 
-                            {/* Languages */}
-                            {doctor.languages && doctor.languages.length > 0 && (
-                                <div className="flex flex-wrap gap-2 mt-3">
-                                    {doctor.languages.map((lang, idx) => (
-                                        <span
-                                            key={idx}
-                                            className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded"
-                                        >
-                                            {lang}
-                                        </span>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Call Button */}
-                        <div className="border-t border-gray-200 p-3 bg-gray-50">
-                            <Button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleCallDoctor(doctor.phone);
-                                }}
-                                className="w-full bg-green-600 hover:bg-green-700"
-                            >
-                                <Phone className="w-4 h-4 mr-2" />
-                                {t.call} {doctor.phone}
-                            </Button>
-                        </div>
-                    </Card>
-                ))
+                            {/* Call Button */}
+                            <div className="border-t border-gray-200 p-3 bg-gray-50">
+                                <Button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCallDoctor(doctor.phone);
+                                    }}
+                                    className="w-full bg-green-600 hover:bg-green-700"
+                                >
+                                    <Phone className="w-4 h-4 mr-2" />
+                                    {t.call} {doctor.phone}
+                                </Button>
+                            </div>
+                        </Card>
+                    ))
                 )}
             </div>
 
