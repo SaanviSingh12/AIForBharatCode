@@ -1,0 +1,8 @@
+target/
+.git/
+.idea/
+*.md
+*.sh
+.DS_Store
+.aws-sam/
+samconfig.toml
