@@ -17,4 +17,6 @@ public class PharmacyDto {
     private String phone;
     private String address;
     private String timings;
+    private double latitude;
+    private double longitude;
 }

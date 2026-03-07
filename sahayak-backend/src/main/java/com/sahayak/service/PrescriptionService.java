@@ -44,7 +44,8 @@ public class PrescriptionService {
      * 4. Look up generic prices
      * 5. Generate audio response via Polly
      */
-    public PrescriptionResponse analyzePrescription(MultipartFile imageFile, String language) {
+    public PrescriptionResponse analyzePrescription(MultipartFile imageFile, String language,
+                                                     String lat, String lng) {
         String s3Key = null;
         try {
             String extractedText;
@@ -61,9 +62,11 @@ public class PrescriptionService {
                 extractedText = "Tab. Paracetamol 500mg - twice daily\nTab. Amoxicillin 500mg - thrice daily\nOmeprazole 20mg - once daily before food";
             }
 
-            // AI analysis for generic alternatives
+            // AI analysis for generic alternatives (location-aware for kendra context)
             String lang = language != null ? language : "hi-IN";
-            Map<String, Object> medicineData = bedrockService.processMedicines(extractedText, lang);
+            Double userLat = safeParseDbl(lat);
+            Double userLng = safeParseDbl(lng);
+            Map<String, Object> medicineData = bedrockService.processMedicines(extractedText, lang, userLat, userLng);
 
             @SuppressWarnings("unchecked")
             List<Map<String, Object>> medicinesList =
@@ -78,8 +81,8 @@ public class PrescriptionService {
             int totalSavingsPercent = ((Number) medicineData.getOrDefault("totalSavingsPercent", 0)).intValue();
             String responseText = (String) medicineData.getOrDefault("responseInLanguage", "");
 
-            // Jan Aushadhi locations
-            List<PharmacyDto> janAushadhiLocations = mockDataService.getPharmacies();
+            // Jan Aushadhi locations (filtered by user location)
+            List<PharmacyDto> janAushadhiLocations = mockDataService.getPharmacies(lat, lng);
 
             // Audio response
             String audioBase64 = null;
@@ -120,9 +123,12 @@ public class PrescriptionService {
      *
      * @param prescription The prescription text to analyze
      * @param language     Language code (e.g., "hi-IN", "en-IN")
+     * @param lat          User latitude
+     * @param lng          User longitude
      * @return PrescriptionResponse with medicines, pricing, and audio response
      */
-    public PrescriptionResponse analyzePrescription(String prescription, String language) {
+    public PrescriptionResponse analyzePrescription(String prescription, String language,
+                                                     String lat, String lng) {
         try {
             String extractedText = prescription;
             String lang = language != null ? language : "hi-IN";
@@ -143,8 +149,8 @@ public class PrescriptionService {
             int totalSavingsPercent = ((Number) medicineData.getOrDefault("totalSavingsPercent", 0)).intValue();
             String responseText = (String) medicineData.getOrDefault("responseInLanguage", "");
 
-            // Jan Aushadhi locations
-            List<PharmacyDto> janAushadhiLocations = mockDataService.getPharmacies();
+            // Jan Aushadhi locations (filtered by user location)
+            List<PharmacyDto> janAushadhiLocations = mockDataService.getPharmacies(lat, lng);
 
             // Audio response
             String audioBase64 = null;
@@ -283,25 +289,12 @@ public class PrescriptionService {
 
     public List<PharmacyDto> getNearbyPharmacies(String lat, String lng) {
         log.info("Getting nearby pharmacies for lat: {}, lng: {}", lat, lng);
-        // In a real implementation, you'd call an external API (like Google Places) to get nearby pharmacies based on lat/lng.
-        // For this mock, we'll return a static list of pharmacies.
+        return mockDataService.getPharmacies(lat, lng);
+    }
 
-        return List.of(
-                PharmacyDto.builder()
-                        .name("Jan Aushadhi Kendra - City Center")
-                        .address("123 Main St, City Center")
-                        .distance(0.5)
-                        .build(),
-                PharmacyDto.builder()
-                        .name("Jan Aushadhi Kendra - Market Road")
-                        .address("456 Market Rd, Downtown")
-                        .distance(1.2)
-                        .build(),
-                PharmacyDto.builder()
-                        .name("Jan Aushadhi Kendra - Near Hospital")
-                        .address("789 Health Ave, Medical District")
-                        .distance(2.0)
-                        .build()
-        );
+    private Double safeParseDbl(String val) {
+        if (val == null || val.isBlank()) return null;
+        try { return Double.parseDouble(val); }
+        catch (NumberFormatException e) { return null; }
     }
 }

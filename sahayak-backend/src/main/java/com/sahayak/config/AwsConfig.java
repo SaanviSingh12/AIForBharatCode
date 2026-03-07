@@ -17,10 +17,13 @@ public class AwsConfig {
     @Value("${aws.region}")
     private String awsRegion;
 
+    @Value("${aws.bedrock.region:${aws.region}}")
+    private String bedrockRegion;
+
     @Bean
     public BedrockRuntimeClient bedrockRuntimeClient() {
         return BedrockRuntimeClient.builder()
-                .region(Region.of(awsRegion))
+                .region(Region.of(bedrockRegion))
                 .build();
     }
 

@@ -15,7 +15,7 @@ type Step = {
 export const SymptomAnalysis: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { language, setSymptoms, setTriageResult, setIsLoading, setApiError, pendingAudioBlob, setPendingAudioBlob } = useApp();
+    const { language, setSymptoms, setTriageResult, setIsLoading, setApiError, pendingAudioBlob, setPendingAudioBlob, userLocation } = useApp();
     const t = getTranslations(language);
 
     const audioBlob: Blob | null = pendingAudioBlob;
@@ -116,7 +116,7 @@ export const SymptomAnalysis: React.FC = () => {
                 apiAnalyzeSymptoms(
                     audioBlob,
                     language,
-                    {},
+                    userLocation ?? {},
                     directText ?? undefined
                 ),
                 delay(2000), // ensure step 2 shows for at least 2 seconds
