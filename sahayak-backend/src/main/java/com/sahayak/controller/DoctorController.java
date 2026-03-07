@@ -28,18 +28,20 @@ public class DoctorController {
     @GetMapping
     public ResponseEntity<List<DoctorDto>> getDoctors(
             @RequestParam(value = "query", required = false) String query,
-            @RequestParam(value = "specialty", required = false) String specialty) {
+            @RequestParam(value = "specialty", required = false) String specialty,
+            @RequestParam(value = "lat", required = false) String lat,
+            @RequestParam(value = "lng", required = false) String lng) {
 
-        log.info("Doctors request - query: {}, specialty: {}", query, specialty);
+        log.info("Doctors request - query: {}, specialty: {}, lat: {}, lng: {}", query, specialty, lat, lng);
 
         List<DoctorDto> doctors;
 
         if (query != null && !query.isBlank()) {
-            doctors = doctorService.searchDoctors(query);
+            doctors = doctorService.searchDoctors(query, lat, lng);
         } else if (specialty != null && !specialty.isBlank()) {
-            doctors = doctorService.getDoctorsBySpecialty(specialty);
+            doctors = doctorService.getDoctorsBySpecialty(specialty, lat, lng);
         } else {
-            doctors = doctorService.getAllDoctors();
+            doctors = doctorService.getAllDoctors(lat, lng);
         }
 
         return ResponseEntity.ok(doctors);
@@ -65,10 +67,12 @@ public class DoctorController {
      * Get only government doctors (PMJAY eligible, free consultation).
      */
     @GetMapping("/government")
-    public ResponseEntity<List<DoctorDto>> getGovernmentDoctors() {
-        log.info("Government doctors request");
+    public ResponseEntity<List<DoctorDto>> getGovernmentDoctors(
+            @RequestParam(value = "lat", required = false) String lat,
+            @RequestParam(value = "lng", required = false) String lng) {
+        log.info("Government doctors request - lat: {}, lng: {}", lat, lng);
 
-        List<DoctorDto> doctors = doctorService.getGovernmentDoctors();
+        List<DoctorDto> doctors = doctorService.getGovernmentDoctors(lat, lng);
         return ResponseEntity.ok(doctors);
     }
 
@@ -78,10 +82,13 @@ public class DoctorController {
      * Get doctors by specialty.
      */
     @GetMapping("/specialty/{specialty}")
-    public ResponseEntity<List<DoctorDto>> getDoctorsBySpecialty(@PathVariable String specialty) {
-        log.info("Doctors by specialty request - specialty: {}", specialty);
+    public ResponseEntity<List<DoctorDto>> getDoctorsBySpecialty(
+            @PathVariable String specialty,
+            @RequestParam(value = "lat", required = false) String lat,
+            @RequestParam(value = "lng", required = false) String lng) {
+        log.info("Doctors by specialty request - specialty: {}, lat: {}, lng: {}", specialty, lat, lng);
 
-        List<DoctorDto> doctors = doctorService.getDoctorsBySpecialty(specialty);
+        List<DoctorDto> doctors = doctorService.getDoctorsBySpecialty(specialty, lat, lng);
         return ResponseEntity.ok(doctors);
     }
 }

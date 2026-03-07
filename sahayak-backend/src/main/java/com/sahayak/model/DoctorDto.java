@@ -26,4 +26,6 @@ public class DoctorDto {
     private String waitTime;
     private int experience;
     private List<String> languages;
+    private double latitude;
+    private double longitude;
 }

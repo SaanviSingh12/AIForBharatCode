@@ -14,7 +14,7 @@ import { getDoctors, type DoctorDto, type HospitalDto } from '../services/api';
 
 export const DoctorSearch: React.FC = () => {
     const navigate = useNavigate();
-    const { language, triageResult } = useApp();
+    const { language, triageResult, userLocation } = useApp();
     const t = getTranslations(language);
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -27,7 +27,7 @@ export const DoctorSearch: React.FC = () => {
         const fetchDocs = async () => {
             setIsLoadingDoctors(true);
             try {
-                const data: DoctorDto[] = await getDoctors();
+                const data: DoctorDto[] = await getDoctors({}, userLocation ?? {});
                 if (!cancelled) {
                     setFetchedDoctors(
                         data.map((d) => ({
@@ -51,7 +51,7 @@ export const DoctorSearch: React.FC = () => {
         };
         fetchDocs();
         return () => { cancelled = true; };
-    }, []);
+    }, [userLocation]);
 
     // Use API results if available, otherwise fall back to mock data
     const apiHospitals = triageResult?.hospitals;
