@@ -54,7 +54,7 @@ export const SymptomEntry: React.FC = () => {
                             <Keyboard className="w-8 h-8 text-white" />
                         </div>
                         <div className="flex-1">
-                            <h3 className="font-semibold text-lg text-gray-800">Type Your Symptoms</h3>
+                            <h3 className="font-semibold text-lg text-gray-800">{t.typeYourSymptoms}</h3>
                             <p className="text-sm text-gray-500 mt-1">Write down what you're feeling and let AI assist you</p>
                         </div>
                     </div>

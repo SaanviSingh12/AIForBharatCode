@@ -10,6 +10,7 @@ export const gu: TranslationKeys = {
 
     // Symptom Entry
     speakSymptoms: 'તમારા લક્ષણો બોલો',
+    typeYourSymptoms: 'તમારા લક્ષણો લખો',
     typeSymptoms: 'અથવા તમારા લક્ષણો અહીં લખો...',
     analyzing: 'વિશ્લેષણ કરી રહ્યા છીએ...',
     startRecording: 'રેકોર્ડિંગ શરૂ કરવા ટેપ કરો',
@@ -38,8 +39,23 @@ export const gu: TranslationKeys = {
     // Emergency
     emergency: 'ઈમર્જન્સી',
     call: 'કૉલ કરો',
-    emergencyServices: 'ઈમર્જન્સી સેવાઓ',
-
+    emergencyServices: 'ઈમર્જન્સી સેવાઓ', emergencyMode: 'આપાતકાલીન મોડ',
+    lifeThreatening: 'જો તમે જીவન લે ખતરનાક આપાતકાલીન પરિસ્થિતિનો સામનો કરી રહ્યા છો, તો તાત્કાલિક એમ્બ્યુલન્સને કોલ કરો',
+    emergencyNumbers: 'આપાતકાલીન નંબરો',
+    ambulanceNational: 'એમ્બ્યુલન્સ (રાષ્ટ્રીય)',
+    medicalEmergency: 'વૈદ્યકીય આપાતકાલીન',
+    policeEmergency: 'પોલીસ આપાતકાલીન',
+    fireEmergency: 'અગ્નિશમન આપાતકાલીન',
+    womenHelpline: 'મહિલા હેલ્પલાઇન',
+    childHelpline: 'બાળક હેલ્પલાઇન',
+    importantGuidelines: 'મહત્வની માર્ગદર્શિકા',
+    stayCalm: 'શાંત રહો અને કોલ કરતાં સ્પષ્ટપણે બોલો',
+    provideLocation: 'તમારું અચૂક સ્થાન પ્રદાન કરો',
+    describeEmergency: 'આપાતકાલીન પરિસ્થિતિનો வર્ણન કરો',
+    followInstructions: 'ઑપરેટરની સૂચનાઓનું પાલન કરો',
+    dontHangUp: 'કહેவામાં ન આவે ત્યાં સુધી ફોન ન જોડો',
+    medicalEmergencySymptoms: 'વૈદ્યકીય આપાતકાલીન લક્ષણો',
+    emergencySymptomsDesc: 'છાતીમાં દર્દ, શ્வાસ લેவામாં અவઘરாઈ, ગંભીર રક્તસ્રાவ, બેહોશી, સ્ટ્રોકનாં લક્ષણો, ગંભીર જળગણી, અથவா શંકાસ્પદ હ્રદયનો દોરો - તாત્કாલિક 108 પર કોલ કરો!',
     // Profile
     changeLanguage: 'ભાષા બદલો',
     settings: 'સેટિંગ્સ',
