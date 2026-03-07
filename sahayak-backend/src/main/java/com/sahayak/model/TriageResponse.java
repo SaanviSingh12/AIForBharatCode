@@ -1,5 +1,6 @@
 package com.sahayak.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +16,10 @@ public class TriageResponse {
     private boolean success;
     private String symptomText;          // Transcribed / input text
     private String specialist;           // e.g. "Cardiologist"
+
+    @JsonProperty("isEmergency")
     private boolean isEmergency;
+
     private String urgencyLevel;         // "emergency" | "urgent" | "low"
     private String summary;              // English summary
     private String responseText;         // Response in user's language

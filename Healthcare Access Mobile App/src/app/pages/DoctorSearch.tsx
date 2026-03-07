@@ -1,4 +1,4 @@
-import { ArrowLeft, Award, Building, MapPin, Phone, Search, Stethoscope, Volume2, X } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Award, Building, Filter, MapPin, Navigation, Phone, Search, Volume2, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { getTranslations } from '../../i18n';
@@ -14,6 +14,7 @@ import { getDoctors, playAudioResponse, type DoctorDto, type HospitalDto } from 
 
 export const DoctorSearch: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { language, triageResult, userLocation } = useApp();
     const t = getTranslations(language);
 
@@ -21,10 +22,11 @@ export const DoctorSearch: React.FC = () => {
     const audioBase64 = (location.state as any)?.audioBase64 || null;
     const [showResponseBanner, setShowResponseBanner] = useState(!!responseText);
 
-    // Debug: Log received data
-    console.log('DoctorSearch received:', { responseText, audioBase64: audioBase64 ? 'present' : 'null', showResponseBanner });
+    // Recommended specialist from triage result
+    const recommendedSpecialist = triageResult?.specialist || null;
 
     const [searchQuery, setSearchQuery] = useState('');
+    const [typeFilter, setTypeFilter] = useState<'all' | 'government' | 'private'>('all');
     const [fetchedDoctors, setFetchedDoctors] = useState<Doctor[]>([]);
     const [isLoadingDoctors, setIsLoadingDoctors] = useState(false);
 
@@ -90,8 +92,11 @@ export const DoctorSearch: React.FC = () => {
     const filteredDoctors = apiDoctors
         .filter(
             (doctor) =>
-                doctor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                doctor.specialty.toLowerCase().includes(searchQuery.toLowerCase())
+                (doctor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                doctor.specialty.toLowerCase().includes(searchQuery.toLowerCase())) &&
+                (typeFilter === 'all' ||
+                 (typeFilter === 'government' && doctor.type === 'government') ||
+                 (typeFilter === 'private' && doctor.type !== 'government'))
         )
         .sort((a, b) => {
             if (a.type === 'government' && b.type !== 'government') return -1;
@@ -108,6 +113,11 @@ export const DoctorSearch: React.FC = () => {
         }
     };
 
+    // Counts for filter badges
+    const govtCount = apiDoctors.filter(d => d.type === 'government').length;
+    const privateCount = apiDoctors.filter(d => d.type !== 'government').length;
+    const allCount = apiDoctors.length;
+
     const getDoctorTypeColor = (type: Doctor['type']) => {
         switch (type) {
             case 'government': return 'bg-green-100 text-green-800 border-green-300';
@@ -119,6 +129,11 @@ export const DoctorSearch: React.FC = () => {
 
     const handleCallDoctor = (phone: string) => {
         window.location.href = `tel:${phone}`;
+    };
+
+    const handleGetDirections = (name: string, address: string) => {
+        const query = encodeURIComponent(`${name}, ${address}`);
+        window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
     };
 
     return (
@@ -146,38 +161,90 @@ export const DoctorSearch: React.FC = () => {
                         className="pl-10"
                     />
                 </div>
+
+                {/* Filter Tiles */}
+                <div className="flex gap-1.5 mt-2">
+                    <button
+                        onClick={() => setTypeFilter('all')}
+                        className={`py-1 px-2.5 rounded-full text-[11px] font-medium transition-all border ${
+                            typeFilter === 'all'
+                                ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                                : 'bg-white text-gray-500 border-gray-200'
+                        }`}
+                    >
+                        All {allCount}
+                    </button>
+                    <button
+                        onClick={() => setTypeFilter('government')}
+                        className={`py-1 px-2.5 rounded-full text-[11px] font-medium transition-all border ${
+                            typeFilter === 'government'
+                                ? 'bg-green-600 text-white border-green-600 shadow-sm'
+                                : 'bg-white text-green-700 border-green-200'
+                        }`}
+                    >
+                        Govt {govtCount}
+                    </button>
+                    <button
+                        onClick={() => setTypeFilter('private')}
+                        className={`py-1 px-2.5 rounded-full text-[11px] font-medium transition-all border ${
+                            typeFilter === 'private'
+                                ? 'bg-purple-600 text-white border-purple-600 shadow-sm'
+                                : 'bg-white text-purple-700 border-purple-200'
+                        }`}
+                    >
+                        Private {privateCount}
+                    </button>
+                </div>
             </div>
 
-            {/* Response Text Banner */}
+            {/* Emergency Banner */}
+            {(triageResult?.isEmergency || (triageResult as any)?.emergency) && (
+                <button
+                    onClick={() => navigate('/emergency')}
+                    className="w-full bg-red-600 hover:bg-red-700 transition-colors px-4 py-2.5 flex items-center justify-center gap-2 animate-pulse"
+                >
+                    <AlertTriangle className="w-4 h-4 text-white" />
+                    <span className="text-white text-sm font-bold">⚠ EMERGENCY DETECTED — Tap here for immediate help</span>
+                    <AlertTriangle className="w-4 h-4 text-white" />
+                </button>
+            )}
+
+            {/* AI Response — shown above doctor list */}
             {showResponseBanner && responseText && (
-                <div className="p-4 pb-0">
-                    <div className="bg-gradient-to-r from-green-100 to-blue-100 rounded-xl border border-green-200 p-4 shadow-md animate-fade-in relative">
-                        <button
-                            onClick={() => setShowResponseBanner(false)}
-                            className="absolute top-2 right-2 p-1 hover:bg-white/50 rounded-full transition-colors"
-                        >
-                            <X className="w-4 h-4 text-gray-600" />
-                        </button>
-                        <div className="flex items-start gap-3 pr-6">
-                            <div className="bg-white rounded-full p-2 mt-0.5">
-                                <Stethoscope className="w-4 h-4 text-green-600" />
-                            </div>
-                            <div className="flex-1">
-                                <p className="text-xs font-medium text-gray-600 mb-1">Analysis Result:</p>
-                                <p className="text-sm text-gray-800 font-medium mb-2">{responseText}</p>
-                                {audioBase64 && (
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => playAudioResponse(audioBase64)}
-                                    >
-                                        <Volume2 className="w-4 h-4 mr-2" />
-                                        Play Audio
-                                    </Button>
-                                )}
+                <div className="p-4 pb-0 space-y-3">
+                    {/* Response in patient's language + audio */}
+                        <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-200 p-4 shadow-sm relative">
+                            <button
+                                onClick={() => setShowResponseBanner(false)}
+                                className="absolute top-2 right-2 p-1 hover:bg-white/50 rounded-full transition-colors"
+                            >
+                                <X className="w-4 h-4 text-gray-600" />
+                            </button>
+                            <div className="flex items-start gap-3 pr-6">
+                                <div className="bg-green-100 rounded-full p-2 mt-0.5">
+                                    <Volume2 className="w-4 h-4 text-green-600" />
+                                </div>
+                                <div className="flex-1">
+                                    <p className="text-xs font-semibold text-green-600 uppercase tracking-wide mb-1">Response for Patient</p>
+                                    {recommendedSpecialist && (
+                                        <Badge className="bg-blue-100 text-blue-800 border-blue-300 text-xs mb-2">
+                                            Recommended: {recommendedSpecialist}
+                                        </Badge>
+                                    )}
+                                    <p className="text-sm text-gray-800 leading-relaxed mb-2">{responseText}</p>
+                                    {audioBase64 && (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => playAudioResponse(audioBase64)}
+                                        >
+                                            <Volume2 className="w-4 h-4 mr-2" />
+                                            Play Audio
+                                        </Button>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>
                 </div>
             )}
 
@@ -185,11 +252,13 @@ export const DoctorSearch: React.FC = () => {
             <div className="p-4 space-y-4">
                 <div className="flex items-center justify-between">
                     <p className="text-sm text-gray-600">
-                        {filteredDoctors.length} doctors found
+                        {filteredDoctors.length} {typeFilter === 'government' ? 'government' : typeFilter === 'private' ? 'private' : ''} hospitals found
                     </p>
-                    <p className="text-xs text-green-600">
-                        ✓ Government doctors prioritized
-                    </p>
+                    {typeFilter === 'all' && (
+                        <p className="text-xs text-green-600">
+                            ✓ Government hospitals prioritized
+                        </p>
+                    )}
                 </div>
 
                 {isLoadingDoctors ? (
@@ -212,7 +281,7 @@ export const DoctorSearch: React.FC = () => {
                         <Card key={doctor.id} className="overflow-hidden">
                             <div
                                 className="p-4 cursor-pointer"
-                                onClick={() => navigate(`/doctor/${doctor.id}`)}
+                                onClick={() => navigate(`/doctor-profile/${doctor.id}`)}
                             >
                                 {/* Doctor Header */}
                                 <div className="flex items-start justify-between mb-3">
@@ -260,17 +329,28 @@ export const DoctorSearch: React.FC = () => {
                                 )}
                             </div>
 
-                            {/* Call Button */}
-                            <div className="border-t border-gray-200 p-3 bg-gray-50">
+                            {/* Action Buttons */}
+                            <div className="border-t border-gray-200 p-3 bg-gray-50 flex gap-2">
+                                <Button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleGetDirections(doctor.name, doctor.address);
+                                    }}
+                                    variant="outline"
+                                    className="flex-1 border-blue-300 text-blue-700 hover:bg-blue-50"
+                                >
+                                    <Navigation className="w-4 h-4 mr-2" />
+                                    Directions
+                                </Button>
                                 <Button
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         handleCallDoctor(doctor.phone);
                                     }}
-                                    className="w-full bg-green-600 hover:bg-green-700"
+                                    className="flex-1 bg-green-600 hover:bg-green-700"
                                 >
                                     <Phone className="w-4 h-4 mr-2" />
-                                    {t.call} {doctor.phone}
+                                    {t.call}
                                 </Button>
                             </div>
                         </Card>
