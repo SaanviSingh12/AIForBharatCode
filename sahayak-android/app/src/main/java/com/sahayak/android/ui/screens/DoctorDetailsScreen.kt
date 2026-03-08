@@ -18,10 +18,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.LocalHospital
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Map
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Card
@@ -58,7 +57,7 @@ fun DoctorDetailsScreen(
     val context = LocalContext.current
 
     LaunchedEffect(doctorId) {
-        viewModel.loadDoctor(doctorId)
+        viewModel.loadHospital(doctorId)
     }
 
     Scaffold(
@@ -74,7 +73,7 @@ fun DoctorDetailsScreen(
             )
         },
     ) { padding ->
-        if (uiState.doctorsLoading) {
+        if (uiState.hospitalsLoading) {
             CircularProgressIndicator(
                 modifier = Modifier
                     .fillMaxSize()
@@ -83,8 +82,8 @@ fun DoctorDetailsScreen(
                     .size(48.dp),
             )
         } else {
-            val doctor = uiState.selectedDoctor
-            if (doctor == null) {
+            val hospital = uiState.selectedHospital
+            if (hospital == null) {
                 Text(
                     text = strings.noResults,
                     modifier = Modifier.padding(padding).padding(32.dp),
@@ -97,40 +96,39 @@ fun DoctorDetailsScreen(
                         .verticalScroll(rememberScrollState())
                         .padding(16.dp),
                 ) {
-                    // Doctor name & specialty
+                    // Hospital name & specialist
                     Text(
-                        text = doctor.name,
+                        text = hospital.name,
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        text = doctor.specialty,
+                        text = hospital.specialist.ifBlank { "General" },
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary,
                     )
 
                     Spacer(Modifier.height(16.dp))
 
-                    // Info cards
+                    // Info chips
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        InfoChip(
-                            icon = Icons.Default.Star,
-                            text = "${doctor.rating} ★",
-                            modifier = Modifier.weight(1f),
-                        )
-                        InfoChip(
-                            icon = Icons.Default.Schedule,
-                            text = doctor.waitTime.ifBlank { "N/A" },
-                            modifier = Modifier.weight(1f),
-                        )
-                        InfoChip(
-                            icon = Icons.Default.LocationOn,
-                            text = "${doctor.distance} km",
-                            modifier = Modifier.weight(1f),
-                        )
+                        if (hospital.hasEmergency) {
+                            InfoChip(
+                                icon = Icons.Default.LocalHospital,
+                                text = "Emergency",
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+                        if (hospital.distance > 0) {
+                            InfoChip(
+                                icon = Icons.Default.LocationOn,
+                                text = "${hospital.distance} km",
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
                     }
 
                     Spacer(Modifier.height(16.dp))
@@ -143,13 +141,15 @@ fun DoctorDetailsScreen(
                         ),
                     ) {
                         Column(Modifier.padding(16.dp)) {
-                            DetailRow("Type", doctor.type.replaceFirstChar { it.uppercase() })
-                            DetailRow("Experience", "${doctor.experience} years")
-                            DetailRow("Fee", if (doctor.fee == 0) strings.free else "₹${doctor.fee}")
-                            DetailRow("PMJAY", if (doctor.pmjay) "✅ Empanelled" else "❌")
-                            DetailRow("Languages", doctor.languages.joinToString(", "))
-                            if (doctor.address.isNotBlank()) {
-                                DetailRow("Address", doctor.address)
+                            DetailRow("Type", hospital.type.replaceFirstChar { it.uppercase() })
+                            DetailRow("Fee", if (hospital.free) strings.free else if (hospital.fee != null) "₹${hospital.fee}" else "N/A")
+                            DetailRow("PMJAY", when (hospital.pmjayStatus) {
+                                "empanelled" -> "✅ Empanelled"
+                                else -> "❌ Not Empanelled"
+                            })
+                            DetailRow("Emergency", if (hospital.hasEmergency) "✅ Available" else "❌ Not Available")
+                            if (hospital.address.isNotBlank()) {
+                                DetailRow("Address", hospital.address)
                             }
                         }
                     }
@@ -157,10 +157,35 @@ fun DoctorDetailsScreen(
                     Spacer(Modifier.height(24.dp))
 
                     // Open in Google Maps button
-                    if (doctor.address.isNotBlank()) {
+                    if (hospital.latitude != 0.0 && hospital.longitude != 0.0) {
                         Button(
                             onClick = {
-                                val query = Uri.encode("${doctor.name}, ${doctor.address}")
+                                val query = Uri.encode("${hospital.name}, ${hospital.address}")
+                                val uri = Uri.parse("geo:${hospital.latitude},${hospital.longitude}?q=$query")
+                                val mapIntent = Intent(Intent.ACTION_VIEW, uri).apply {
+                                    setPackage("com.google.android.apps.maps")
+                                }
+                                if (mapIntent.resolveActivity(context.packageManager) != null) {
+                                    context.startActivity(mapIntent)
+                                } else {
+                                    val webUri = Uri.parse(
+                                        "https://www.google.com/maps/search/?api=1&query=${hospital.latitude},${hospital.longitude}"
+                                    )
+                                    context.startActivity(Intent(Intent.ACTION_VIEW, webUri))
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth().height(48.dp),
+                        ) {
+                            Icon(Icons.Default.Map, contentDescription = null)
+                            Spacer(Modifier.width(8.dp))
+                            Text("Open in Google Maps")
+                        }
+
+                        Spacer(Modifier.height(12.dp))
+                    } else if (hospital.address.isNotBlank()) {
+                        Button(
+                            onClick = {
+                                val query = Uri.encode("${hospital.name}, ${hospital.address}")
                                 val uri = Uri.parse("geo:0,0?q=$query")
                                 val mapIntent = Intent(Intent.ACTION_VIEW, uri).apply {
                                     setPackage("com.google.android.apps.maps")
@@ -185,17 +210,17 @@ fun DoctorDetailsScreen(
                     }
 
                     // Call button
-                    if (doctor.phone.isNotBlank()) {
+                    if (hospital.phone.isNotBlank()) {
                         OutlinedButton(
                             onClick = {
-                                val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${doctor.phone}"))
+                                val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${hospital.phone}"))
                                 context.startActivity(intent)
                             },
                             modifier = Modifier.fillMaxWidth().height(48.dp),
                         ) {
                             Icon(Icons.Default.Call, contentDescription = null)
                             Spacer(Modifier.width(8.dp))
-                            Text("${strings.call} ${doctor.phone}")
+                            Text("${strings.call} ${hospital.phone}")
                         }
                     }
                 }

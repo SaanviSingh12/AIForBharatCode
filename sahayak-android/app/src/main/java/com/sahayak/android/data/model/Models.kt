@@ -33,6 +33,17 @@ data class HospitalDto(
     val address: String = "",
     val hasEmergency: Boolean = false,
     val pmjayStatus: String = "",         // "empanelled" | "not-empanelled"
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0,
+)
+
+@Serializable
+data class HospitalPageResponse(
+    val hospitals: List<HospitalDto> = emptyList(),
+    val page: Int = 0,
+    val pageSize: Int = 50,
+    val totalCount: Long = 0,
+    val hasMore: Boolean = false,
 )
 
 // ─────────────────────────────────────────────

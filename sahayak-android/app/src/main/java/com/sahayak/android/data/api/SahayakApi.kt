@@ -1,7 +1,8 @@
 package com.sahayak.android.data.api
 
-import com.sahayak.android.data.model.DoctorDto
 import com.sahayak.android.data.model.HealthResponse
+import com.sahayak.android.data.model.HospitalDto
+import com.sahayak.android.data.model.HospitalPageResponse
 import com.sahayak.android.data.model.PharmacyDto
 import com.sahayak.android.data.model.PrescriptionResponse
 import com.sahayak.android.data.model.TriageResponse
@@ -73,16 +74,15 @@ interface SahayakApi {
         @Query("lng") longitude: Double,
     ): List<PharmacyDto>
 
-    // ── Doctors ──────────────────────────────────
-    @GET("api/v1/doctors")
-    suspend fun getDoctors(
-        @Query("specialty") specialty: String? = null,
+    // ── Hospitals (paginated) ───────────────────
+    @GET("api/v1/hospitals")
+    suspend fun getHospitals(
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 50,
         @Query("type") type: String? = null,
-        @Query("available") available: Boolean? = null,
-        @Query("latitude") latitude: Double? = null,
-        @Query("longitude") longitude: Double? = null,
-    ): List<DoctorDto>
+        @Query("query") query: String? = null,
+    ): HospitalPageResponse
 
-    @GET("api/v1/doctors/{id}")
-    suspend fun getDoctor(@Path("id") id: String): DoctorDto
+    @GET("api/v1/hospitals/{id}")
+    suspend fun getHospital(@Path("id") id: String): HospitalDto
 }

@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.sahayak.android.data.api.SahayakRepository
-import com.sahayak.android.data.model.DoctorDto
+import com.sahayak.android.data.model.HospitalDto
 import com.sahayak.android.data.model.PharmacyDto
 import com.sahayak.android.data.model.PrescriptionResponse
 import com.sahayak.android.data.model.TriageResponse
@@ -49,10 +49,13 @@ data class SahayakUiState(
     val pharmacies: List<PharmacyDto> = emptyList(),
     val pharmaciesLoading: Boolean = false,
 
-    // Doctors
-    val doctors: List<DoctorDto> = emptyList(),
-    val selectedDoctor: DoctorDto? = null,
-    val doctorsLoading: Boolean = false,
+    // Hospitals (paginated)
+    val hospitals: List<HospitalDto> = emptyList(),
+    val selectedHospital: HospitalDto? = null,
+    val hospitalsLoading: Boolean = false,
+    val hospitalPage: Int = 0,
+    val hasMoreHospitals: Boolean = false,
+    val hospitalTotalCount: Long = 0,
 
     // Global
     val isLoading: Boolean = false,
@@ -216,35 +219,91 @@ class SahayakViewModel @Inject constructor(
         }
     }
 
-    // ── Doctors ──────────────────────────────
+    // ── Hospitals (paginated, 50 per page) ──
 
-    fun loadDoctors(
-        specialty: String? = null,
+    private companion object {
+        const val HOSPITAL_PAGE_SIZE = 50
+    }
+
+    /**
+     * Load the first page of hospitals, replacing any existing list.
+     */
+    fun loadHospitals(
         type: String? = null,
-        latitude: Double? = null,
-        longitude: Double? = null,
+        query: String? = null,
     ) {
         viewModelScope.launch {
-            _state.update { it.copy(doctorsLoading = true, error = null) }
-            repo.getDoctors(specialty, type, available = true, latitude ?: lat, longitude ?: lng)
-                .onSuccess { list ->
-                    _state.update { it.copy(doctors = list, doctorsLoading = false) }
+            _state.update {
+                it.copy(
+                    hospitalsLoading = true,
+                    error = null,
+                    hospitals = emptyList(),
+                    hospitalPage = 0,
+                    hasMoreHospitals = false,
+                    hospitalTotalCount = 0,
+                )
+            }
+            repo.getHospitals(page = 0, size = HOSPITAL_PAGE_SIZE, type = type, query = query)
+                .onSuccess { page ->
+                    _state.update {
+                        it.copy(
+                            hospitals = page.hospitals,
+                            hospitalsLoading = false,
+                            hospitalPage = 0,
+                            hasMoreHospitals = page.hasMore,
+                            hospitalTotalCount = page.totalCount,
+                        )
+                    }
                 }
                 .onFailure { ex ->
-                    _state.update { it.copy(doctorsLoading = false, error = ex.message) }
+                    _state.update { it.copy(hospitalsLoading = false, error = ex.message) }
                 }
         }
     }
 
-    fun loadDoctor(id: String) {
+    /**
+     * Load the next page and append results.
+     */
+    fun loadMoreHospitals(
+        type: String? = null,
+        query: String? = null,
+    ) {
+        val current = _state.value
+        if (current.hospitalsLoading || !current.hasMoreHospitals) return
+
+        val nextPage = current.hospitalPage + 1
         viewModelScope.launch {
-            _state.update { it.copy(doctorsLoading = true, error = null) }
-            repo.getDoctor(id)
-                .onSuccess { doc ->
-                    _state.update { it.copy(selectedDoctor = doc, doctorsLoading = false) }
+            _state.update { it.copy(hospitalsLoading = true, error = null) }
+            repo.getHospitals(page = nextPage, size = HOSPITAL_PAGE_SIZE, type = type, query = query)
+                .onSuccess { page ->
+                    _state.update {
+                        it.copy(
+                            hospitals = it.hospitals + page.hospitals,
+                            hospitalsLoading = false,
+                            hospitalPage = nextPage,
+                            hasMoreHospitals = page.hasMore,
+                            hospitalTotalCount = page.totalCount,
+                        )
+                    }
                 }
                 .onFailure { ex ->
-                    _state.update { it.copy(doctorsLoading = false, error = ex.message) }
+                    _state.update { it.copy(hospitalsLoading = false, error = ex.message) }
+                }
+        }
+    }
+
+    /**
+     * Load a single hospital by ID.
+     */
+    fun loadHospital(id: String) {
+        viewModelScope.launch {
+            _state.update { it.copy(hospitalsLoading = true, error = null) }
+            repo.getHospital(id)
+                .onSuccess { hospital ->
+                    _state.update { it.copy(selectedHospital = hospital, hospitalsLoading = false) }
+                }
+                .onFailure { ex ->
+                    _state.update { it.copy(hospitalsLoading = false, error = ex.message) }
                 }
         }
     }

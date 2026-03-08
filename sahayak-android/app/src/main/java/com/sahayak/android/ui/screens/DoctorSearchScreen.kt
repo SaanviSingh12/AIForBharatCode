@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,11 +20,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.LocalHospital
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -39,15 +41,17 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.sahayak.android.data.model.DoctorDto
+import com.sahayak.android.data.model.HospitalDto
 import com.sahayak.android.ui.SahayakViewModel
 import com.sahayak.android.ui.components.ShimmerLoadingList
 import com.sahayak.android.ui.theme.GovernmentGreen
@@ -64,9 +68,27 @@ fun DoctorSearchScreen(
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var selectedType by rememberSaveable { mutableStateOf<String?>(null) }
 
-    // Load doctors on first composition
+    // Load first page on composition
     LaunchedEffect(Unit) {
-        viewModel.loadDoctors()
+        viewModel.loadHospitals()
+    }
+
+    // Lazy list state for infinite scroll
+    val listState = rememberLazyListState()
+
+    // Detect when user scrolls near the bottom → load more
+    val shouldLoadMore by remember {
+        derivedStateOf {
+            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val totalItems = listState.layoutInfo.totalItemsCount
+            lastVisibleItem >= totalItems - 5 && !uiState.hospitalsLoading && uiState.hasMoreHospitals
+        }
+    }
+
+    LaunchedEffect(shouldLoadMore) {
+        if (shouldLoadMore) {
+            viewModel.loadMoreHospitals(type = selectedType, query = searchQuery.ifBlank { null })
+        }
     }
 
     Scaffold(
@@ -91,7 +113,10 @@ fun DoctorSearchScreen(
             // Search bar
             OutlinedTextField(
                 value = searchQuery,
-                onValueChange = { searchQuery = it },
+                onValueChange = { query ->
+                    searchQuery = query
+                    viewModel.loadHospitals(type = selectedType, query = query.ifBlank { null })
+                },
                 placeholder = { Text(strings.searchDoctors) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
@@ -105,52 +130,74 @@ fun DoctorSearchScreen(
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 FilterChip(
                     selected = selectedType == null,
-                    onClick = { selectedType = null; viewModel.loadDoctors() },
+                    onClick = {
+                        selectedType = null
+                        viewModel.loadHospitals(query = searchQuery.ifBlank { null })
+                    },
                     label = { Text("All") },
                 )
                 FilterChip(
                     selected = selectedType == "government",
                     onClick = {
                         selectedType = "government"
-                        viewModel.loadDoctors(type = "government")
+                        viewModel.loadHospitals(type = "government", query = searchQuery.ifBlank { null })
                     },
                     label = { Text(strings.government) },
                 )
             }
 
+            // Total count badge
+            if (uiState.hospitalTotalCount > 0) {
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = "${uiState.hospitalTotalCount} hospitals found",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
             Spacer(Modifier.height(12.dp))
 
-            if (uiState.doctorsLoading) {
+            if (uiState.hospitalsLoading && uiState.hospitals.isEmpty()) {
                 ShimmerLoadingList(
                     itemCount = 4,
                     modifier = Modifier.padding(top = 8.dp),
                 )
+            } else if (uiState.hospitals.isEmpty()) {
+                Text(
+                    text = strings.noResults,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(32.dp),
+                )
             } else {
-                val filtered = uiState.doctors.filter {
-                    searchQuery.isBlank() ||
-                        it.name.contains(searchQuery, ignoreCase = true) ||
-                        it.specialty.contains(searchQuery, ignoreCase = true)
-                }
+                LazyColumn(
+                    state = listState,
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    itemsIndexed(uiState.hospitals, key = { _, h -> h.id }) { index, hospital ->
+                        AnimatedVisibility(
+                            visible = true,
+                            enter = fadeIn(tween(350, delayMillis = (index % 50) * 50, easing = EaseOutCubic)) +
+                                slideInVertically(tween(350, delayMillis = (index % 50) * 50, easing = EaseOutCubic)) { it / 3 },
+                        ) {
+                            HospitalCard(
+                                hospital = hospital,
+                                strings = strings,
+                                onClick = { onDoctorClick(hospital.id) },
+                            )
+                        }
+                    }
 
-                if (filtered.isEmpty()) {
-                    Text(
-                        text = strings.noResults,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(32.dp),
-                    )
-                } else {
-                    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        itemsIndexed(filtered, key = { _, d -> d.id }) { index, doctor ->
-                            AnimatedVisibility(
-                                visible = true,
-                                enter = fadeIn(tween(350, delayMillis = index * 50, easing = EaseOutCubic)) +
-                                    slideInVertically(tween(350, delayMillis = index * 50, easing = EaseOutCubic)) { it / 3 },
+                    // Loading indicator at the bottom while fetching next page
+                    if (uiState.hospitalsLoading && uiState.hospitals.isNotEmpty()) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center,
                             ) {
-                                DoctorCard(
-                                    doctor = doctor,
-                                    strings = strings,
-                                    onClick = { onDoctorClick(doctor.id) },
-                                )
+                                CircularProgressIndicator(modifier = Modifier.size(32.dp))
                             }
                         }
                     }
@@ -161,8 +208,8 @@ fun DoctorSearchScreen(
 }
 
 @Composable
-private fun DoctorCard(
-    doctor: DoctorDto,
+private fun HospitalCard(
+    hospital: HospitalDto,
     strings: com.sahayak.android.i18n.Strings,
     onClick: () -> Unit,
 ) {
@@ -179,17 +226,17 @@ private fun DoctorCard(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = doctor.name,
+                        text = hospital.name,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                     )
                     Text(
-                        text = doctor.specialty,
+                        text = hospital.specialist.ifBlank { "General" },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary,
                     )
                 }
-                if (doctor.type == "government") {
+                if (hospital.type == "government") {
                     Card(
                         colors = CardDefaults.cardColors(
                             containerColor = GovernmentGreen.copy(alpha = 0.15f),
@@ -212,44 +259,60 @@ private fun DoctorCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.Default.Star,
-                        contentDescription = null,
-                        modifier = Modifier.size(14.dp),
-                        tint = MaterialTheme.colorScheme.tertiary,
-                    )
-                    Spacer(Modifier.width(2.dp))
-                    Text(
-                        text = "${doctor.rating}",
-                        style = MaterialTheme.typography.labelSmall,
-                    )
+                if (hospital.hasEmergency) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Default.LocalHospital,
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                            tint = MaterialTheme.colorScheme.error,
+                        )
+                        Spacer(Modifier.width(2.dp))
+                        Text(
+                            text = "Emergency",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
                 }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.Default.LocationOn,
-                        contentDescription = null,
-                        modifier = Modifier.size(14.dp),
-                    )
-                    Spacer(Modifier.width(2.dp))
-                    Text(
-                        text = "${doctor.distance} ${strings.distance}",
-                        style = MaterialTheme.typography.labelSmall,
-                    )
+                if (hospital.distance > 0) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Default.LocationOn,
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                        )
+                        Spacer(Modifier.width(2.dp))
+                        Text(
+                            text = "${hospital.distance} ${strings.distance}",
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                    }
                 }
-                if (doctor.fee == 0) {
+                if (hospital.free) {
                     Text(
                         text = strings.free,
                         style = MaterialTheme.typography.labelSmall,
                         color = GovernmentGreen,
                         fontWeight = FontWeight.Bold,
                     )
-                } else {
+                } else if (hospital.fee != null && hospital.fee > 0) {
                     Text(
-                        text = "₹${doctor.fee}",
+                        text = "₹${hospital.fee}",
                         style = MaterialTheme.typography.labelSmall,
                     )
                 }
+            }
+
+            // Address line
+            if (hospital.address.isNotBlank()) {
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = hospital.address,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                )
             }
         }
     }

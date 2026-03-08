@@ -1,6 +1,7 @@
 package com.sahayak.android.data.api
 
-import com.sahayak.android.data.model.DoctorDto
+import com.sahayak.android.data.model.HospitalDto
+import com.sahayak.android.data.model.HospitalPageResponse
 import com.sahayak.android.data.model.PharmacyDto
 import com.sahayak.android.data.model.PrescriptionResponse
 import com.sahayak.android.data.model.TriageResponse
@@ -115,20 +116,19 @@ class SahayakRepository @Inject constructor(
         withContext(Dispatchers.IO) { api.nearbyPharmacies(latitude, longitude) }
     }
 
-    // ── Doctors ──────────────────────────────────
+    // ── Hospitals (paginated) ───────────────────
 
-    suspend fun getDoctors(
-        specialty: String? = null,
+    suspend fun getHospitals(
+        page: Int = 0,
+        size: Int = 50,
         type: String? = null,
-        available: Boolean? = null,
-        latitude: Double? = null,
-        longitude: Double? = null,
-    ): Result<List<DoctorDto>> = runCatching {
-        withContext(Dispatchers.IO) { api.getDoctors(specialty, type, available, latitude, longitude) }
+        query: String? = null,
+    ): Result<HospitalPageResponse> = runCatching {
+        withContext(Dispatchers.IO) { api.getHospitals(page, size, type, query) }
     }
 
-    suspend fun getDoctor(id: String): Result<DoctorDto> = runCatching {
-        withContext(Dispatchers.IO) { api.getDoctor(id) }
+    suspend fun getHospital(id: String): Result<HospitalDto> = runCatching {
+        withContext(Dispatchers.IO) { api.getHospital(id) }
     }
 
     // ── Helpers ──────────────────────────────────
