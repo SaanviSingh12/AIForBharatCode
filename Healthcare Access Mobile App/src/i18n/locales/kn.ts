@@ -157,4 +157,14 @@ export const kn: TranslationKeys = {
     hypertension: 'ಅಧಿಕ ರಕ್ತದೊತ್ತಡ',
     appSettings: 'ಅಪ್ಲಿಕೇಶನ್ ಸೆಟ್ಟಿಂಗ್‌ಗಳು',
     changeLanguageButton: 'ಭಾಷೆ ಬದಲಿಸಿ',
+
+    // Bottom Navigation
+    navHome: 'ಮುಖಪುಟ',
+    navSymptoms: 'ಲಕ್ಷಣಗಳು',
+    navDoctors: 'ವೈದ್ಯರು',
+    navPharmacy: 'ಔಷಧಾಲಯ',
+    navProfile: 'ಪ್ರೊಫೈಲ್',
+
+    // Common Buttons
+    directions: 'ದಿಕ್ಕುಗಳು',
 };

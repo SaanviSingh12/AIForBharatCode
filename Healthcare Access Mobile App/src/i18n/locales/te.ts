@@ -159,4 +159,14 @@ export const te: TranslationKeys = {
     hypertension: 'హైపర్‌టెన్షన్',
     appSettings: 'యాప్ సెట్టింగ్‌లు',
     changeLanguageButton: 'భాషను మార్చండి',
+
+    // Bottom Navigation
+    navHome: 'హోమ్',
+    navSymptoms: 'లక్షణాలు',
+    navDoctors: 'వైద్యులు',
+    navPharmacy: 'ఫార్మసీ',
+    navProfile: 'ప్రొఫైల్',
+
+    // Common Buttons
+    directions: 'దిశలు',
 };

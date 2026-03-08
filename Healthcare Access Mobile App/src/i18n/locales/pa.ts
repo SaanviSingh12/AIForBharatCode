@@ -157,4 +157,14 @@ export const pa: TranslationKeys = {
     hypertension: 'ਹਾਈਪਰਟੈਂਸ਼ਨ',
     appSettings: 'ਐਪ ਸੈਟਿੰਗਾਂ',
     changeLanguageButton: 'ਭਾਸ਼ਾ ਬਦਲੋ',
+
+    // Bottom Navigation
+    navHome: 'ਹੋਮ',
+    navSymptoms: 'ਲੱਛਣ',
+    navDoctors: 'ਡਾਕਟਰ',
+    navPharmacy: 'ਫਾਰਮੇਸੀ',
+    navProfile: 'ਪ੍ਰੋਫਾਈਲ',
+
+    // Common Buttons
+    directions: 'ਦਿਸ਼ਾਵਾਂ',
 };

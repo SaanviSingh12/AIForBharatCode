@@ -159,4 +159,14 @@ export const bn: TranslationKeys = {
     hypertension: 'উচ্চ রক্তচাপ',
     appSettings: 'অ্যাপ সেটিংস',
     changeLanguageButton: 'ভাষা পরিবর্তন করুন',
+
+    // Bottom Navigation
+    navHome: 'হোম',
+    navSymptoms: 'লক্ষণ',
+    navDoctors: 'ডাক্তার',
+    navPharmacy: 'ফার্মেসি',
+    navProfile: 'প্রোফাইল',
+
+    // Common Buttons
+    directions: 'দিকনির্দেশ',
 };

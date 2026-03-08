@@ -157,4 +157,14 @@ export const mr: TranslationKeys = {
     hypertension: 'उच्च रक्तदाब',
     appSettings: 'अॅप सेटिंग्ज',
     changeLanguageButton: 'भाषा बदला',
+
+    // Bottom Navigation
+    navHome: 'होम',
+    navSymptoms: 'लक्षणे',
+    navDoctors: 'डॉक्टर',
+    navPharmacy: 'फार्मसी',
+    navProfile: 'प्रोफाइल',
+
+    // Common Buttons
+    directions: 'दिशानिर्देश',
 };

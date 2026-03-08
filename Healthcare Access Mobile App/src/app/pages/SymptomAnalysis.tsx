@@ -103,8 +103,12 @@ export const SymptomAnalysis: React.FC = () => {
 
                 console.log('Navigating with:', { responseTextToPass, audioToPass: audioToPass ? 'present' : 'null' });
 
-                // Always go to doctor-search — emergency banner will show there if needed
-                navigate('/doctor-search', { replace: true, state: { fromSymptoms: true, responseText: responseTextToPass, audioBase64: audioToPass } });
+                // Navigate to emergency mode if emergency detected, otherwise to doctor search
+                if (result.isEmergency) {
+                    navigate('/emergency', { replace: true, state: { fromSymptoms: true, responseText: responseTextToPass, audioBase64: audioToPass } });
+                } else {
+                    navigate('/doctor-search', { replace: true, state: { fromSymptoms: true, responseText: responseTextToPass, audioBase64: audioToPass } });
+                }
             } else {
                 updateStep(1, 'error');
                 setApiError(result.error || 'Analysis failed');
@@ -121,7 +125,7 @@ export const SymptomAnalysis: React.FC = () => {
                 const isEmergency = emergencyKeywords.some((kw) => directText.toLowerCase().includes(kw));
                 if (isEmergency) {
                     await delay(800);
-                    navigate('/doctor-search', { replace: true, state: { fromSymptoms: true } });
+                    navigate('/emergency', { replace: true, state: { fromSymptoms: true } });
                     return;
                 }
             }
@@ -215,7 +219,9 @@ export const SymptomAnalysis: React.FC = () => {
                                         variant="outline"
                                         size="sm"
                                         className="mt-3"
+                                        disabled={language !== 'en' && language !== 'hi'}
                                         onClick={() => playAudioResponse(audioBase64)}
+                                        title={language !== 'en' && language !== 'hi' ? 'Audio only available in English and Hindi' : ''}
                                     >
                                         <Volume2 className="w-4 h-4 mr-2" />
                                         Play Audio Response

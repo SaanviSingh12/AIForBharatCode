@@ -157,4 +157,14 @@ export const gu: TranslationKeys = {
     hypertension: 'હાઇપરટેન્શન',
     appSettings: 'એપ્લિકેશન સેટિંગ્સ',
     changeLanguageButton: 'ભાષા બદલો',
+
+    // Bottom Navigation
+    navHome: 'હોમ',
+    navSymptoms: 'લક્ષણો',
+    navDoctors: 'ડૉક્ટરો',
+    navPharmacy: 'ફાર્મસી',
+    navProfile: 'પ્રોફાઇલ',
+
+    // Common Buttons
+    directions: 'દિશાઓ',
 };

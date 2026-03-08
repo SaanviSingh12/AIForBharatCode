@@ -155,4 +155,14 @@ export const ml: TranslationKeys = {
     hypertension: 'ഉയർന്ന രക്തസമ്മർദ്ദം',
     appSettings: 'ആപ്പ് സെറ്റിംഗുകൾ',
     changeLanguageButton: 'ഭാഷ മാറ്റുക',
+
+    // Bottom Navigation
+    navHome: 'ഹോം',
+    navSymptoms: 'ലക്ഷണങ്ങൾ',
+    navDoctors: 'ഡോക്ടർമാർ',
+    navPharmacy: 'ഫാർമസി',
+    navProfile: 'പ്രൊഫൈൽ',
+
+    // Common Buttons
+    directions: 'ദിശകൾ',
 };
