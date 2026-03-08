@@ -105,7 +105,9 @@ export const EmergencyMode: React.FC = () => {
                                     <Button
                                         variant="outline"
                                         size="sm"
+                                        disabled={language !== 'en' && language !== 'hi'}
                                         onClick={() => playAudioResponse(audioBase64)}
+                                        title={language !== 'en' && language !== 'hi' ? 'Audio only available in English and Hindi' : ''}
                                     >
                                         <Volume2 className="w-4 h-4 mr-2" />
                                         Play Audio

@@ -132,7 +132,9 @@ export const PharmacyResults: React.FC = () => {
                                     <Button
                                         variant="outline"
                                         size="sm"
+                                        disabled={language !== 'en' && language !== 'hi'}
                                         onClick={() => playAudioResponse(prescriptionResult.audioBase64!)}
+                                        title={language !== 'en' && language !== 'hi' ? 'Audio only available in English and Hindi' : ''}
                                     >
                                         <Volume2 className="w-4 h-4 mr-2" />
                                         Play Audio
@@ -312,7 +314,7 @@ export const PharmacyResults: React.FC = () => {
                                             className="flex-1 border-blue-300 text-blue-700 hover:bg-blue-50"
                                         >
                                             <Navigation className="w-4 h-4 mr-2" />
-                                            Directions
+                                            {t.directions}
                                         </Button>
                                         <Button
                                             onClick={() => handleCall(pharmacy.phone)}

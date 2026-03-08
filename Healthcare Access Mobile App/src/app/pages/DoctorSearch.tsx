@@ -1,4 +1,4 @@
-import { AlertTriangle, ArrowLeft, Award, Building, Filter, MapPin, Navigation, Phone, Search, Volume2, X } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Award, Building, MapPin, Navigation, Phone, Search, Volume2, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { getTranslations } from '../../i18n';
@@ -93,10 +93,10 @@ export const DoctorSearch: React.FC = () => {
         .filter(
             (doctor) =>
                 (doctor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                doctor.specialty.toLowerCase().includes(searchQuery.toLowerCase())) &&
+                    doctor.specialty.toLowerCase().includes(searchQuery.toLowerCase())) &&
                 (typeFilter === 'all' ||
-                 (typeFilter === 'government' && doctor.type === 'government') ||
-                 (typeFilter === 'private' && doctor.type !== 'government'))
+                    (typeFilter === 'government' && doctor.type === 'government') ||
+                    (typeFilter === 'private' && doctor.type !== 'government'))
         )
         .sort((a, b) => {
             if (a.type === 'government' && b.type !== 'government') return -1;
@@ -166,31 +166,28 @@ export const DoctorSearch: React.FC = () => {
                 <div className="flex gap-1.5 mt-2">
                     <button
                         onClick={() => setTypeFilter('all')}
-                        className={`py-1 px-2.5 rounded-full text-[11px] font-medium transition-all border ${
-                            typeFilter === 'all'
-                                ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                                : 'bg-white text-gray-500 border-gray-200'
-                        }`}
+                        className={`py-1 px-2.5 rounded-full text-[11px] font-medium transition-all border ${typeFilter === 'all'
+                            ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                            : 'bg-white text-gray-500 border-gray-200'
+                            }`}
                     >
                         All {allCount}
                     </button>
                     <button
                         onClick={() => setTypeFilter('government')}
-                        className={`py-1 px-2.5 rounded-full text-[11px] font-medium transition-all border ${
-                            typeFilter === 'government'
-                                ? 'bg-green-600 text-white border-green-600 shadow-sm'
-                                : 'bg-white text-green-700 border-green-200'
-                        }`}
+                        className={`py-1 px-2.5 rounded-full text-[11px] font-medium transition-all border ${typeFilter === 'government'
+                            ? 'bg-green-600 text-white border-green-600 shadow-sm'
+                            : 'bg-white text-green-700 border-green-200'
+                            }`}
                     >
                         Govt {govtCount}
                     </button>
                     <button
                         onClick={() => setTypeFilter('private')}
-                        className={`py-1 px-2.5 rounded-full text-[11px] font-medium transition-all border ${
-                            typeFilter === 'private'
-                                ? 'bg-purple-600 text-white border-purple-600 shadow-sm'
-                                : 'bg-white text-purple-700 border-purple-200'
-                        }`}
+                        className={`py-1 px-2.5 rounded-full text-[11px] font-medium transition-all border ${typeFilter === 'private'
+                            ? 'bg-purple-600 text-white border-purple-600 shadow-sm'
+                            : 'bg-white text-purple-700 border-purple-200'
+                            }`}
                     >
                         Private {privateCount}
                     </button>
@@ -213,38 +210,40 @@ export const DoctorSearch: React.FC = () => {
             {showResponseBanner && responseText && (
                 <div className="p-4 pb-0 space-y-3">
                     {/* Response in patient's language + audio */}
-                        <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-200 p-4 shadow-sm relative">
-                            <button
-                                onClick={() => setShowResponseBanner(false)}
-                                className="absolute top-2 right-2 p-1 hover:bg-white/50 rounded-full transition-colors"
-                            >
-                                <X className="w-4 h-4 text-gray-600" />
-                            </button>
-                            <div className="flex items-start gap-3 pr-6">
-                                <div className="bg-green-100 rounded-full p-2 mt-0.5">
-                                    <Volume2 className="w-4 h-4 text-green-600" />
-                                </div>
-                                <div className="flex-1">
-                                    <p className="text-xs font-semibold text-green-600 uppercase tracking-wide mb-1">Response for Patient</p>
-                                    {recommendedSpecialist && (
-                                        <Badge className="bg-blue-100 text-blue-800 border-blue-300 text-xs mb-2">
-                                            Recommended: {recommendedSpecialist}
-                                        </Badge>
-                                    )}
-                                    <p className="text-sm text-gray-800 leading-relaxed mb-2">{responseText}</p>
-                                    {audioBase64 && (
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => playAudioResponse(audioBase64)}
-                                        >
-                                            <Volume2 className="w-4 h-4 mr-2" />
-                                            Play Audio
-                                        </Button>
-                                    )}
-                                </div>
+                    <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-200 p-4 shadow-sm relative">
+                        <button
+                            onClick={() => setShowResponseBanner(false)}
+                            className="absolute top-2 right-2 p-1 hover:bg-white/50 rounded-full transition-colors"
+                        >
+                            <X className="w-4 h-4 text-gray-600" />
+                        </button>
+                        <div className="flex items-start gap-3 pr-6">
+                            <div className="bg-green-100 rounded-full p-2 mt-0.5">
+                                <Volume2 className="w-4 h-4 text-green-600" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-xs font-semibold text-green-600 uppercase tracking-wide mb-1">Response for Patient</p>
+                                {recommendedSpecialist && (
+                                    <Badge className="bg-blue-100 text-blue-800 border-blue-300 text-xs mb-2">
+                                        Recommended: {recommendedSpecialist}
+                                    </Badge>
+                                )}
+                                <p className="text-sm text-gray-800 leading-relaxed mb-2">{responseText}</p>
+                                {audioBase64 && (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        disabled={language !== 'en' && language !== 'hi'}
+                                        onClick={() => playAudioResponse(audioBase64)}
+                                        title={language !== 'en' && language !== 'hi' ? 'Audio only available in English and Hindi' : ''}
+                                    >
+                                        <Volume2 className="w-4 h-4 mr-2" />
+                                        Play Audio
+                                    </Button>
+                                )}
                             </div>
                         </div>
+                    </div>
                 </div>
             )}
 
@@ -340,7 +339,7 @@ export const DoctorSearch: React.FC = () => {
                                     className="flex-1 border-blue-300 text-blue-700 hover:bg-blue-50"
                                 >
                                     <Navigation className="w-4 h-4 mr-2" />
-                                    Directions
+                                    {t.directions}
                                 </Button>
                                 <Button
                                     onClick={(e) => {

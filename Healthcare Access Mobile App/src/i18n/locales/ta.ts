@@ -159,4 +159,14 @@ export const ta: TranslationKeys = {
     hypertension: 'உயர் இரத்த அழுத்தம்',
     appSettings: 'செயலி அமைப்புகள்',
     changeLanguageButton: 'மொழியை மாற்று',
+
+    // Bottom Navigation
+    navHome: 'முகப்பு',
+    navSymptoms: 'அறிகுறிகள்',
+    navDoctors: 'மருத்துவர்கள்',
+    navPharmacy: 'மருந்தகம்',
+    navProfile: 'சுயவிவரம்',
+
+    // Common Buttons
+    directions: 'வழிகள்',
 };

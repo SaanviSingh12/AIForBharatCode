@@ -157,6 +157,16 @@ export const en = {
     hypertension: 'Hypertension',
     appSettings: 'App Settings',
     changeLanguageButton: 'Change Language',
+
+    // Bottom Navigation
+    navHome: 'Home',
+    navSymptoms: 'Symptoms',
+    navDoctors: 'Doctors',
+    navPharmacy: 'Pharmacy',
+    navProfile: 'Profile',
+
+    // Common Buttons
+    directions: 'Directions',
 };
 
 export type TranslationKeys = typeof en;
