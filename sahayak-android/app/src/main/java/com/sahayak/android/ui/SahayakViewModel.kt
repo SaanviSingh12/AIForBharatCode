@@ -1,6 +1,7 @@
 package com.sahayak.android.ui
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.sahayak.android.data.api.SahayakRepository
@@ -70,7 +71,16 @@ class SahayakViewModel @Inject constructor(
     private val repo: SahayakRepository,
 ) : AndroidViewModel(application) {
 
-    private val _state = MutableStateFlow(SahayakUiState())
+    private val prefs = application.getSharedPreferences("sahayak_prefs", Context.MODE_PRIVATE)
+
+    private fun savedLanguage(): String = prefs.getString("language_code", "hi") ?: "hi"
+
+    private val _state = MutableStateFlow(
+        SahayakUiState(
+            languageCode = savedLanguage(),
+            strings = getStrings(savedLanguage()),
+        )
+    )
     val state: StateFlow<SahayakUiState> = _state.asStateFlow()
 
     val locationProvider = LocationProvider(application)
@@ -100,6 +110,7 @@ class SahayakViewModel @Inject constructor(
     // ── Language ──────────────────────────────
 
     fun setLanguage(code: String) {
+        prefs.edit().putString("language_code", code).apply()
         _state.update { it.copy(languageCode = code, strings = getStrings(code)) }
     }
 

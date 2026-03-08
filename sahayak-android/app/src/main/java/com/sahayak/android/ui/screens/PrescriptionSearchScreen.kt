@@ -142,6 +142,7 @@ fun PrescriptionSearchScreen(
         }
     }
 
+    Box(modifier = Modifier.fillMaxSize()) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -330,6 +331,32 @@ fun PrescriptionSearchScreen(
             }
         }
     }
+
+    // ── Loading overlay ──────────────────
+    if (uiState.prescriptionLoading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(48.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    strokeWidth = 4.dp,
+                )
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    text = strings.analyzing,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        }
+    }
+    } // Box
 }
 
 @Composable

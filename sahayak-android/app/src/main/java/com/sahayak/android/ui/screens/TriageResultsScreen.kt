@@ -229,37 +229,38 @@ fun TriageResultsScreen(
                     ),
                     shape = MaterialTheme.shapes.large,
                 ) {
-                    Column(
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(20.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text(text = "🩺", fontSize = 48.sp)
-                        Spacer(Modifier.height(8.dp))
-
-                        result.specialist?.let {
-                            Text(
-                                text = "${strings.recommended}: $it",
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            )
-                            Spacer(Modifier.height(4.dp))
-                        }
-
-                        result.urgencyLevel?.let { urgency ->
-                            val urgencyColor = when (urgency.lowercase()) {
-                                "emergency" -> EmergencyRed
-                                "high" -> Color(0xFFFF9800)
-                                else -> GovernmentGreen
+                        Text(text = "🩺", fontSize = 40.sp)
+                        Spacer(Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            result.specialist?.let {
+                                Text(
+                                    text = "${strings.recommended}: $it",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                )
+                                Spacer(Modifier.height(4.dp))
                             }
-                            Text(
-                                text = "${strings.urgency}: $urgency",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                color = urgencyColor,
-                            )
+
+                            result.urgencyLevel?.let { urgency ->
+                                val urgencyColor = when (urgency.lowercase()) {
+                                    "emergency" -> EmergencyRed
+                                    "high" -> Color(0xFFFF9800)
+                                    else -> GovernmentGreen
+                                }
+                                Text(
+                                    text = "${strings.urgency}: $urgency",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = urgencyColor,
+                                )
+                            }
                         }
                     }
                 }
