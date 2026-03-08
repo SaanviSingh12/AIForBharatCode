@@ -1,0 +1,29 @@
+# Lambda-specific Spring Boot configuration
+# Activated via SPRING_PROFILES_ACTIVE=lambda environment variable
+
+server:
+  # Disable the embedded Tomcat server in Lambda (handled by API Gateway)
+  servlet:
+    context-path: /
+
+spring:
+  main:
+    # Use lazy initialization to speed up cold starts
+    lazy-initialization: true
+    web-application-type: servlet
+
+# AWS configuration pulled from Lambda environment
+aws:
+  region: ${AWS_REGION_NAME:ap-south-1}
+  bedrock:
+    region: ${AWS_REGION_NAME:ap-south-1}
+    # Must use inference profile ID — direct model IDs no longer work with on-demand
+    model-id: apac.amazon.nova-lite-v1:0
+
+sahayak:
+  use-real-aws: ${SAHAYAK_USE_REAL_AWS:true}
+
+logging:
+  level:
+    root: INFO
+    com.sahayak: INFO

@@ -1,0 +1,132 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Sahayak AI Health Agent - Spring Boot backend on AWS Lambda
+
+Globals:
+  Api:
+    EndpointConfiguration: REGIONAL
+    BinaryMediaTypes:
+      - "multipart/form-data"
+      - "application/octet-stream"
+      - "audio/*"
+      - "image/*"
+  Function:
+    Timeout: 120
+    MemorySize: 2048
+    Runtime: java17
+    Architectures:
+      - x86_64
+
+Parameters:
+  Stage:
+    Type: String
+    Default: prod
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+  UseRealAws:
+    Type: String
+    Default: "true"
+    AllowedValues:
+      - "true"
+      - "false"
+
+Resources:
+  SahayakFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub sahayak-backend-${Stage}
+      Handler: com.sahayak.StreamLambdaHandler
+      CodeUri: .
+      SnapStart:
+        ApplyOn: PublishedVersions
+      AutoPublishAlias: live
+      Environment:
+        Variables:
+          SPRING_PROFILES_ACTIVE: lambda
+          AWS_REGION_NAME: ap-south-1
+          SAHAYAK_USE_REAL_AWS: !Ref UseRealAws
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        # Bedrock access
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+                - bedrock:InvokeModelWithResponseStream
+              Resource: "*"
+        # Transcribe access
+        - Statement:
+            - Effect: Allow
+              Action:
+                - transcribe:StartTranscriptionJob
+                - transcribe:GetTranscriptionJob
+                - transcribe:StartStreamTranscription
+              Resource: "*"
+        # Textract access
+        - Statement:
+            - Effect: Allow
+              Action:
+                - textract:DetectDocumentText
+                - textract:AnalyzeDocument
+              Resource: "*"
+        # Polly access
+        - Statement:
+            - Effect: Allow
+              Action:
+                - polly:SynthesizeSpeech
+              Resource: "*"
+        # S3 access
+        - Statement:
+            - Effect: Allow
+              Action:
+                - s3:PutObject
+                - s3:GetObject
+                - s3:DeleteObject
+              Resource: "arn:aws:s3:::sahayak-*/*"
+        # DynamoDB access
+        - Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+                - dynamodb:PutItem
+                - dynamodb:Query
+                - dynamodb:Scan
+                - dynamodb:UpdateItem
+                - dynamodb:BatchWriteItem
+              Resource: "arn:aws:dynamodb:ap-south-1:*:table/sahayak-*"
+      Events:
+        ProxyApiRoot:
+          Type: Api
+          Properties:
+            Path: /
+            Method: ANY
+            RestApiId: !Ref SahayakApi
+        ProxyApiGreedy:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+            RestApiId: !Ref SahayakApi
+
+  SahayakApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub sahayak-api-${Stage}
+      StageName: !Ref Stage
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key'"
+        AllowOrigin: "'*'"
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL for the Sahayak backend
+    Value: !Sub "https://${SahayakApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/"
+  FunctionArn:
+    Description: Lambda Function ARN
+    Value: !GetAtt SahayakFunction.Arn
+  FunctionName:
+    Description: Lambda Function Name
+    Value: !Ref SahayakFunction
