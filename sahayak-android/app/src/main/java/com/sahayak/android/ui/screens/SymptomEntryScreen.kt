@@ -243,7 +243,6 @@ fun SymptomEntryScreen(
                                             audioManager.playFile(file) { isPlayingPreview = false }
                                         }
                                     },
-                                    modifier = Modifier.weight(1f),
                                 ) {
                                     Icon(
                                         imageVector = if (isPlayingPreview) Icons.Default.Stop
@@ -251,8 +250,8 @@ fun SymptomEntryScreen(
                                         contentDescription = null,
                                         modifier = Modifier.size(18.dp),
                                     )
-                                    Spacer(Modifier.width(4.dp))
-                                    Text(if (isPlayingPreview) strings.cancel else strings.startRecording)
+                                    // Spacer(Modifier.width(4.dp))
+                                    // Text(if (isPlayingPreview) strings.cancel else strings.startRecording)
                                 }
                                 // Send to backend
                                 Button(
