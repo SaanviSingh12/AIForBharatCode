@@ -1,6 +1,7 @@
 package com.sahayak.service;
 
 import com.sahayak.model.HospitalDto;
+import com.sahayak.model.HospitalPageResponse;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -204,6 +205,145 @@ public class DynamoDbHospitalService {
         } catch (Exception e) {
             log.error("Failed to get table count: {}", e.getMessage());
             return 0;
+        }
+    }
+
+    // ── Paginated Query Methods ─────────────────────────────────────
+
+    /**
+     * Get a paginated list of all hospitals (scan-based).
+     * Supports filtering by type (e.g. "government").
+     *
+     * @param page     0-based page index
+     * @param pageSize number of records per page (max 50)
+     * @param type     optional type filter ("government", "private")
+     * @param query    optional search string matched against name or address
+     * @return paginated response with hospitals and metadata
+     */
+    public HospitalPageResponse getHospitalsPaginated(int page, int pageSize,
+                                                       String type, String query) {
+        pageSize = Math.min(pageSize, 50); // enforce max page size
+        log.info("Paginated hospital scan — page: {}, pageSize: {}, type: {}, query: {}",
+                page, pageSize, type, query);
+
+        try {
+            // Build optional filter expression
+            StringBuilder filterExpr = new StringBuilder();
+            Map<String, AttributeValue> exprValues = new HashMap<>();
+
+            if (type != null && !type.isBlank()) {
+                filterExpr.append("#t = :typeVal");
+                exprValues.put(":typeVal", AttributeValue.fromS(type));
+            }
+
+            Map<String, String> exprNames = new HashMap<>();
+            if (filterExpr.toString().contains("#t")) {
+                exprNames.put("#t", "type");
+            }
+
+            // DynamoDB scan — collect all matching items then do in-memory paging.
+            // For a production system with millions of rows you'd use a GSI;
+            // with 22k hospitals a full scan is acceptable (<1s).
+            List<HospitalDto> allMatching = new ArrayList<>();
+            Map<String, AttributeValue> lastKey = null;
+
+            do {
+                ScanRequest.Builder scanBuilder = ScanRequest.builder()
+                        .tableName(tableName);
+
+                if (!filterExpr.isEmpty()) {
+                    scanBuilder.filterExpression(filterExpr.toString())
+                            .expressionAttributeValues(exprValues);
+                    if (!exprNames.isEmpty()) {
+                        scanBuilder.expressionAttributeNames(exprNames);
+                    }
+                }
+
+                if (lastKey != null) {
+                    scanBuilder.exclusiveStartKey(lastKey);
+                }
+
+                ScanResponse response = dynamoDbClient.scan(scanBuilder.build());
+
+                for (Map<String, AttributeValue> item : response.items()) {
+                    HospitalDto dto = mapToDto(item);
+                    // Apply text search filter in Java (name or address)
+                    if (query != null && !query.isBlank()) {
+                        String q = query.toLowerCase();
+                        boolean nameMatch = dto.getName() != null
+                                && dto.getName().toLowerCase().contains(q);
+                        boolean addrMatch = dto.getAddress() != null
+                                && dto.getAddress().toLowerCase().contains(q);
+                        if (!nameMatch && !addrMatch) continue;
+                    }
+                    allMatching.add(dto);
+                }
+
+                lastKey = response.lastEvaluatedKey().isEmpty()
+                        ? null : response.lastEvaluatedKey();
+            } while (lastKey != null);
+
+            // Sort: government first, then by name
+            allMatching.sort(Comparator
+                    .comparing((HospitalDto h) -> !"government".equals(h.getType()))
+                    .thenComparing(h -> h.getName() != null ? h.getName() : ""));
+
+            long totalCount = allMatching.size();
+            int fromIndex = page * pageSize;
+            int toIndex = Math.min(fromIndex + pageSize, allMatching.size());
+
+            List<HospitalDto> pageItems = (fromIndex < allMatching.size())
+                    ? allMatching.subList(fromIndex, toIndex)
+                    : List.of();
+
+            log.info("Returning page {} ({} items) of {} total hospitals",
+                    page, pageItems.size(), totalCount);
+
+            return HospitalPageResponse.builder()
+                    .hospitals(pageItems)
+                    .page(page)
+                    .pageSize(pageSize)
+                    .totalCount(totalCount)
+                    .hasMore(toIndex < totalCount)
+                    .build();
+
+        } catch (Exception e) {
+            log.error("Paginated hospital scan failed: {}", e.getMessage(), e);
+            return HospitalPageResponse.builder()
+                    .hospitals(List.of())
+                    .page(page)
+                    .pageSize(pageSize)
+                    .totalCount(0)
+                    .hasMore(false)
+                    .build();
+        }
+    }
+
+    /**
+     * Get a single hospital by its composite key (stateCode + id).
+     * The id format is "XX-NNNNN" where XX is the state code.
+     */
+    public Optional<HospitalDto> getHospitalById(String id) {
+        try {
+            String stateCode = id.contains("-")
+                    ? id.substring(0, id.indexOf('-'))
+                    : "XX";
+
+            GetItemRequest request = GetItemRequest.builder()
+                    .tableName(tableName)
+                    .key(Map.of(
+                            "stateCode", AttributeValue.fromS(stateCode),
+                            "id", AttributeValue.fromS(id)))
+                    .build();
+
+            GetItemResponse response = dynamoDbClient.getItem(request);
+            if (response.hasItem() && !response.item().isEmpty()) {
+                return Optional.of(mapToDto(response.item()));
+            }
+            return Optional.empty();
+        } catch (Exception e) {
+            log.error("Failed to get hospital by id {}: {}", id, e.getMessage());
+            return Optional.empty();
         }
     }
 
