@@ -79,6 +79,7 @@ fun LanguageSelectionScreen(
             items(languageConfigs) { config ->
                 LanguageCard(
                     config = config,
+                    strings = strings,
                     onClick = { onLanguageSelected(config.code) },
                 )
             }
@@ -89,6 +90,7 @@ fun LanguageSelectionScreen(
 @Composable
 private fun LanguageCard(
     config: LanguageConfig,
+    strings: Strings,
     onClick: () -> Unit,
 ) {
     Card(
@@ -130,7 +132,7 @@ private fun LanguageCard(
                 if (config.voiceInput) {
                     Icon(
                         Icons.Default.Mic,
-                        contentDescription = "Voice input",
+                        contentDescription = strings.voiceInput,
                         modifier = Modifier.size(16.dp),
                         tint = MaterialTheme.colorScheme.primary,
                     )
@@ -139,14 +141,14 @@ private fun LanguageCard(
                 if (config.voiceOutput) {
                     Icon(
                         Icons.Default.VolumeUp,
-                        contentDescription = "Voice output",
+                        contentDescription = strings.voiceOutput,
                         modifier = Modifier.size(16.dp),
                         tint = MaterialTheme.colorScheme.primary,
                     )
                 }
                 if (!config.voiceInput && !config.voiceOutput) {
                     Text(
-                        text = "Text only",
+                        text = strings.textOnly,
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

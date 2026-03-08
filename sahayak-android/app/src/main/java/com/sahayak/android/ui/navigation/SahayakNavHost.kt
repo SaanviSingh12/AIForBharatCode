@@ -241,6 +241,9 @@ fun SahayakNavHost(
         composable(Routes.USER_PROFILE) {
             UserProfileScreen(
                 viewModel = viewModel,
+                onChangeLanguage = {
+                    navController.navigate(Routes.LANGUAGE_SELECTION)
+                },
                 onBack = { navController.popBackStack() },
             )
         }

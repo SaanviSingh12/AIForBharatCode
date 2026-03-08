@@ -134,7 +134,7 @@ fun DoctorSearchScreen(
                         selectedType = null
                         viewModel.loadHospitals(query = searchQuery.ifBlank { null })
                     },
-                    label = { Text("All") },
+                    label = { Text(strings.all) },
                 )
                 FilterChip(
                     selected = selectedType == "government",
@@ -150,7 +150,7 @@ fun DoctorSearchScreen(
             if (uiState.hospitalTotalCount > 0) {
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = "${uiState.hospitalTotalCount} hospitals found",
+                    text = "${uiState.hospitalTotalCount} ${strings.hospitalsFound}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -231,7 +231,7 @@ private fun HospitalCard(
                         fontWeight = FontWeight.SemiBold,
                     )
                     Text(
-                        text = hospital.specialist.ifBlank { "General" },
+                        text = hospital.specialist.ifBlank { strings.general },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary,
                     )
@@ -269,7 +269,7 @@ private fun HospitalCard(
                         )
                         Spacer(Modifier.width(2.dp))
                         Text(
-                            text = "Emergency",
+                            text = strings.emergencyLabel,
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.error,
                         )

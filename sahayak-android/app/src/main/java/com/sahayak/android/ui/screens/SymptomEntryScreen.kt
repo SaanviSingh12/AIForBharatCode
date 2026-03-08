@@ -304,7 +304,7 @@ fun SymptomEntryScreen(
                     color = MaterialTheme.colorScheme.outlineVariant,
                 )
                 Text(
-                    text = "OR",
+                    text = strings.orDivider,
                     modifier = Modifier.padding(horizontal = 16.dp),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -318,7 +318,7 @@ fun SymptomEntryScreen(
             Spacer(Modifier.height(24.dp))
 
             Text(
-                text = "Type your symptoms",
+                text = strings.typeYourSymptoms,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
             )
@@ -388,14 +388,14 @@ fun SymptomEntryScreen(
                     Spacer(Modifier.width(12.dp))
                     Column {
                         Text(
-                            text = "ATTENTION!",
+                            text = strings.attention,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = EmergencyRed,
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            text = "If you are experiencing severe or life-threatening symptoms, please call emergency services immediately at 108",
+                            text = strings.emergencyAttentionMessage,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                         )

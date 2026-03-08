@@ -51,15 +51,6 @@ private data class EmergencyContact(
     val number: String,
 )
 
-private val emergencyContacts = listOf(
-    EmergencyContact("Emergency (112)", "112"),
-    EmergencyContact("Ambulance (108)", "108"),
-    EmergencyContact("Women Helpline (181)", "181"),
-    EmergencyContact("Child Helpline (1098)", "1098"),
-    EmergencyContact("Health Helpline (104)", "104"),
-    EmergencyContact("Police (100)", "100"),
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmergencyScreen(
@@ -68,6 +59,15 @@ fun EmergencyScreen(
     onBack: () -> Unit,
 ) {
     val context = LocalContext.current
+
+    val emergencyContacts = listOf(
+        EmergencyContact(strings.emergencyContact112, "112"),
+        EmergencyContact(strings.ambulanceContact108, "108"),
+        EmergencyContact(strings.womenHelpline181, "181"),
+        EmergencyContact(strings.childHelpline1098, "1098"),
+        EmergencyContact(strings.healthHelpline104, "104"),
+        EmergencyContact(strings.policeContact100, "100"),
+    )
 
     // Intercept system back gesture so triageResult is cleared
     BackHandler(onBack = onBack)
@@ -118,7 +118,7 @@ fun EmergencyScreen(
                 ) {
                     Column(Modifier.padding(16.dp)) {
                         Text(
-                            text = "⚠️ Assessment Summary",
+                            text = "⚠️ ${strings.assessmentSummary}",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = EmergencyRed,
@@ -126,7 +126,7 @@ fun EmergencyScreen(
                         triageResult.specialist?.let {
                             Spacer(Modifier.height(8.dp))
                             Text(
-                                text = "Recommended Specialist: $it",
+                                text = "${strings.recommendedSpecialist}: $it",
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
                             )
@@ -134,7 +134,7 @@ fun EmergencyScreen(
                         triageResult.urgencyLevel?.let {
                             Spacer(Modifier.height(4.dp))
                             Text(
-                                text = "Urgency: ${it.replaceFirstChar { c -> c.uppercase() }}",
+                                text = "${strings.urgency}: ${it.replaceFirstChar { c -> c.uppercase() }}",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = EmergencyRed,
                                 fontWeight = FontWeight.Bold,
@@ -203,7 +203,7 @@ fun EmergencyScreen(
 
             // All emergency contacts
             Text(
-                text = "Emergency Numbers",
+                text = strings.emergencyNumbers,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
             )

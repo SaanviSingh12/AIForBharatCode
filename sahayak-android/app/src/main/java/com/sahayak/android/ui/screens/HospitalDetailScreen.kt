@@ -64,7 +64,7 @@ fun HospitalDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(hospital?.name ?: "Hospital Details") },
+                title = { Text(hospital?.name ?: strings.hospitalDetails) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = strings.back)
@@ -84,13 +84,14 @@ fun HospitalDetailScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = "Hospital not found",
+                    text = strings.hospitalNotFound,
                     style = MaterialTheme.typography.titleMedium,
                 )
             }
         } else {
             HospitalDetailContent(
                 hospital = hospital,
+                strings = strings,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
@@ -126,6 +127,7 @@ fun HospitalDetailScreen(
 @Composable
 private fun HospitalDetailContent(
     hospital: HospitalDto,
+    strings: com.sahayak.android.i18n.Strings,
     modifier: Modifier = Modifier,
     onOpenInMaps: () -> Unit,
     onCall: () -> Unit,
@@ -160,8 +162,8 @@ private fun HospitalDetailContent(
                         )
                         Spacer(Modifier.height(2.dp))
                         Text(
-                            text = if (hospital.type == "government") "Government Hospital"
-                            else "Private Hospital",
+                            text = if (hospital.type == "government") strings.governmentHospital
+                            else strings.privateHospital,
                             style = MaterialTheme.typography.labelMedium,
                             color = if (hospital.type == "government") GovernmentGreen
                             else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -176,28 +178,28 @@ private fun HospitalDetailContent(
         // ── Details section ──
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp)) {
-                DetailRow(label = "Specialist", value = hospital.specialist)
+                DetailRow(label = strings.specialist, value = hospital.specialist)
                 HorizontalDivider(Modifier.padding(vertical = 8.dp))
-                DetailRow(label = "Distance", value = "${hospital.distance} km away")
+                DetailRow(label = strings.distanceLabel, value = "${hospital.distance} ${strings.distance}")
                 HorizontalDivider(Modifier.padding(vertical = 8.dp))
                 DetailRow(
-                    label = "Fee",
-                    value = if (hospital.free) "FREE" else "₹${hospital.fee ?: "N/A"}",
+                    label = strings.fee,
+                    value = if (hospital.free) strings.freeUppercase else "₹${hospital.fee ?: strings.notAvailable}",
                     valueColor = if (hospital.free) GovernmentGreen else null,
                 )
                 HorizontalDivider(Modifier.padding(vertical = 8.dp))
                 DetailRow(
-                    label = "Emergency",
-                    value = if (hospital.hasEmergency) "Available" else "Not available",
+                    label = strings.emergencyLabel,
+                    value = if (hospital.hasEmergency) strings.available else strings.notAvailableStatus,
                     valueColor = if (hospital.hasEmergency) GovernmentGreen else EmergencyRed,
                 )
                 if (hospital.pmjayStatus.isNotBlank()) {
                     HorizontalDivider(Modifier.padding(vertical = 8.dp))
-                    DetailRow(label = "PMJAY Status", value = hospital.pmjayStatus)
+                    DetailRow(label = strings.pmjayStatus, value = hospital.pmjayStatus)
                 }
                 if (hospital.phone.isNotBlank()) {
                     HorizontalDivider(Modifier.padding(vertical = 8.dp))
-                    DetailRow(label = "Phone", value = hospital.phone)
+                    DetailRow(label = strings.phone, value = hospital.phone)
                 }
             }
         }
@@ -237,7 +239,7 @@ private fun HospitalDetailContent(
                 modifier = Modifier.size(22.dp),
             )
             Spacer(Modifier.width(8.dp))
-            Text("Open in Google Maps", style = MaterialTheme.typography.titleMedium)
+            Text(strings.openInGoogleMaps, style = MaterialTheme.typography.titleMedium)
         }
 
         Spacer(Modifier.height(12.dp))
@@ -257,7 +259,7 @@ private fun HospitalDetailContent(
                     modifier = Modifier.size(22.dp),
                 )
                 Spacer(Modifier.width(8.dp))
-                Text("Call Hospital", style = MaterialTheme.typography.titleMedium)
+                Text(strings.callHospital, style = MaterialTheme.typography.titleMedium)
             }
         }
     }

@@ -103,7 +103,7 @@ fun DoctorDetailsScreen(
                         fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        text = hospital.specialist.ifBlank { "General" },
+                        text = hospital.specialist.ifBlank { strings.general },
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary,
                     )
@@ -118,14 +118,14 @@ fun DoctorDetailsScreen(
                         if (hospital.hasEmergency) {
                             InfoChip(
                                 icon = Icons.Default.LocalHospital,
-                                text = "Emergency",
+                                text = strings.emergencyLabel,
                                 modifier = Modifier.weight(1f),
                             )
                         }
                         if (hospital.distance > 0) {
                             InfoChip(
                                 icon = Icons.Default.LocationOn,
-                                text = "${hospital.distance} km",
+                                text = "${hospital.distance} ${strings.distance}",
                                 modifier = Modifier.weight(1f),
                             )
                         }
@@ -141,15 +141,15 @@ fun DoctorDetailsScreen(
                         ),
                     ) {
                         Column(Modifier.padding(16.dp)) {
-                            DetailRow("Type", hospital.type.replaceFirstChar { it.uppercase() })
-                            DetailRow("Fee", if (hospital.free) strings.free else if (hospital.fee != null) "₹${hospital.fee}" else "N/A")
-                            DetailRow("PMJAY", when (hospital.pmjayStatus) {
-                                "empanelled" -> "✅ Empanelled"
-                                else -> "❌ Not Empanelled"
+                            DetailRow(strings.type, hospital.type.replaceFirstChar { it.uppercase() })
+                            DetailRow(strings.fee, if (hospital.free) strings.free else if (hospital.fee != null) "₹${hospital.fee}" else strings.notAvailable)
+                            DetailRow(strings.pmjay, when (hospital.pmjayStatus) {
+                                "empanelled" -> "✅ ${strings.empanelled}"
+                                else -> "❌ ${strings.notEmpanelled}"
                             })
-                            DetailRow("Emergency", if (hospital.hasEmergency) "✅ Available" else "❌ Not Available")
+                            DetailRow(strings.emergencyLabel, if (hospital.hasEmergency) "✅ ${strings.available}" else "❌ ${strings.notAvailableStatus}")
                             if (hospital.address.isNotBlank()) {
-                                DetailRow("Address", hospital.address)
+                                DetailRow(strings.address, hospital.address)
                             }
                         }
                     }
@@ -178,7 +178,7 @@ fun DoctorDetailsScreen(
                         ) {
                             Icon(Icons.Default.Map, contentDescription = null)
                             Spacer(Modifier.width(8.dp))
-                            Text("Open in Google Maps")
+                            Text(strings.openInGoogleMaps)
                         }
 
                         Spacer(Modifier.height(12.dp))
@@ -203,7 +203,7 @@ fun DoctorDetailsScreen(
                         ) {
                             Icon(Icons.Default.Map, contentDescription = null)
                             Spacer(Modifier.width(8.dp))
-                            Text("Open in Google Maps")
+                            Text(strings.openInGoogleMaps)
                         }
 
                         Spacer(Modifier.height(12.dp))

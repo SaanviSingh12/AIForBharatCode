@@ -11,6 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -34,6 +36,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import com.sahayak.android.data.model.UserProfile
 import com.sahayak.android.ui.SahayakViewModel
 
@@ -41,6 +45,7 @@ import com.sahayak.android.ui.SahayakViewModel
 @Composable
 fun UserProfileScreen(
     viewModel: SahayakViewModel,
+    onChangeLanguage: () -> Unit,
     onBack: () -> Unit,
 ) {
     val uiState by viewModel.state.collectAsState()
@@ -52,7 +57,7 @@ fun UserProfileScreen(
     var gender by rememberSaveable { mutableStateOf(profile.gender) }
     var genderExpanded by remember { mutableStateOf(false) }
 
-    val genderOptions = listOf("Male", "Female", "Other")
+    val genderOptions = listOf(strings.male, strings.female, strings.other)
 
     Scaffold(
         topBar = {
@@ -85,7 +90,7 @@ fun UserProfileScreen(
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Name") },
+                label = { Text(strings.name) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = MaterialTheme.shapes.medium,
@@ -96,7 +101,7 @@ fun UserProfileScreen(
             OutlinedTextField(
                 value = age,
                 onValueChange = { age = it },
-                label = { Text("Age") },
+                label = { Text(strings.age) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = MaterialTheme.shapes.medium,
@@ -113,7 +118,7 @@ fun UserProfileScreen(
                     value = gender,
                     onValueChange = { },
                     readOnly = true,
-                    label = { Text("Gender") },
+                    label = { Text(strings.gender) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = genderExpanded) },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -146,6 +151,21 @@ fun UserProfileScreen(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(strings.submit)
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            OutlinedButton(
+                onClick = onChangeLanguage,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Icon(
+                    Icons.Default.Language,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(strings.changeLanguage)
             }
         }
     }

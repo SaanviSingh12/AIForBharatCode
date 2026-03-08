@@ -164,7 +164,7 @@ fun HomeScreen(
 
         // ── Services section ──
         Text(
-            text = "Services",
+            text = strings.services,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.staggerAnim(2),
@@ -184,7 +184,7 @@ fun HomeScreen(
                 iconTint = Color(0xFF2196F3),
                 iconBg = Color(0xFF2196F3).copy(alpha = 0.12f),
                 title = strings.symptomChecker,
-                subtitle = "AI-Powered Analysis",
+                subtitle = strings.aiPoweredAnalysis,
                 onClick = onNavigateToSymptoms,
                 modifier = Modifier.weight(1f),
             )
@@ -193,7 +193,7 @@ fun HomeScreen(
                 iconTint = Color(0xFF4CAF50),
                 iconBg = Color(0xFF4CAF50).copy(alpha = 0.12f),
                 title = strings.findDoctors,
-                subtitle = "Govt and private doctors",
+                subtitle = strings.govtAndPrivateDoctors,
                 onClick = onNavigateToDoctors,
                 modifier = Modifier.weight(1f),
             )
@@ -211,7 +211,7 @@ fun HomeScreen(
                 iconTint = Color(0xFFFF9800),
                 iconBg = Color(0xFFFF9800).copy(alpha = 0.12f),
                 title = strings.prescriptionScan,
-                subtitle = "Find cheap generic medicines",
+                subtitle = strings.findCheapGenericMedicines,
                 onClick = onNavigateToPrescription,
                 modifier = Modifier.weight(1f),
             )
@@ -220,7 +220,7 @@ fun HomeScreen(
                 iconTint = Color(0xFF9C27B0),
                 iconBg = Color(0xFF9C27B0).copy(alpha = 0.12f),
                 title = strings.profile,
-                subtitle = "Your details",
+                subtitle = strings.yourDetails,
                 onClick = onNavigateToProfile,
                 modifier = Modifier.weight(1f),
             )
@@ -231,7 +231,7 @@ fun HomeScreen(
         // ── Government Schemes section ──
         Column(modifier = Modifier.staggerAnim(5)) {
         Text(
-            text = "Government Schemes",
+            text = strings.governmentSchemes,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
         )
@@ -246,14 +246,14 @@ fun HomeScreen(
         ) {
             Column(Modifier.padding(16.dp)) {
                 Text(
-                    text = "PM-JAY",
+                    text = strings.pmJay,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF1565C0),
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = "Ayushman Bharat – Free healthcare up to ₹5 lakhs.",
+                    text = strings.pmJayDescription,
                     style = MaterialTheme.typography.bodySmall,
                     color = Color(0xFF1976D2),
                 )
@@ -271,14 +271,14 @@ fun HomeScreen(
         ) {
             Column(Modifier.padding(16.dp)) {
                 Text(
-                    text = "Jan Aushadhi",
+                    text = strings.janAushadhi,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF2E7D32),
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = "Generic medicines at affordable prices. Save upto 85%.",
+                    text = strings.janAushadhiDescription,
                     style = MaterialTheme.typography.bodySmall,
                     color = Color(0xFF388E3C),
                 )

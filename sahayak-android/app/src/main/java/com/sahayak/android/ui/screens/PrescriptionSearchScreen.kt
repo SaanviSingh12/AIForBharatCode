@@ -183,13 +183,13 @@ fun PrescriptionSearchScreen(
                     Spacer(Modifier.width(16.dp))
                     Column {
                         Text(
-                            text = "Take Photo",
+                            text = strings.takePhoto,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                         )
                         Spacer(Modifier.height(2.dp))
                         Text(
-                            text = "Take photo of prescription from camera",
+                            text = strings.takePhotoDescription,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -208,7 +208,7 @@ fun PrescriptionSearchScreen(
                     icon = Icons.Default.Image,
                     iconTint = Color(0xFF2196F3),
                     iconBg = Color(0xFF2196F3).copy(alpha = 0.12f),
-                    title = "Upload from Gallery",
+                    title = strings.uploadFromGallery,
                     subtitle = null,
                     onClick = { imagePickerLauncher.launch("image/*") },
                     modifier = Modifier.weight(1f),
@@ -217,7 +217,7 @@ fun PrescriptionSearchScreen(
                     icon = Icons.Default.Medication,
                     iconTint = Color(0xFF4CAF50),
                     iconBg = Color(0xFF4CAF50).copy(alpha = 0.12f),
-                    title = "Browse Pharmacies",
+                    title = strings.browsePharmacies,
                     subtitle = null,
                     onClick = onPharmacyResults,
                     modifier = Modifier.weight(1f),
@@ -236,7 +236,7 @@ fun PrescriptionSearchScreen(
                     color = MaterialTheme.colorScheme.outlineVariant,
                 )
                 Text(
-                    text = "OR",
+                    text = strings.orDivider,
                     modifier = Modifier.padding(horizontal = 16.dp),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -308,14 +308,14 @@ fun PrescriptionSearchScreen(
                     Spacer(Modifier.width(14.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Did you know?",
+                            text = strings.didYouKnow,
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF2E7D32),
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            text = "Generic medicines at Jan Aushadhi Kendras save you up to 80% compared to branded medicines with the same quality!",
+                            text = strings.janAushadhiSavingsTip,
                             style = MaterialTheme.typography.bodySmall,
                             color = Color(0xFF388E3C),
                         )

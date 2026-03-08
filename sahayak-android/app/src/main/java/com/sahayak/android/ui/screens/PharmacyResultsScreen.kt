@@ -151,7 +151,7 @@ private fun PharmacyCard(
                         ),
                     ) {
                         Text(
-                            text = "Jan Aushadhi",
+                            text = strings.janAushadhi,
                             style = MaterialTheme.typography.labelSmall,
                             color = GovernmentGreen,
                             fontWeight = FontWeight.Bold,

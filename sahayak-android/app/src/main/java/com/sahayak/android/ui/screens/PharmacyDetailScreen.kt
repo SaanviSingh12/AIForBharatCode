@@ -77,7 +77,7 @@ fun PharmacyDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(pharmacy?.name ?: "Pharmacy Details") },
+                title = { Text(pharmacy?.name ?: strings.pharmacyDetails) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = strings.back)
@@ -97,13 +97,14 @@ fun PharmacyDetailScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = "Pharmacy not found",
+                    text = strings.pharmacyNotFound,
                     style = MaterialTheme.typography.titleMedium,
                 )
             }
         } else {
             PharmacyDetailContent(
                 pharmacy = pharmacy,
+                strings = strings,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
@@ -138,6 +139,7 @@ fun PharmacyDetailScreen(
 @Composable
 private fun PharmacyDetailContent(
     pharmacy: PharmacyDto,
+    strings: com.sahayak.android.i18n.Strings,
     modifier: Modifier = Modifier,
     onOpenInMaps: () -> Unit,
     onCall: () -> Unit,
@@ -194,9 +196,9 @@ private fun PharmacyDetailContent(
                         Spacer(Modifier.height(2.dp))
                         Text(
                             text = when (pharmacy.type) {
-                                "jan-aushadhi" -> "Jan Aushadhi Kendra"
-                                "government" -> "Government Pharmacy"
-                                else -> "Pharmacy"
+                                "jan-aushadhi" -> strings.janAushadhiKendra
+                                "government" -> strings.governmentPharmacy
+                                else -> strings.pharmacy
                             },
                             style = MaterialTheme.typography.labelMedium,
                             color = if (isJanAushadhi) GovernmentGreen
@@ -212,20 +214,20 @@ private fun PharmacyDetailContent(
         // ── Details section ──
         Card(modifier = Modifier.fillMaxWidth().sectionAnim(1)) {
             Column(Modifier.padding(16.dp)) {
-                DetailRow(label = "Distance", value = "${pharmacy.distance} km")
+                DetailRow(label = strings.distanceLabel, value = "${pharmacy.distance} ${strings.distance}")
                 if (pharmacy.timings.isNotBlank()) {
                     HorizontalDivider(Modifier.padding(vertical = 8.dp))
-                    DetailRow(label = "Timings", value = pharmacy.timings)
+                    DetailRow(label = strings.timings, value = pharmacy.timings)
                 }
                 if (pharmacy.phone.isNotBlank()) {
                     HorizontalDivider(Modifier.padding(vertical = 8.dp))
-                    DetailRow(label = "Phone", value = pharmacy.phone)
+                    DetailRow(label = strings.phone, value = pharmacy.phone)
                 }
                 if (isJanAushadhi) {
                     HorizontalDivider(Modifier.padding(vertical = 8.dp))
                     DetailRow(
-                        label = "Savings",
-                        value = "Up to 85% off brand prices",
+                        label = strings.savings,
+                        value = strings.savingsUpTo85,
                         valueColor = GovernmentGreen,
                     )
                 }
@@ -248,7 +250,7 @@ private fun PharmacyDetailContent(
                 )
                 Spacer(Modifier.width(12.dp))
                 Text(
-                    text = pharmacy.address.ifBlank { "Address not available" },
+                    text = pharmacy.address.ifBlank { strings.addressNotAvailable },
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }
@@ -269,7 +271,7 @@ private fun PharmacyDetailContent(
                     modifier = Modifier.size(22.dp),
                 )
                 Spacer(Modifier.width(8.dp))
-                Text("Open in Google Maps", style = MaterialTheme.typography.titleMedium)
+                Text(strings.openInGoogleMaps, style = MaterialTheme.typography.titleMedium)
             }
 
             // Call button
@@ -288,7 +290,7 @@ private fun PharmacyDetailContent(
                         modifier = Modifier.size(22.dp),
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text("Call Pharmacy", style = MaterialTheme.typography.titleMedium)
+                    Text(strings.callPharmacy, style = MaterialTheme.typography.titleMedium)
                 }
             }
         }

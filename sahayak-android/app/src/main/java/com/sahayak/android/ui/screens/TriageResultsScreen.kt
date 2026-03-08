@@ -106,7 +106,7 @@ fun TriageResultsScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = "No results available",
+                    text = strings.noResultsAvailable,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -162,7 +162,7 @@ fun TriageResultsScreen(
 
                         result.specialist?.let {
                             Text(
-                                text = "Recommended: $it",
+                                text = "${strings.recommended}: $it",
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -177,7 +177,7 @@ fun TriageResultsScreen(
                                 else -> GovernmentGreen
                             }
                             Text(
-                                text = "Urgency: $urgency",
+                                text = "${strings.urgency}: $urgency",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 color = urgencyColor,
@@ -199,7 +199,7 @@ fun TriageResultsScreen(
                     ) {
                         Column(Modifier.padding(16.dp)) {
                             Text(
-                                text = "Analysis",
+                                text = strings.analysis,
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                             )
@@ -237,7 +237,7 @@ fun TriageResultsScreen(
                             modifier = Modifier.size(20.dp),
                         )
                         Spacer(Modifier.width(8.dp))
-                        Text(if (isPlayingTts) strings.cancel else "🔊 Listen to Response")
+                        Text(if (isPlayingTts) strings.cancel else "🔊 ${strings.listenToResponse}")
                     }
                     Spacer(Modifier.height(16.dp))
                 }
@@ -246,7 +246,7 @@ fun TriageResultsScreen(
                 if (result.hospitals.isNotEmpty()) {
                     Column(modifier = Modifier.sectionAnim(3)) {
                     Text(
-                        text = "Nearby Hospitals",
+                        text = strings.nearbyHospitals,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                     )
@@ -257,7 +257,7 @@ fun TriageResultsScreen(
                             enter = fadeIn(tween(350, delayMillis = index * 60, easing = EaseOutCubic)) +
                                 slideInVertically(tween(350, delayMillis = index * 60, easing = EaseOutCubic)) { it / 3 },
                         ) {
-                            TriageHospitalCard(hospital, onClick = { onHospitalClick(hospital.id) })
+                            TriageHospitalCard(hospital, strings = strings, onClick = { onHospitalClick(hospital.id) })
                         }
                         Spacer(Modifier.height(8.dp))
                     }
@@ -269,7 +269,7 @@ fun TriageResultsScreen(
 }
 
 @Composable
-private fun TriageHospitalCard(hospital: HospitalDto, onClick: () -> Unit) {
+private fun TriageHospitalCard(hospital: HospitalDto, strings: com.sahayak.android.i18n.Strings, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -289,7 +289,7 @@ private fun TriageHospitalCard(hospital: HospitalDto, onClick: () -> Unit) {
                 )
                 if (hospital.type == "government") {
                     Text(
-                        text = "Govt",
+                        text = strings.govt,
                         style = MaterialTheme.typography.labelSmall,
                         color = GovernmentGreen,
                         fontWeight = FontWeight.Bold,
@@ -309,12 +309,12 @@ private fun TriageHospitalCard(hospital: HospitalDto, onClick: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = "${hospital.distance} km",
+                    text = "${hospital.distance} ${strings.distance}",
                     style = MaterialTheme.typography.labelSmall,
                 )
                 if (hospital.free) {
                     Text(
-                        text = "FREE",
+                        text = strings.freeUppercase,
                         style = MaterialTheme.typography.labelSmall,
                         color = GovernmentGreen,
                         fontWeight = FontWeight.Bold,

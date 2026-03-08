@@ -75,7 +75,7 @@ fun PrescriptionResultsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Medicine Results") },
+                title = { Text(strings.medicineResults) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = strings.back)
@@ -94,7 +94,7 @@ fun PrescriptionResultsScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = "No results available",
+                    text = strings.noResultsAvailable,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -162,7 +162,7 @@ fun PrescriptionResultsScreen(
                         Text(text = "💰", fontSize = 48.sp)
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            text = "You can save $animatedSavings%",
+                            text = "${strings.youCanSavePercent} $animatedSavings%",
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
                             color = SavingsGreen,
@@ -175,7 +175,7 @@ fun PrescriptionResultsScreen(
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
-                                    text = "Brand Cost",
+                                    text = strings.brandCost,
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -187,7 +187,7 @@ fun PrescriptionResultsScreen(
                             }
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
-                                    text = "Generic Cost",
+                                    text = strings.genericCost,
                                     style = MaterialTheme.typography.labelMedium,
                                     color = SavingsGreen,
                                 )
@@ -207,7 +207,7 @@ fun PrescriptionResultsScreen(
                 // ── Medicine list header ─────────────
                 Column(modifier = Modifier.sectionAnim(1)) {
                 Text(
-                    text = "Medicines (${result.medicines.size})",
+                    text = "${strings.medicinesCount} (${result.medicines.size})",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                 )
@@ -319,7 +319,7 @@ private fun ResultMedicineCard(
                         color = SavingsGreen,
                     )
                     Text(
-                        text = "Save ${medicine.savingsPercent}%",
+                        text = "${strings.savePercent} ${medicine.savingsPercent}%",
                         style = MaterialTheme.typography.labelSmall,
                         color = SavingsGreen,
                     )
