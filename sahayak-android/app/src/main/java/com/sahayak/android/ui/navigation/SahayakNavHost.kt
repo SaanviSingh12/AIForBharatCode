@@ -142,6 +142,7 @@ fun SahayakNavHost(
             TriageResultsScreen(
                 viewModel = viewModel,
                 onHospitalClick = { id -> navController.navigate(Routes.hospitalDetail(id)) },
+                onEmergencyDetected = { navController.navigate(Routes.EMERGENCY) },
                 onBack = {
                     viewModel.clearTriageResult()
                     navController.popBackStack()

@@ -26,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.VolumeUp
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -67,6 +68,7 @@ import kotlinx.coroutines.launch
 fun TriageResultsScreen(
     viewModel: SahayakViewModel,
     onHospitalClick: (String) -> Unit,
+    onEmergencyDetected: () -> Unit,
     onBack: () -> Unit,
 ) {
     val uiState by viewModel.state.collectAsState()
@@ -143,6 +145,82 @@ fun TriageResultsScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp),
             ) {
+                // ── Emergency detected card ──────────
+                if (result.isEmergency == true) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth().sectionAnim(0),
+                        colors = CardDefaults.cardColors(
+                            containerColor = EmergencyRed,
+                        ),
+                        shape = MaterialTheme.shapes.large,
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Warning,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(48.dp),
+                            )
+                            Spacer(Modifier.height(12.dp))
+                            Text(
+                                text = strings.emergencyDetected,
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                            )
+                            Spacer(Modifier.height(16.dp))
+
+                            // Symptom summary in white card
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = Color.White,
+                                ),
+                                shape = MaterialTheme.shapes.medium,
+                            ) {
+                                Text(
+                                    text = result.summary
+                                        ?: result.responseText ?: "",
+                                    modifier = Modifier.padding(16.dp),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = Color.Black,
+                                )
+                            }
+
+                            Spacer(Modifier.height(16.dp))
+
+                            // Wide "Go to Emergency Mode" button
+                            Button(
+                                onClick = { onEmergencyDetected() },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.White,
+                                    contentColor = EmergencyRed,
+                                ),
+                                shape = MaterialTheme.shapes.medium,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Warning,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp),
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    text = strings.goToEmergencyMode,
+                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.titleMedium,
+                                )
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(16.dp))
+                }
+
                 // ── Specialist recommendation banner ─────
                 Card(
                     modifier = Modifier.fillMaxWidth().sectionAnim(0),

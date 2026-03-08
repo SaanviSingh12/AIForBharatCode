@@ -117,9 +117,7 @@ fun SymptomEntryScreen(
     // Check for emergency redirect or navigate to results
     val triageResult = uiState.triageResult
     LaunchedEffect(triageResult) {
-        if (triageResult?.isEmergency == true) {
-            onEmergencyDetected()
-        } else if (triageResult != null && !hasNavigatedToResults) {
+        if (triageResult != null && !hasNavigatedToResults) {
             hasNavigatedToResults = true
             onTriageResults()
         }
