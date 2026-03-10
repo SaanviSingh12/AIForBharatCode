@@ -4,7 +4,7 @@ Sahayak is a mobile-first application that aims to make healthcare more accessib
 
 ## [Download the APK for the app here](https://github.com/SaanviSingh12/AIForBharatCode/releases/tag/v0.0.1)
 
-- Click on the app-debug.apk to download.
+- Click on the app-debug.apk on the [Releases page](https://github.com/SaanviSingh12/AIForBharatCode/releases/tag/v0.0.1) to download.
 - You may have to enable installation from unknown sources in your android settings.
 - Play Protect may warn you that the app is not trusted - this is expected, as our app is a *debug* version. It has not been signed yet.
 
